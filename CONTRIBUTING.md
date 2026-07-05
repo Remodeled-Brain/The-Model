@@ -46,3 +46,30 @@ New files never conflict; edits to one shared file do. `CHANGELOG.md` is assembl
 ## 7. Versions are git tags
 
 Do not create `v2/`, `v3/` folders inside `model/`. When a version is frozen, it gets a git tag and (if shipped to an external LLM) a copy under `packets/<version>/`.
+
+## 8. Syncing via GitHub — the shared remote
+
+The single source of truth is the private GitHub repo (`origin`). **Nextcloud (or any file-sync tool) must not sync this repo** — syncing a live `.git` across machines corrupts it. Keep the working copy in a plain local folder; sync only through GitHub.
+
+**Start of every session:**
+
+```
+git pull --rebase origin main
+```
+
+**After making changes:**
+
+```
+git add -A
+git commit -m "<what changed> (<provider>)"
+git push origin main
+```
+
+If your push is rejected because another machine/LLM pushed first, run `git pull --rebase origin main`, resolve any conflict, then push again. **Never force-push `main`.**
+
+**Cutting a version:** tag it and push the tag.
+
+```
+git tag v0.06        # example
+git push origin v0.06
+```
