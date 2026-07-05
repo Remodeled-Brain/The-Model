@@ -1,0 +1,1 @@
+- **[adopted]** Added `FABLE.md` bootstrap pointer and `providers/fable/` for Claude Fable 5 as a first-class reviewer (branch `fable/`, stress-test role). (claude, 2026-07-05)
