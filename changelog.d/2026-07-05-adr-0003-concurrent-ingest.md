@@ -1,0 +1,1 @@
+- **[candidate]** Added candidate ADR 0003 (concurrent multi-LLM ingest): replication-by-design, per-agent atomic records, and two early-stage comparison checkpoints (heavy post-ingest "thunderdome" + light post-weighting check that retires itself once weighting stabilizes). (claude, 2026-07-05)
