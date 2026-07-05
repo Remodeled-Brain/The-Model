@@ -31,4 +31,7 @@ Material is **candidate** until explicitly approved, then **adopted**. See `CONT
 
 ## Start here if you are an LLM
 
-Read `CONTRIBUTING.md`, then `model/00_readme_for_llms.md`.
+Read `CONTRIBUTING.md`, then `model/00_readme_for_llms.md`.## Remote
+
+`origin` = private GitHub repo **`Remodeled-Brain/The-Model`** (https://github.com/Remodeled-Brain/The-Model). See `decisions/0002-repo-location-and-sync.md`.
+

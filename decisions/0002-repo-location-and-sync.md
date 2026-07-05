@@ -22,3 +22,7 @@ The Model is worked on by several LLMs across machines. An earlier setup placed 
 ## Propagation
 
 Because this changes a project-wide fact, it is recorded here and referenced from `README.md` and the bootstrap files (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`) so any LLM re-reading the repo picks it up. Other LLMs already in flight (e.g. ChatGPT) must be pointed at this ADR to correct their assumption.
+
+## Remote
+
+`origin` is the private GitHub repo **`Remodeled-Brain/The-Model`** - https://github.com/Remodeled-Brain/The-Model . All machines clone/pull/push against it. The local `origin` URL embeds the account username (`https://Remodeled-Brain@github.com/Remodeled-Brain/The-Model.git`) so Windows Credential Manager selects the correct account's token instead of another cached GitHub account.
