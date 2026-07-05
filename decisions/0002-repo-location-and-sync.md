@@ -9,7 +9,7 @@ The Model is worked on by several LLMs across machines. An earlier setup kept th
 
 ## Decision
 
-1. **Canonical working copy lives at `C:\Users\david\Documents\The Model`** — a plain local folder that is **not** inside any cloud file-sync folder.
+1. **Canonical working copy lives at `%USERPROFILE%\Documents\The Model`** — a plain local folder that is **not** inside any cloud file-sync folder.
 2. **Cross-machine sync is via a private GitHub repo (`origin`) only.** No file-sync tool may sync the repo, and especially not `.git`.
 3. The local path may differ on other machines, but the **sync source of truth is always the GitHub remote**, not a synced folder.
 

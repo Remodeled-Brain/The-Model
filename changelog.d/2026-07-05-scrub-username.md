@@ -1,0 +1,1 @@
+- **[adopted]** Scrubbed local Windows username from repo docs; paths now use `%USERPROFILE%\...` so the repo is safe to share for external review. (claude, 2026-07-05)

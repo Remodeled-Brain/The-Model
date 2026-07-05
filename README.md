@@ -23,7 +23,7 @@ Versions are **git tags** (e.g. `v0.05-v4`), not `v1/ v2/` folders. The current 
 
 ## Location & sync
 
-The canonical working copy lives at `C:\Users\david\Documents\The Model` — a plain local folder, **not** inside any cloud file-sync folder (syncing a live `.git` corrupts it). Cross-machine sync is through the private GitHub remote only. See `decisions/0002-repo-location-and-sync.md`.
+The canonical working copy lives at `%USERPROFILE%\Documents\The Model` — a plain local folder, **not** inside any cloud file-sync folder (syncing a live `.git` corrupts it). Cross-machine sync is through the private GitHub remote only. See `decisions/0002-repo-location-and-sync.md`.
 
 ## Canonical vs candidate
 

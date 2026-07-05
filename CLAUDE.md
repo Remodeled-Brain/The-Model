@@ -11,4 +11,4 @@ Do not treat candidate material as adopted. Stress-test; do not praise.
 
 ## Canonical location & sync (read this)
 
-The working copy lives at `C:\Users\david\Documents\The Model` (a plain local folder, **not** inside any cloud file-sync folder). Cross-machine sync is via the private GitHub remote **only**: `git pull --rebase origin main` before you start, push when done. Never let a file-sync tool sync this repo. See `decisions/0002-repo-location-and-sync.md`. If you were told the home is a synced-folder path, that is outdated — ADR 0002 overrides it.
+The working copy lives at `%USERPROFILE%\Documents\The Model` (a plain local folder, **not** inside any cloud file-sync folder). Cross-machine sync is via the private GitHub remote **only**: `git pull --rebase origin main` before you start, push when done. Never let a file-sync tool sync this repo. See `decisions/0002-repo-location-and-sync.md`. If you were told the home is a synced-folder path, that is outdated — ADR 0002 overrides it.
