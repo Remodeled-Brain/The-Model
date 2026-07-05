@@ -1,0 +1,19 @@
+{
+  "packet": "v0_05_v4_porting_packet",
+  "status": "candidate",
+  "created": "2026-07-05",
+  "files": [
+    "00_readme_for_llms.md",
+    "01_version_goals_and_non_goals.md",
+    "02_runtime_behavior_contract.md",
+    "03_ingest_architecture.yaml",
+    "04_candidate_rule_adoption_gate.yaml",
+    "05_failure_semantics_and_weight_caps.yaml",
+    "06_candidate_ingest_rules_reference.yaml",
+    "07_fixtures_and_regression_tests.md",
+    "08_prompt_harness.md",
+    "09_changelog_candidate.md",
+    "10_single_file_master_prompt.txt"
+  ],
+  "zip": "/mnt/data/v0_05_v4_porting_packet.zip"
+}

@@ -1,0 +1,1 @@
+- **[adopted]** Created repo scaffold: canonical `model/`, frozen `packets/v0.05-v4/`, `providers/`, `conformance/`, `decisions/`, fragment changelog, provider pointer files. (scaffold, 2026-07-05)

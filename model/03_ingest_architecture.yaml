@@ -1,0 +1,131 @@
+v0_05_v4_ingest_architecture:
+  status: candidate
+  layer: paper_ingest
+  purpose: >
+    Increase ingest rigor and internal consistency by catching folklore,
+    regionalization, proxy-promotion, practical-significance inflation,
+    chain breaks, and spectrum compression before node mapping.
+
+  core_principle:
+    name: INGEST.PRINCIPLE.05v4
+    definition: >
+      Ingestion begins by stripping folklore and regional interface text. Only the
+      physically measured substrate, demonstrated variable, causal route, and surviving
+      residue may map to model nodes. Diagnostic labels, region labels, biomarker labels,
+      spectrum labels, and conserved-region labels are handles only. They cannot perform
+      causal work.
+    ordering_rule: >
+      Folklore filters fire before validation gates. Validation evaluates evidentiary
+      strength only after the source generates an admissible physical claim.
+
+  ingest_order:
+    - strip_author_interface_text
+    - run_folklore_filters
+    - run_region_as_implementation_filter
+    - run_label_removal_residue_test
+    - run_proxy_promotion_gate
+    - run_chain_closure_gate
+    - run_conservation_dependency_gate
+    - map_surviving_residue_to_nodes
+    - write_support_layer_only
+    - mark_promotion_candidates_only_after_gates_pass
+
+  stage_logic:
+    strip_author_interface_text:
+      output:
+        - raw_measured_substrate
+        - raw_measured_variable
+        - author_claim_terms_removed_or_marked
+
+    run_folklore_filters:
+      applies:
+        - diagnostic_label_filter
+        - spectrum_compression_filter
+        - controller_language_filter
+        - biomarker_status_filter
+        - clinical_promise_filter
+      output:
+        - label_dependencies
+        - folklore_residue
+
+    run_region_as_implementation_filter:
+      output:
+        - implementation_site
+        - source_status
+        - timing_dependency_requirements
+
+    run_label_removal_residue_test:
+      output:
+        - claim_after_label_removal
+        - residue_after_label_removal
+        - node_mapping_allowed_or_blocked
+
+    run_proxy_promotion_gate:
+      output:
+        - proxy_status
+        - measured_variable_limit
+        - translation_limit
+
+    run_chain_closure_gate:
+      applies:
+        - same_input_different_output
+        - controlled_frame_intensifier
+        - practical_significance_gate
+        - temporality_gate
+      output:
+        - causal_frame_status
+        - missing_route_slots
+        - chain_closure_status
+
+    run_conservation_dependency_gate:
+      output:
+        - conserved_operation
+        - dependency_relation
+        - maintenance_route
+        - conservation_priority_status
+
+    map_surviving_residue_to_nodes:
+      input_required:
+        - measured_substrate
+        - measured_variable
+        - claim_after_label_removal
+        - proxy_status
+        - chain_closure_status
+        - translation_limit
+
+    write_support_layer_only:
+      allowed_writes:
+        - evidence
+        - provenance
+        - paper_links
+        - extraction_notes
+        - disconfirmation_notes
+        - method_notes
+        - category_failure_notes
+        - proxy_status_notes
+        - missing_route_notes
+        - source_tree_handles
+        - watch_items
+        - promotion_candidates
+        - promotion_gate_results
+
+    mark_promotion_candidates_only_after_gates_pass:
+      blocked_if:
+        - no_claim_after_label_removal
+        - causal_route_unclosed
+        - proxy_promoted_to_mechanism
+        - diagnostic_label_required_for_mapping
+        - region_label_required_for_origin
+        - conservation_used_as_weight
+
+  validator_invariants:
+    ingest_order_required: true
+    folklore_filters_before_validation_gates: true
+    node_mapping_requires_surviving_residue: true
+    support_layer_only_during_ingest: true
+    promotion_candidate_requires_prior_gates_passed: true
+    diagnostic_label_can_group_but_cannot_ground: true
+    region_label_cannot_supply_origin: true
+    conservation_priority_cannot_feed_weight_directly: true
+    analytical_significance_cannot_feed_weight_directly: true
+    failed_gate_routes_claim_to_lower_weight_channel_by_default: true

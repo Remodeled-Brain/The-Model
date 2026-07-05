@@ -1,0 +1,109 @@
+INGEST.GATE_FAILURE_ROUTING.05v4:
+  status: candidate
+  layer: paper_ingest
+  purpose: >
+    Clarify that ingest gates change what a source may support. They do not discard
+    papers by default.
+
+  rule: >
+    Gate failure changes what a source may support. It does not remove the source
+    from ingest by default. Failed criteria route the source into attenuated support
+    channels, method notes, proxy-only evidence, category-failure notes, missing-route
+    slots, disconfirmation notes, or source-tree handles. Direct node grounding and
+    promotion require gate passage.
+
+  default_failed_gate_result:
+    paper_record: keep
+    support_layer: write
+    direct_node_grounding: deny_or_cap
+    promotion_candidate: deny
+    weight: attenuate_to_channel_cap
+
+  failure_target:
+    - claim_role
+    - node_grounding_permission
+    - promotion_permission
+    - weight_channel
+    - translation_status
+
+  preserved_outputs:
+    - provenance
+    - extraction_notes
+    - proxy_status
+    - method_notes
+    - category_failure_notes
+    - missing_route_notes
+    - disconfirmation_notes
+    - source_tree_handles
+    - watch_items
+
+  failed_criterion_routes:
+    no_label_stripped_residue:
+      route_to:
+        - category_failure_note
+        - extraction_note
+      weight_effect: no_direct_node_grounding
+
+    diagnostic_label_required_for_claim:
+      route_to:
+        - label_dependent_observation
+        - cohort_grouping_note
+      weight_effect: severe_attenuation
+
+    proxy_promoted_to_mechanism:
+      route_to:
+        - proxy_only_evidence
+        - translation_limit_note
+      weight_effect: capped_by_proxy_status
+
+    practical_significance_not_established:
+      route_to:
+        - assay_level_difference
+        - magnitude_or_noise_floor_missing
+      weight_effect: no_biological_or_clinical_weight
+
+    same_input_different_output_unresolved:
+      route_to:
+        - missing_differentiator_slot
+        - incomplete_causal_frame
+      weight_effect: no_category_clarity_weight
+
+    controlled_frame_with_remaining_divergence:
+      route_to:
+        - missing_route_exposed_by_control
+      weight_effect: intensified_route_burden
+
+    region_as_source_unclosed:
+      route_to:
+        - implementation_site_observation
+        - perturbation_leverage_note
+      weight_effect: no_origin_weight
+
+    conservation_without_dependency:
+      route_to:
+        - conservation_handle
+        - source_tree_priority_only
+      weight_effect: no_causal_weight
+
+  hard_zero_scope:
+    postdictive_claim:
+      zeroes:
+        - prediction_weight
+        - direct_node_grounding
+      preserves:
+        - provenance
+        - extraction_note
+        - source_tree_handle
+
+    no_mechanistic_residue:
+      zeroes:
+        - mechanism_mapping
+        - promotion_candidate
+      preserves:
+        - label_failure_note
+        - assay_observation_if_any
+
+  compact_principle:
+    folklore_filters_before_validation:
+      effect: classify_and_cap
+      not_effect: discard_by_default

@@ -1,0 +1,248 @@
+candidate_ingest_rules_reference:
+  status: candidate
+  layer: pre_node_mapping
+  note: >
+    These rules should be evaluated and consolidated before integration. They are
+    best treated as a candidate ingest-admissibility cluster rather than many unrelated
+    top-level rules.
+
+  v0_05_v4_candidate_ingest_rules:
+    purpose: >
+      Increase ingest rigor and internal consistency by catching folklore, regionalization,
+      proxy-promotion, practical-significance inflation, and spectrum compression before
+      node mapping.
+
+    global_shift:
+      from:
+        - rigid regional priority
+        - brainstem-first as default interpretive route
+        - anatomical region treated as causal origin
+      to:
+        - conserved dependency first
+        - maintenance-route first
+        - demonstrated causal chain first
+        - region as implementation site, not explanatory source
+
+    terminology_guard:
+      avoid_promoting:
+        - brainstem-first
+        - cortex-first
+        - basal-ganglia controller
+        - cerebellum module
+        - region X does function Y
+        - highly conserved region as standalone explanation
+      prefer:
+        - conserved maintenance substrate
+        - conserved dependency node
+        - routed maintenance implementation
+        - transition-control surface
+        - downstream gating surface
+        - stabilization route
+        - measured substrate and demonstrated causal route
+
+  LABEL_REMOVAL_RESIDUE_TEST:
+    trigger: always_during_paper_ingest
+    rule: Remove author labels and ask what physical claim remains.
+    strip:
+      - diagnosis labels
+      - biomarker status
+      - disease names as causal objects
+      - clinical promise language
+      - spectrum generalization
+      - controller/command/decision language
+      - region-does-function language
+      - folklore cognitive labels
+      - anatomical prestige language
+      - proxy-as-mechanism language
+    required_questions:
+      - What substrate was measured?
+      - What variable changed?
+      - What causal route was demonstrated?
+      - What claim remains if labels are unavailable?
+      - Does the result still map to a model node after stripping?
+      - What residue depends on the removed labels?
+    failure_effect:
+      - no_direct_node_grounding
+      - no_promotion_candidate
+      - route_to_category_failure_or_extraction_note
+    fail_if:
+      - no mechanistic claim survives label removal
+
+  FOLKLORE_FILTER_DIAGNOSTIC_LABEL:
+    trigger:
+      - diagnostic category used as causal object
+      - clinical label used to organize measurement
+      - disease/syndrome label treated as the thing measured
+    rule: >
+      Diagnostic labels are handles. They may organize a paper's cohort description,
+      but they cannot enter the mechanism as causal objects.
+    fail_if:
+      - assay cannot generate diagnostic distinction without prior labels
+      - label is imported before measurement and then credited as discovered by measurement
+      - label substitutes for developmental route
+    required_output:
+      - measured_substrate
+      - measured_variable
+      - grouping_variable
+      - claim_after_label_stripping
+      - residual_label_dependence
+    failure_effect:
+      - severe_weight_attenuation
+      - no_direct_node_grounding
+      - support_layer_label_dependent_observation
+
+  REGION_AS_IMPLEMENTATION_NOT_SOURCE:
+    trigger:
+      - region X controls Y
+      - region X generates Y
+      - region X is responsible for Y
+      - brainstem/cortex/cerebellum/basal-ganglia-first framing
+    rule: >
+      A region is treated as an implementation site unless the paper demonstrates
+      source, dependency position, and causal direction.
+    fail_if:
+      - activity in a region is treated as origin
+      - perturbability is treated as origin
+      - downstream deformation is treated as upstream generation
+      - conserved-region language substitutes for route evidence
+    rewrite_to:
+      - measured activity at implementation site
+      - perturbation leverage at implementation site
+      - causal origin unresolved unless timing/dependency controls close the route
+    failure_effect:
+      - no_origin_weight
+      - implementation_site_observation_only
+
+  CONSERVATION_DEPENDENCY_RULE:
+    definition: >
+      Conservation increases ingest priority only when the paper identifies a conserved
+      operation, dependency, or maintenance route. Conservation alone does not establish
+      causal origin.
+    pass_if:
+      - conserved structure is tied to a demonstrated operation
+      - perturbation shows dependency position
+      - downstream structures lose explanatory power after conserved-route variables are controlled
+      - causal timing runs from conserved maintenance route to later differentiated route
+    fail_if:
+      - highly conserved is used as prestige language
+      - conserved region is named but causal work is assigned to a later folk construct
+      - anatomical age is treated as causal sufficiency
+      - a late structure is called the controller without controlling upstream conserved-route variables
+    rewrite_to:
+      - identify the conserved operation
+      - identify the dependency relation
+      - identify the maintenance route
+      - identify the measured causal direction
+    invariants:
+      conservation_can_prioritize_ingest: true
+      conservation_can_supply_weight: false
+      conservation_can_supply_origin: false
+
+  CHAIN_BREAK_SAME_INPUT_DIFFERENT_OUTPUT:
+    trigger:
+      - same mutation, different phenotype
+      - controlled environment, different outcome
+      - same input, divergent result
+      - genetically matched or controlled conditions used to imply diagnostic clarity
+    rule: >
+      Same-input/different-output is not an explanation. It marks the input set as incomplete
+      unless the differentiating causal variable is identified.
+    fail_if:
+      - divergence is renamed as diagnosis
+      - divergence is treated as evidence for the category
+      - missing variable is not investigated
+      - controlled sameness is used to strengthen a diagnostic claim without closing the causal route
+    rewrite_to:
+      - missing differentiating variable
+      - incomplete causal frame
+      - divergent developmental stabilization route not identified
+    failure_effect:
+      - missing_differentiator_slot
+      - no_category_clarity_weight
+
+  CONTROLLED_FRAME_INTENSIFIER:
+    trigger:
+      - controlled assay conditions
+      - controlled environment
+      - shared mutation
+      - matched samples
+      - iPSC model described as removing confounds
+    rule: >
+      Removing environmental variance intensifies the demand to explain remaining divergence.
+      It does not license a diagnostic leap.
+    fail_if:
+      - controlled sameness is treated as explanatory completeness
+      - paper uses controlled conditions to imply category specificity
+      - remaining divergence is not traced to a causal route
+    rewrite_to:
+      - controlled frame exposes missing route
+      - unexplained divergence means the model's input set is incomplete
+    failure_effect:
+      - intensified_route_burden
+      - missing_route_exposed_by_control
+
+  PRACTICAL_SIGNIFICANCE_GATE:
+    trigger:
+      - statistically significant
+      - analytical significance
+      - fold difference
+      - nanosensor readout
+      - p-value or significant difference language
+    rule: >
+      Analytical separability does not establish practical, biological, or clinical significance.
+    fail_if:
+      - no variance envelope
+      - no noise floor
+      - no effect-size interpretation
+      - no biological range
+      - no clinical threshold when clinical relevance is claimed
+      - no replication across samples, clones, batches, or cohorts
+    rewrite_to:
+      - assay-level difference only
+      - practical significance not established
+    failure_effect:
+      - assay_level_difference
+      - no_biological_or_clinical_weight_without_range_magnitude_replication_and_route
+
+  PROXY_PROMOTION_GATE:
+    status: implied_candidate
+    rule: >
+      A proxy, biomarker, assay readout, or measured correlate cannot become mechanism without
+      translation controls and a demonstrated route.
+    fail_if:
+      - proxy is treated as mechanism
+      - biomarker status substitutes for causal route
+      - measured variable is promoted beyond its assay level
+      - translation limit is not stated
+    failure_effect:
+      - proxy_only_evidence
+      - translation_cap
+      - no_direct_node_grounding_if_mechanism_depends_on_proxy_status
+
+  SPECTRUM_COMPRESSION_FILTER:
+    status: implied_candidate
+    rule: >
+      A spectrum label cannot compress heterogeneous developmental or mechanistic routes
+      into one causal point.
+    fail_if:
+      - spectrum is treated as one causal object
+      - divergent routes are absorbed into a single diagnostic continuum
+      - label supplies unity that measurement did not generate
+    failure_effect:
+      - category_failure_note
+      - route_heterogeneity_note
+      - no_single-node_grounding_without_route_split
+
+  CONTROLLER_LANGUAGE_FILTER:
+    status: implied_candidate
+    rule: >
+      Controller, command, decision, and coordination language must be rewritten into
+      measured interaction, dependency, route, balance, gating, or release terms before
+      mechanism mapping.
+    fail_if:
+      - controller language supplies hidden operator
+      - decision language replaces chain generation
+      - command language assigns source without route evidence
+    failure_effect:
+      - rewrite_required
+      - no_mechanism_mapping_until_operator_removed
