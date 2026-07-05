@@ -8,3 +8,7 @@ You are working on **The Model**, a platform-agnostic scaffold shared across mul
 4. Log any change as a new fragment in `changelog.d/` — do not edit `CHANGELOG.md` directly.
 
 Do not treat candidate material as adopted. Stress-test; do not praise.
+
+## Canonical location & sync (read this)
+
+The working copy lives at `C:\Users\david\Documents\The Model` (a plain local folder, **not** inside Nextcloud or any sync tool). Cross-machine sync is via the private GitHub remote **only**: `git pull --rebase origin main` before you start, push when done. Never sync the repo through Nextcloud. See `decisions/0002-repo-location-and-sync.md`. If you were told the home is a Nextcloud path, that is outdated — ADR 0002 overrides it.

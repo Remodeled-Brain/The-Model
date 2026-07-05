@@ -21,6 +21,10 @@ A platform-agnostic scaffold ("The Model / Remodeled Brain") developed collabora
 
 Versions are **git tags** (e.g. `v0.05-v4`), not `v1/ v2/` folders. The current living version is in `model/`; the exact bytes shipped for a given version are in `packets/<version>/`.
 
+## Location & sync
+
+The canonical working copy lives at `C:\Users\david\Documents\The Model` — a plain local folder, **not** inside Nextcloud or any file-sync tool (syncing a live `.git` corrupts it). Cross-machine sync is through the private GitHub remote only. See `decisions/0002-repo-location-and-sync.md`.
+
 ## Canonical vs candidate
 
 Material is **candidate** until explicitly approved, then **adopted**. See `CONTRIBUTING.md` and `model/04_candidate_rule_adoption_gate.yaml`. An assisting LLM must never treat candidate rules as integrated.
