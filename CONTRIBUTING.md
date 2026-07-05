@@ -49,7 +49,7 @@ Do not create `v2/`, `v3/` folders inside `model/`. When a version is frozen, it
 
 ## 8. Syncing via GitHub — the shared remote
 
-The single source of truth is the private GitHub repo (`origin`). **Nextcloud (or any file-sync tool) must not sync this repo** — syncing a live `.git` across machines corrupts it. Keep the working copy in a plain local folder; sync only through GitHub.
+The single source of truth is the private GitHub repo (`origin`). **No file-sync tool may sync this repo** — syncing a live `.git` across machines corrupts it. Keep the working copy in a plain local folder; sync only through GitHub.
 
 **Start of every session:**
 

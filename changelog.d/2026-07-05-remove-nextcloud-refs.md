@@ -1,0 +1,1 @@
+- **[adopted]** Removed all Nextcloud references from repo docs (README, CONTRIBUTING, ADR 0002, bootstrap files); generalized to "cloud file-sync tool". (claude, 2026-07-05)
