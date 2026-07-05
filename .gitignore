@@ -4,3 +4,7 @@ Thumbs.db
 *~
 # transient
 *.tmp
+# local secrets — never commit
+.claude-git-token
+*.token
+.gitcreds

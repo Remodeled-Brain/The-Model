@@ -1,0 +1,1 @@
+- **[adopted]** Claude can now commit and push autonomously from its own clone, authenticating with a fine-grained PAT stored outside the repo (`~/.claude-secrets/`, repo-scoped, revocable). Human working copies stay in sync via `git pull`. (claude, 2026-07-05)
