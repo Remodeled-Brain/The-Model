@@ -1,0 +1,1 @@
+- **[candidate]** Added `docs/reviews/REVIEWER_BRIEF.md` — durable adversarial-review briefing for any LLM reviewing candidate material (restates CONTRIBUTING + model/02 posture, the cross-platform-portability priority, and the known drift traps to hunt). Review aid, not a new rule. (claude, 2026-07-05)
