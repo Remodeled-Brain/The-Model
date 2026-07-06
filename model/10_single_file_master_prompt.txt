@@ -68,7 +68,7 @@ The foundation for this version is:
 - conserved dependency
 - routed maintenance
 - demonstrated causal chain
-- folklore-stripped residue
+- the folklore-stripped physical claim (`post_strip_claim`)
 
 ## Global shift
 
@@ -88,7 +88,7 @@ Move to:
 - demonstrated causal chain first
 - region as implementation site unless source is demonstrated
 - diagnostic, biomarker, spectrum, and region labels as handles only
-- physical residue before node mapping
+- `post_strip_claim` before node mapping
 
 ## Core principle
 
@@ -100,7 +100,7 @@ Validation evaluates evidentiary strength only after the source generates an adm
 
 INGEST.PRINCIPLE.05v4:
 
-Ingestion begins by stripping folklore and regional interface text. Only the physically measured substrate, demonstrated variable, causal route, and surviving residue may map to model nodes. Diagnostic labels, region labels, biomarker labels, spectrum labels, and conserved-region labels are handles only. They cannot perform causal work.
+Ingest runs in two phases. Phase A (admissibility) strips folklore and regional interface text and extracts claim fields — measured substrate, measured variable, grouping variable, and the `post_strip_claim` that remains once labels are treated as handles. Phase B (validation) then weights evidence and assigns a role. Only the extracted `post_strip_claim` may map to model nodes, and only after Phase B. Diagnostic labels, region labels, biomarker labels, spectrum labels, and conserved-region labels are handles only. They cannot perform causal work.
 
 ## Non-goals
 
@@ -296,7 +296,11 @@ v0_05_v4_ingest_architecture:
         - grouping_variable
         - post_strip_claim
         - handle_dependencies
-      claim_form: see model/06 post_strip_claim_form (candidate; slots the post_strip_claim)
+        - handle_flags   # structural markers (e.g. label_precedes_measurement) adjudicated in Phase B
+      phase_A_is_structural: >
+        Phase A raises handle_flags but does not adjudicate them. It fails admissibility only when no
+        post_strip_claim survives handle removal. All evidentiary judgment is deferred to Phase B.
+      claim_form: see model/06 post_strip_claim_form (reserved_for_v0_07)
       admissibility_verdict:
         admissible_if: a post_strip_claim exists after handles are removed
         inadmissible_if: no physical claim survives handle removal
@@ -312,6 +316,10 @@ v0_05_v4_ingest_architecture:
       - proxy_promotion                              # proxy != mechanism without translation controls
       - practical_significance                       # analytical separability != biological/clinical weight
       - controlled_sameness_missing_differentiator   # merged chain-break + controlled-frame
+    adjudicates_handle_flags: >
+      Phase B consumes the handle_flags raised in Phase A (e.g. label_precedes_measurement,
+      region_used_as_origin, proxy_present) and decides role and weight from them. The flags are the
+      evidentiary questions; Phase A only recorded them.
     interaction_note: >
       region_source_closure and conservation_dependency can affect each other; both run on the
       already-extracted claim fields before roles are assigned, so ordering between them does not
@@ -363,7 +371,11 @@ v0_05_v4_ingest_architecture:
   validator_invariants:
     two_phase_order_required: true
     phase_A_admissibility_before_phase_B_validation: true
-    admissibility_is_structural_not_evidentiary: true
+    admissibility_flags_in_phase_A_evidentiary_adjudication_in_phase_B: true
+    # Phase A records handle_flags (structural markers) and decides only whether a post_strip_claim
+    # exists; the evidentiary predicates behind those flags are adjudicated by Phase B gates, not A.
+    # (Deeper follow-up: relabel 06 handle_types `fail_if` -> `flags` and move any predicate that
+    #  weighs method/route evidence to its Phase B gate. Tracked as an open item.)
     node_mapping_requires_post_strip_claim: true
     support_layer_only_during_ingest: true
     promotion_candidate_requires_prior_gates_passed: true
@@ -492,6 +504,7 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
 
   # --- v0.05 v4 revision: positive support types on an ordered ladder ---
   support_type_ladder:
+    status: reserved_for_v0_07   # forward-declaration; the weighting/grounding consumer is not designed yet
     note: >
       Ordered strongest to weakest role. A gate result assigns a level; "not established" means
       "capped at or below the named level," not free discretion. Levels are named, not numeric;
@@ -537,23 +550,29 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
 
   gate_intersection_semantics:
     status: candidate
-    purpose: Deterministic result when several gates fail on one source; keep support info, cap safely.
+    purpose: Deterministic result when several gates apply to one source; keep support info, cap safely.
     rule: >
-      Failed-gate routes accumulate (union of notes; no support-layer information lost), but
-      support cap, node-grounding permission, and promotion permission collapse to the most
-      restrictive surviving value.
+      Failed-gate routes accumulate (union of notes; no support-layer information lost). Permissions
+      intersect: node-grounding and promotion are denied if ANY applicable gate denies them. Only a
+      `fail` denies; `not_applicable` and `unresolved` (see record_schema gate_results) do not.
     notes: accumulate
     permissions:
-      support_weight: min_across_failed_gates
-      node_grounding: denied_if_any_gate_denies
-      promotion: denied_if_any_gate_denies
+      node_grounding: denied_if_any_applicable_gate_fails
+      promotion: denied_if_any_applicable_gate_fails
+    support_cap:
+      note: >
+        There is no single scalar minimum across gates — support-channel outputs are unrelated
+        strings on orthogonal dimensions (e.g. proxy_only vs implementation_site_observation), so no
+        total order exists. Each failing gate imposes its own channel cap independently; a source
+        carries every cap that applies. Do not attempt a numeric min across them.
     example:
       failed_gates: [region_source_closure, conservation_dependency, proxy_promotion]
       notes_accumulated: [implementation_site_observation, conservation_handle, proxy_only_evidence]
-      result: {causal_weight: none, node_grounding: denied, promotion: denied}
+      caps_applied: [no_origin_weight, no_causal_weight, capped_by_proxy_status]
+      result: {node_grounding: denied, promotion: denied}
 
   visibility_priority_cap:
-    status: candidate
+    status: reserved_for_v0_07   # invariant is sound but its consumer (priority ranking) is deferred
     purpose: Prevent a large folklore-biased literature from hijacking ingest priority.
     rule: >
       Descriptive volume raises watchlist visibility only. A body of label-dependent,
@@ -716,7 +735,7 @@ candidate_ingest_rules_reference:
       (post_strip_claim) separate.
 
   post_strip_claim_form:
-    status: candidate
+    status: reserved_for_v0_07   # slot taxonomy is promising but its consumer (node mapping) is deferred
     purpose: >
       Force support-bearing claims into physical slots so a natural-language post_strip_claim
       cannot launder a hidden causal operator after labels are removed. Slottability is the
@@ -761,6 +780,13 @@ candidate_ingest_rules_reference:
       - grouping_variable
       - post_strip_claim
       - handle_dependencies
+      - handle_flags
+    handle_condition_semantics: >
+      Within handle_types below, the listed conditions are FLAGS raised in Phase A, not Phase A
+      failures. Phase A is structural: it fails admissibility only when no post_strip_claim survives
+      handle removal. The flags (e.g. label_precedes_measurement, region_used_as_origin) are recorded
+      in handle_flags and adjudicated by the Phase B gates, which decide role and weight. This keeps
+      evidentiary judgment out of Phase A.
     handle_types:
       diagnostic_label:
         is_handle_for: cohort description / grouping
@@ -836,6 +862,9 @@ candidate_ingest_rules_reference:
       - missing_differentiator_slot
       - no_category_clarity_weight
       - intensified_route_burden
+    not_a_rejection: >
+      "Missing differentiator" marks the input set as incomplete and routes to intensified_route_burden
+      and a missing_differentiator_slot. It never means reject or discard the paper.
 
   REGION_SOURCE_CLOSURE:
     phase: B_validation
@@ -1266,32 +1295,36 @@ Common weak-LLM failure:
 
 The model gives a definition table and thinks it has explained the mechanism.
 
-## Fixture 11: Descriptive volume vs route-closing source (visibility-count exploit)
+## Fixture 11: Descriptive volume does not become grounding (visibility-count exploit)
+
+This fixture tests one behavior: descriptive volume raising visibility must not convert to grounding or priority. It exercises `visibility_priority_cap` and `aggregation_limit` (both `reserved_for_v0_07`); treat it as a reserved/forward fixture until those consumers are adopted.
 
 Input pattern:
 
-Forty descriptive papers report the same diagnostic-label-based association (for example, a marker that correlates with a syndrome). None closes a causal route; most are label-dependent, and several share a cohort or assay pipeline. A single separate source identifies the missing differentiating variable and disconfirms the folklore reading.
+Forty descriptive papers report the same diagnostic-label-based association (for example, a marker that correlates with a syndrome). None closes a causal route and all are label-dependent. Provenance fields show several share one cohort or assay pipeline (`shared_pipeline_id` present on those records).
 
 Expected filters:
 
-- STRIP_AND_EXTRACT_GATE (handle: diagnostic_label) on the descriptive pile
-- visibility_priority_cap
+- STRIP_AND_EXTRACT_GATE (handle: diagnostic_label) on each paper — all route to label-dependent / descriptive_support
 - aggregation_limit
-- CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR on the route-closing source
+- visibility_priority_cap
 
 Expected allowed support channel:
 
-- descriptive_support / watchlist visibility for the volume
-- missing_differentiator_slot and disconfirmation note for the single source
+- descriptive_support and watchlist visibility for the volume
 
 Expected blocked role:
 
-- ingest priority or node grounding derived from descriptive volume
-- the 40-paper pile outranking the route-closing source
+- node grounding derived from descriptive volume (raw count never grounds)
+- ingest priority derived from descriptive volume
 
 Expected outcome:
 
-The route-closing/disconfirming source holds higher ingest priority than the descriptive pile. Correlated sources (shared pipeline/cohort) count once, not forty times. Volume raises watchlist status only.
+Volume raises watchlist visibility only; it produces no grounding and no priority. Records sharing `shared_pipeline_id` count once for visibility, not forty times.
+
+Note (separate behavior, not asserted here):
+
+The precedence of a route-closing or disconfirming source over a descriptive pile is a priority-ranking behavior that belongs to the deferred weighting pass; it is intentionally out of scope for this fixture and is not tested via CONTROLLED_SAMENESS (which requires an actual same-input/different-output frame, absent here).
 
 Common weak-LLM failure:
 
@@ -1464,33 +1497,34 @@ v0.05 v4 candidate work shifts paper ingest toward admissibility-before-validati
 
 INGEST.PRINCIPLE.05v4:
 
-Ingestion begins by stripping folklore and regional interface text. Only the physically measured substrate, demonstrated variable, causal route, and surviving residue may map to model nodes. Diagnostic labels, region labels, biomarker labels, spectrum labels, and conserved-region labels are handles only. They cannot perform causal work.
+Ingest runs in two phases. Phase A (admissibility) strips folklore and regional interface text and extracts claim fields — measured substrate, measured variable, grouping variable, and the `post_strip_claim` that remains once labels are treated as handles. Phase B (validation) then weights evidence and assigns a role. Only the extracted `post_strip_claim` may map to model nodes, and only after Phase B. Diagnostic labels, region labels, biomarker labels, spectrum labels, and conserved-region labels are handles only. They cannot perform causal work.
 
-## Added candidate ingest ordering
+## Added candidate ingest ordering (two-phase)
+
+Phase A (admissibility, structural):
 
 - strip_author_interface_text
-- run_folklore_filters
-- run_region_as_implementation_filter
-- run_label_removal_residue_test
-- run_proxy_promotion_gate
-- run_chain_closure_gate
-- run_conservation_dependency_gate
-- map_surviving_residue_to_nodes
+- run_strip_and_extract_gate  (emits post_strip_claim + handle flags; no evidence weighting)
+
+Phase B (validation, on extracted fields):
+
+- controlled_sameness_missing_differentiator
+- region_source_closure
+- conservation_dependency
+- proxy_promotion
+- practical_significance
+- map_post_strip_claim_to_nodes
 - write_support_layer_only
 - mark_promotion_candidates_only_after_gates_pass
 
-## Added candidate rule cluster
+## Added candidate rule cluster (consolidated)
 
-- LABEL_REMOVAL_RESIDUE_TEST
-- FOLKLORE_FILTER_DIAGNOSTIC_LABEL
-- REGION_AS_IMPLEMENTATION_NOT_SOURCE
-- CONSERVATION_DEPENDENCY_RULE
-- CHAIN_BREAK_SAME_INPUT_DIFFERENT_OUTPUT
-- CONTROLLED_FRAME_INTENSIFIER
-- PRACTICAL_SIGNIFICANCE_GATE
-- implied PROXY_PROMOTION_GATE
-- implied SPECTRUM_COMPRESSION_FILTER
-- implied CONTROLLER_LANGUAGE_FILTER
+- STRIP_AND_EXTRACT_GATE (Phase A; subsumes the former LABEL_REMOVAL_RESIDUE_TEST, FOLKLORE_FILTER_DIAGNOSTIC_LABEL, SPECTRUM_COMPRESSION_FILTER, CONTROLLER_LANGUAGE_FILTER, biomarker filter, region-label stripping) + handle-type table
+- CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR (Phase B; merges CHAIN_BREAK_SAME_INPUT_DIFFERENT_OUTPUT + CONTROLLED_FRAME_INTENSIFIER)
+- REGION_SOURCE_CLOSURE (Phase B)
+- CONSERVATION_DEPENDENCY (Phase B)
+- PROXY_PROMOTION_GATE (Phase B)
+- PRACTICAL_SIGNIFICANCE_GATE (Phase B)
 
 ## Added failure semantics
 
@@ -1541,7 +1575,7 @@ record_schema_v1:
   layer: support_layer   # ingest records are support-layer only; never claim-layer
   depends_on:
     - adr_0003.paper_id_resolution      # DOI-normalized / alt-id table / content-hash / late-DOI merge / quarantine
-    - adr_0003.agent_key                # family/version/run_id composite
+    - adr_0003.agent_key                # family/version path key + run_id as a record field
 
   fields:
     schema_version:
@@ -1553,11 +1587,17 @@ record_schema_v1:
       note: canonical id resolved BEFORE any write; never a raw DOI/hash guess
     agent:
       required: true
-      form: family/version/run_id
+      form: family/version              # model identity = path key (ADR 0003 identity split)
+    run_id:
+      required: true
+      note: run identity; provenance field, NOT a path component (ADR 0003 identity split)
     measured_substrate:
       required: true
     measured_variable:
       required: true
+    grouping_variable:
+      required: true
+      note: cohort/grouping variable preserved from Phase A; a handle, never causal
     handle_dependencies:
       required: true
       note: author terms stripped or marked (diagnostic/region/biomarker/spectrum/controller/conservation/clinical-promise)
@@ -1567,7 +1607,11 @@ record_schema_v1:
       note: if the claim cannot be slotted, it cannot ground or promote
     gate_results:
       required: true
-      note: per Phase-B gate pass/fail; intersecting failures follow gate_intersection_semantics (05)
+      per_gate_state: [pass, fail, not_applicable, unresolved]
+      note: >
+        each Phase-B gate records one state; not_applicable and unresolved are distinct from fail.
+        intersecting results follow gate_intersection_semantics (05): only fail denies permissions;
+        not_applicable and unresolved never grant grounding but are not treated as fail.
     support_channels:
       required: true
       note: accumulate (union); nothing lost on failure
