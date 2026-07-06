@@ -1,7 +1,7 @@
 # ADR 0003 — Concurrent multi-LLM ingest (CANDIDATE)
 
 **Date:** 2026-07-05
-**Status:** CANDIDATE — not adopted. Recorded for the other LLMs to stress-test before any adoption. Per project rules, treat as candidate, not integrated.
+**Status:** CANDIDATE — not adopted. Recorded for the other LLMs to stress-test before any adoption. Per project rules, treat as candidate, not integrated. Revised 2026-07-05 to absorb the Opus 4.8 adversarial review (see `docs/reviews/2026-07-05-opus-4-8-v0-05-v4-before-patch-review.md`); the revisions are themselves candidate.
 
 ## Context
 
@@ -20,23 +20,57 @@ Intended multi-pass pipeline, with **two comparison checkpoints** in the early s
 1. **Record unit = paper × agent, at every replicated pass.**
    - Ingest: `ingest/<paper_id>/<agent>/record.yaml`
    - Weighting (early stage): `weighting/<paper_id>/<agent>/record.yaml`
-   Different agents write different files, so simultaneous work is conflict-free *by construction*, and the per-agent duplication needed for each comparison is preserved automatically.
-2. **`paper_id` is a stable, shared identifier** — DOI when available, content hash as fallback.
-3. **Records are atomic and append-only on the hot path.** No agent edits another agent's record or any shared file during a replicated pass.
-4. **Aggregates/indexes are generated from records, never hand-edited** — including a coverage view of which agents have covered which papers.
-5. **Two comparison checkpoints:** after ingest (heavy, durable) and after weighting (light, provisional). The weighting checkpoint exists only to hedge model uncertainty in early versions.
+   Different agents write different files, so simultaneous work is conflict-free *for the leaf record only* (see the concurrency scope note below), and the per-agent duplication needed for each comparison is preserved automatically.
+2. **`paper_id` is a canonical identifier resolved before any write** — see *Identity resolution* below. DOI is primary; content hash is a fallback; unresolved identity goes to a quarantine state, never to a canonical path.
+3. **Records are append-only with explicit supersession on the hot path.** No agent edits another agent's record or any shared file during a replicated pass. See *Record identity, schema, and crash semantics*.
+4. **Aggregates/indexes are serialized derived builds** — generated from records by a single writer, never hand-edited and never written concurrently. This includes the coverage view of which agents have covered which papers.
+5. **Two comparison checkpoints:** after ingest (heavy, durable) and after weighting (light, provisional). The weighting checkpoint exists only to hedge model uncertainty in early versions; its input and retirement are specified below.
 6. **Canonical-truth changes (integration/promotion) stay serialized** behind explicit adoption, exactly as the current model requires.
 
-## Open questions (decide when real volume / real runs appear)
+## Concurrency scope (revised)
 
-- **Storage substrate.** Git now vs a database. Recommendation: git now (atomic files version cleanly and migrate as whole units); move the hot path to a DB only if sustained throughput outgrows git. *Migration trigger: to be defined.*
-- **Coverage, not dedup.** Because duplication is intended, no claim/dedup mechanism is needed. A generated **coverage matrix** (which agents covered which papers) is what's useful.
-- **Consensus mechanisms.** Both checkpoints (ingest and weighting) are deferred to ~v0.07. Not designed here — this ADR only reserves their place.
-- **Retirement criterion for the weighting checkpoint.** Define the consistency threshold (how closely per-agent weighting outputs must agree, over how many papers) at which checkpoint 4 is dropped and weighting collapses to a single pass.
+"Conflict-free by construction" holds **only for disjoint leaf record files**. It does **not** hold for generated indexes, aggregate files, or the substrate's own concurrency unit. Explicit handling:
+
+- **Substrate = git (for now).** Git's concurrency unit is the commit / index / ref, not the file. Disjoint paths prevent *content* merge conflicts but not `index.lock` contention or non-fast-forward push rejection. Rule: agents commit their own leaf records; **index/aggregate builds run as a single-writer serialized job**, not inside each agent's hot path. Push contention is handled by `git pull --rebase` then retry, per CONTRIBUTING §8; never force-push `main`.
+- **Prior Nextcloud concern is stale.** ADR 0002 makes sync GitHub-only, so the earlier "sync conflict-copy" critique does not apply. The git-concurrency critique above stands.
+- **Migration trigger (git → DB).** Move the hot path off git when any of: record count > ~100k, full index rebuild > ~60 s, or `git status`/index-op latency becomes the bottleneck in a run. Exact thresholds to be confirmed against real runs (open blocker).
+
+## Identity resolution (revised — the real conflict source)
+
+Two agents can independently assign different ids to the same paper (DOI vs preprint vs PDF-render variant), fragmenting one paper into multiple record trees. Resolve identity **before** writing a canonical path:
+
+1. **DOI normalization** — lowercase, strip resolver prefix, canonical form; DOI is primary `paper_id` when present.
+2. **Alternate-identifier table** — map PMID/arXiv/preprint ids to the canonical `paper_id`.
+3. **Content-hash canonicalization** — fallback when no DOI: hash normalized text (strip whitespace, encoding, and PDF-render variance) so re-exports of the same paper collide rather than fragment.
+4. **Late-arriving-DOI merge path** — when an agent later resolves a DOI for a hash-keyed paper, a serialized merge job re-parents the hash tree under the DOI `paper_id` and leaves a redirect.
+5. **Pending/quarantine state** — unresolved identity writes to `ingest/_pending/<hash>/…`, never to a canonical `paper_id` path, until resolution.
+
+## Record identity, schema, and crash semantics (revised)
+
+- **`<agent>` granularity.** `<agent>` is not just "claude"/"chatgpt". It is a composite key `family/version/run_id` (e.g. `claude/opus-4-8/2026-07-05T…`). Weighting comparison across unpinned model versions is otherwise meaningless.
+- **Shared `record.yaml` schema, versioned, shipped before any checkpoint.** Checkpoint comparison over unschematized records has no defined meaning. Schema versioning lets comparisons detect and handle format drift.
+- **Append-only + supersession.** Records are append-only; a `supersedes:` field plus a generated `current` pointer selects the live record per (paper, agent). Retries do not silently overwrite.
+- **Crash/retry = temp-write-then-atomic-rename.** Write to a temp path, `fsync`, then atomic rename into place, so a crash mid-write never leaves a partial canonical record.
+
+## Checkpoint 4 (weighting comparison) — specified
+
+- **Input must be stated.** If checkpoint 4 runs on **pre-consensus** ingest, weighting divergence is confounded with ingest divergence and the retirement criterion is ill-posed → in that case **hold or cut**. If it runs on **post-consensus** ingest, all agents weight identical input, so divergence is model-to-model scoring variance → **reframe checkpoint 4 as model-QA, not data-consensus.**
+- **Retirement guards.** Retire-on-agreement is unsafe for swappable/correlated LLMs. Any retirement criterion must include: reset-on-model-change, reopen-on-drift, disagreement sampling, and bias/correlation review (agreement can be shared bias, not correctness). A retire-only, never-reopen gate is not acceptable for a non-stationary agent set.
+
+## Open blockers (must resolve before adoption)
+
+- **`paper_id` resolution + merge/quarantine policy** — the algorithm and the late-DOI merge/redirect behavior.
+- **`<agent>` composite-key format** — exact `family/version/run_id` encoding.
+- **`record.yaml` schema v1** — fields and version marker, shipped before any checkpoint.
+- **Append-only vs supersession details** — `current`-pointer generation and conflict handling.
+- **Substrate + migration trigger numbers** — confirm the git→DB thresholds against real runs.
+- **Checkpoint 4 input (pre- vs post-consensus) and framing** — blocking; if unanswerable, hold or cut the checkpoint.
+- **Retirement metric + guards** — concrete disagreement metric and the reset/reopen/correlation rules.
+- **Consensus mechanisms (checkpoints 2 and 4)** — still deferred to ~v0.07; this ADR only reserves their place.
 
 ## Consequences
 
-- Simultaneous ingest and weighting by many LLMs are safe with no locking — atomic per-agent files.
-- Every agent's take on paper X sits together under `ingest/<paper_id>/` (and `weighting/<paper_id>/`), so both comparisons have clean inputs.
-- The weighting checkpoint is deliberately temporary; the ADR names the condition for removing it, so it doesn't calcify into permanent overhead.
+- Simultaneous ingest and weighting are safe **at the leaf-record level** with no locking; index/aggregate builds are serialized, and push contention uses rebase-and-retry.
+- Every agent's take on paper X sits together under `ingest/<paper_id>/` (and `weighting/<paper_id>/`) once identity is canonicalized, so both comparisons have clean, non-fragmented inputs.
+- The weighting checkpoint is deliberately temporary and now carries an explicit input spec and retirement guards, so it neither calcifies nor retires unsafely.
 - Nothing here adopts consensus, weighting, or integration; those remain candidate future passes.

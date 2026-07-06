@@ -2,7 +2,7 @@
   "packet": "v0_05_v4_porting_packet",
   "status": "candidate",
   "created": "2026-07-05",
-  "files": [
+  "source_files": [
     "00_readme_for_llms.md",
     "01_version_goals_and_non_goals.md",
     "02_runtime_behavior_contract.md",
@@ -13,7 +13,12 @@
     "07_fixtures_and_regression_tests.md",
     "08_prompt_harness.md",
     "09_changelog_candidate.md",
+    "record_schema_v1.yaml"
+  ],
+  "generated": [
     "10_single_file_master_prompt.txt"
   ],
-  "zip": "/mnt/data/v0_05_v4_porting_packet.zip"
+  "build": {
+    "10_single_file_master_prompt.txt": "scripts/build_master_prompt.py"
+  }
 }

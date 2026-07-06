@@ -13,6 +13,16 @@ Each fixture contains:
 - expected rewrite
 - common weak-LLM failure
 
+## Rule-name legend (post-consolidation)
+
+The v0.05 v4 consolidation replaced several per-label filters with one Phase-A gate plus a handle-type table, and merged the two controlled-sameness rules. Fixtures below use the consolidated names:
+
+- `STRIP_AND_EXTRACT_GATE` (Phase A) — subsumes the former `LABEL_REMOVAL_RESIDUE_TEST`, `FOLKLORE_FILTER_DIAGNOSTIC_LABEL`, `SPECTRUM_COMPRESSION_FILTER`, `CONTROLLER_LANGUAGE_FILTER`, biomarker filter, and region-label stripping. Named handle types: `diagnostic_label`, `spectrum_label`, `controller_command_language`, `biomarker_status`, `region_label`, `conservation_label`, `clinical_promise_language`.
+- `CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR` (Phase B) — merges the former `CHAIN_BREAK_SAME_INPUT_DIFFERENT_OUTPUT` and `CONTROLLED_FRAME_INTENSIFIER`.
+- `REGION_SOURCE_CLOSURE` (Phase B) — the source/dependency-closure half of the former `REGION_AS_IMPLEMENTATION_NOT_SOURCE` (the label-stripping half is the `region_label` handle).
+- `CONSERVATION_DEPENDENCY` (Phase B) — former `CONSERVATION_DEPENDENCY_RULE`.
+- `PROXY_PROMOTION_GATE`, `PRACTICAL_SIGNIFICANCE_GATE`, `PATCH_ADOPTION_GATE` — unchanged.
+
 ## Fixture 1: Diagnostic label as causal object
 
 Input pattern:
@@ -21,8 +31,7 @@ A paper compares autistic and intellectually disabled cohorts using a nanosensor
 
 Expected filters:
 
-- FOLKLORE_FILTER_DIAGNOSTIC_LABEL
-- LABEL_REMOVAL_RESIDUE_TEST
+- STRIP_AND_EXTRACT_GATE (handle: diagnostic_label, biomarker_status)
 - PROXY_PROMOTION_GATE
 - PRACTICAL_SIGNIFICANCE_GATE
 
@@ -56,9 +65,8 @@ A paper studies the same mutation in genetically similar samples. Some samples s
 
 Expected filters:
 
-- CHAIN_BREAK_SAME_INPUT_DIFFERENT_OUTPUT
-- CONTROLLED_FRAME_INTENSIFIER if environment or sample background is controlled
-- FOLKLORE_FILTER_DIAGNOSTIC_LABEL
+- CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR
+- STRIP_AND_EXTRACT_GATE (handle: diagnostic_label)
 
 Expected allowed support channel:
 
@@ -88,8 +96,7 @@ An iPSC model is described as removing environmental confounds. The paper report
 
 Expected filters:
 
-- CONTROLLED_FRAME_INTENSIFIER
-- CHAIN_BREAK_SAME_INPUT_DIFFERENT_OUTPUT
+- CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR
 - PRACTICAL_SIGNIFICANCE_GATE if differences are statistical only
 
 Expected allowed support channel:
@@ -152,9 +159,8 @@ A paper finds cortical activity during a behavior and states that cortex control
 
 Expected filters:
 
-- REGION_AS_IMPLEMENTATION_NOT_SOURCE
-- LABEL_REMOVAL_RESIDUE_TEST
-- CONTROLLER_LANGUAGE_FILTER
+- STRIP_AND_EXTRACT_GATE (handle: region_label, controller_command_language)
+- REGION_SOURCE_CLOSURE
 
 Expected allowed support channel:
 
@@ -184,9 +190,9 @@ A paper says a highly conserved brainstem region explains a behavior because the
 
 Expected filters:
 
-- CONSERVATION_DEPENDENCY_RULE
-- REGION_AS_IMPLEMENTATION_NOT_SOURCE
-- CONTROLLER_LANGUAGE_FILTER if command language appears
+- CONSERVATION_DEPENDENCY
+- REGION_SOURCE_CLOSURE
+- STRIP_AND_EXTRACT_GATE (handle: conservation_label, controller_command_language if command language appears)
 
 Expected allowed support channel:
 
@@ -217,8 +223,7 @@ A paper measures a blood or cellular marker and describes it as a mechanism of a
 Expected filters:
 
 - PROXY_PROMOTION_GATE
-- LABEL_REMOVAL_RESIDUE_TEST
-- FOLKLORE_FILTER_DIAGNOSTIC_LABEL
+- STRIP_AND_EXTRACT_GATE (handle: biomarker_status, diagnostic_label)
 - PRACTICAL_SIGNIFICANCE_GATE if significance language appears
 
 Expected allowed support channel:
@@ -249,9 +254,7 @@ A paper reports differences across an autism spectrum sample and treats the spec
 
 Expected filters:
 
-- SPECTRUM_COMPRESSION_FILTER
-- FOLKLORE_FILTER_DIAGNOSTIC_LABEL
-- LABEL_REMOVAL_RESIDUE_TEST
+- STRIP_AND_EXTRACT_GATE (handle: spectrum_label, diagnostic_label)
 
 Expected allowed support channel:
 
@@ -334,3 +337,34 @@ Expected blocked role:
 Common weak-LLM failure:
 
 The model gives a definition table and thinks it has explained the mechanism.
+
+## Fixture 11: Descriptive volume vs route-closing source (visibility-count exploit)
+
+Input pattern:
+
+Forty descriptive papers report the same diagnostic-label-based association (for example, a marker that correlates with a syndrome). None closes a causal route; most are label-dependent, and several share a cohort or assay pipeline. A single separate source identifies the missing differentiating variable and disconfirms the folklore reading.
+
+Expected filters:
+
+- STRIP_AND_EXTRACT_GATE (handle: diagnostic_label) on the descriptive pile
+- visibility_priority_cap
+- aggregation_limit
+- CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR on the route-closing source
+
+Expected allowed support channel:
+
+- descriptive_support / watchlist visibility for the volume
+- missing_differentiator_slot and disconfirmation note for the single source
+
+Expected blocked role:
+
+- ingest priority or node grounding derived from descriptive volume
+- the 40-paper pile outranking the route-closing source
+
+Expected outcome:
+
+The route-closing/disconfirming source holds higher ingest priority than the descriptive pile. Correlated sources (shared pipeline/cohort) count once, not forty times. Volume raises watchlist status only.
+
+Common weak-LLM failure:
+
+The model boosts the majority claim because many papers report it, and treats repetition as evidentiary weight.

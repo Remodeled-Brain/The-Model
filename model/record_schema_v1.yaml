@@ -1,0 +1,57 @@
+# model/record_schema_v1.yaml — CANDIDATE
+# Shared per-paper, per-agent ingest record for ADR 0003 concurrent multi-LLM ingest.
+# BLOCKED for adoption until ADR 0003 identity decisions close (see depends_on). A schema is
+# required before any checkpoint comparison can mean anything, but its identity fields cannot be
+# finalized before paper_id resolution and the <agent> composite key are decided.
+record_schema_v1:
+  status: candidate
+  layer: support_layer   # ingest records are support-layer only; never claim-layer
+  depends_on:
+    - adr_0003.paper_id_resolution      # DOI-normalized / alt-id table / content-hash / late-DOI merge / quarantine
+    - adr_0003.agent_key                # family/version/run_id composite
+
+  fields:
+    schema_version:
+      const: v1
+      required: true
+    paper_id:
+      required: true
+      source: adr_0003_identity_resolution
+      note: canonical id resolved BEFORE any write; never a raw DOI/hash guess
+    agent:
+      required: true
+      form: family/version/run_id
+    measured_substrate:
+      required: true
+    measured_variable:
+      required: true
+    handle_dependencies:
+      required: true
+      note: author terms stripped or marked (diagnostic/region/biomarker/spectrum/controller/conservation/clinical-promise)
+    post_strip_claim:
+      required: true
+      form: post_strip_claim_form        # see model/06 (candidate slot taxonomy)
+      note: if the claim cannot be slotted, it cannot ground or promote
+    gate_results:
+      required: true
+      note: per Phase-B gate pass/fail; intersecting failures follow gate_intersection_semantics (05)
+    support_channels:
+      required: true
+      note: accumulate (union); nothing lost on failure
+    blocked_roles:
+      required: true
+      note: node_grounding / promotion / prediction, per most-restrictive surviving cap
+    promotion_status:
+      enum: [none, candidate, blocked]
+      required: true
+    visibility_priority:
+      required: true
+      note: bounded by visibility_priority_cap (05); descriptive volume raises watchlist only
+    supersedes:
+      required: false
+      note: append-only + generated "current" pointer; retries do not overwrite
+
+  invariants:
+    support_layer_only: true
+    no_claim_layer_write: true
+    identity_resolved_before_write: true

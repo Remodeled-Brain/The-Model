@@ -2,15 +2,16 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
   status: candidate
   layer: paper_ingest
   purpose: >
-    Clarify that ingest gates change what a source may support. They do not discard
-    papers by default.
+    Clarify that ingest gates change what a source may support. They do not discard papers by
+    default. Gate failure caps claim role; it does not delete provenance, descriptive value, or
+    method value.
 
   rule: >
-    Gate failure changes what a source may support. It does not remove the source
-    from ingest by default. Failed criteria route the source into attenuated support
-    channels, method notes, proxy-only evidence, category-failure notes, missing-route
-    slots, disconfirmation notes, or source-tree handles. Direct node grounding and
-    promotion require gate passage.
+    Gate failure changes what a source may support. It does not remove the source from ingest by
+    default. Failed criteria route the source into attenuated support channels, method notes,
+    proxy-only evidence, category-failure notes, missing-route slots, disconfirmation notes,
+    descriptive-support notes, or source-tree handles. Direct node grounding and promotion require
+    gate passage.
 
   default_failed_gate_result:
     paper_record: keep
@@ -26,6 +27,85 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
     - weight_channel
     - translation_status
 
+  # --- v0.05 v4 revision: positive support types on an ordered ladder ---
+  support_type_ladder:
+    note: >
+      Ordered strongest to weakest role. A gate result assigns a level; "not established" means
+      "capped at or below the named level," not free discretion. Levels are named, not numeric;
+      numeric calibration is out of scope for this candidate (see non-goals in 01).
+    levels:
+      - mechanistic_grounded
+      - route_partial
+      - proxy_only
+      - descriptive_support
+      - label_dependent_observation
+      - provenance_only
+    level_meanings:
+      mechanistic_grounded: closed causal route; survives all Phase B gates
+      route_partial: partial route; one or more slots missing
+      proxy_only: correlate/biomarker without translation controls
+      descriptive_support: valid descriptive/epi/phenomenological/association/first-report
+      label_dependent_observation: claim depends on an author handle
+      provenance_only: kept for record; no claim role
+
+  over_stripping_guard:
+    purpose: >
+      Prevent Type-II error: valid descriptive, epidemiological, phenomenological, association, or
+      first-report research must not be scored as a failed mechanism paper.
+    rule: >
+      Absence of a demonstrated mechanism is not a defect. A paper that makes no mechanistic claim,
+      but whose post_strip_claim is a sound descriptive/association claim, routes to
+      descriptive_support as a positive role, not to a failure note.
+    routes:
+      descriptive_or_association_claim:
+        role: descriptive_support
+        not_treated_as: mechanism_failure
+
+  aggregation_limit:
+    purpose: Prevent backdoor weight accumulation.
+    rule: >
+      Support-only and attenuated notes never sum into node grounding by raw count. Node grounding
+      requires a passing Phase B gate on a post_strip_claim. Count raises visibility and ingest
+      priority only; it never substitutes for gate passage.
+    invariants:
+      count_can_raise_visibility: true
+      count_can_supply_grounding: false
+      grounding_requires_passing_gate: true
+
+  gate_intersection_semantics:
+    status: candidate
+    purpose: Deterministic result when several gates fail on one source; keep support info, cap safely.
+    rule: >
+      Failed-gate routes accumulate (union of notes; no support-layer information lost), but
+      support cap, node-grounding permission, and promotion permission collapse to the most
+      restrictive surviving value.
+    notes: accumulate
+    permissions:
+      support_weight: min_across_failed_gates
+      node_grounding: denied_if_any_gate_denies
+      promotion: denied_if_any_gate_denies
+    example:
+      failed_gates: [region_source_closure, conservation_dependency, proxy_promotion]
+      notes_accumulated: [implementation_site_observation, conservation_handle, proxy_only_evidence]
+      result: {causal_weight: none, node_grounding: denied, promotion: denied}
+
+  visibility_priority_cap:
+    status: candidate
+    purpose: Prevent a large folklore-biased literature from hijacking ingest priority.
+    rule: >
+      Descriptive volume raises watchlist visibility only. A body of label-dependent,
+      zero-closed-route sources cannot gain ingest priority over sources that close a causal
+      route, identify a missing differentiator, or disconfirm folklore.
+    invariants:
+      volume_can_raise_watchlist: true
+      volume_can_outrank_route_closing_sources: false
+      correlated_sources_count_once: true    # shared pipeline / lab / cohort are not independent
+    deferred:
+      numeric_scaling: out_of_scope_until_real_corpus
+      note: >
+        log scaling, absolute caps, and label/route/proxy multipliers need calibration data;
+        non-goal 01 forbids creating corpus weight from fixtures, so this stays qualitative.
+
   preserved_outputs:
     - provenance
     - extraction_notes
@@ -34,11 +114,12 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
     - category_failure_notes
     - missing_route_notes
     - disconfirmation_notes
+    - descriptive_support_notes
     - source_tree_handles
     - watch_items
 
   failed_criterion_routes:
-    no_label_stripped_residue:
+    no_post_strip_claim:
       route_to:
         - category_failure_note
         - extraction_note
@@ -62,16 +143,12 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
         - magnitude_or_noise_floor_missing
       weight_effect: no_biological_or_clinical_weight
 
-    same_input_different_output_unresolved:
+    controlled_sameness_missing_differentiator:
       route_to:
         - missing_differentiator_slot
         - incomplete_causal_frame
       weight_effect: no_category_clarity_weight
-
-    controlled_frame_with_remaining_divergence:
-      route_to:
-        - missing_route_exposed_by_control
-      weight_effect: intensified_route_burden
+      note: merged route for former same_input_different_output + controlled_frame_divergence
 
     region_as_source_unclosed:
       route_to:
@@ -86,6 +163,10 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
       weight_effect: no_causal_weight
 
   hard_zero_scope:
+    note: >
+      Hard zero applies to claim ROLE, never to the paper. It zeroes specific role permissions
+      while preserving provenance, descriptive support, method notes, source-tree handles, and
+      disconfirmation/watch notes.
     postdictive_claim:
       zeroes:
         - prediction_weight
@@ -93,6 +174,7 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
       preserves:
         - provenance
         - extraction_note
+        - descriptive_support
         - source_tree_handle
 
     no_mechanistic_residue:
@@ -100,8 +182,13 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
         - mechanism_mapping
         - promotion_candidate
       preserves:
+        - descriptive_support
         - label_failure_note
         - assay_observation_if_any
+        - provenance
+      note: >
+        Zeroing the mechanism role does not down-rank a descriptive paper. If a sound descriptive
+        claim survives, it routes to descriptive_support (see over_stripping_guard).
 
   compact_principle:
     folklore_filters_before_validation:

@@ -1,6 +1,5 @@
-# v0.05 v4 Single-File Master Porting Packet
-
-Paste this entire file into another LLM to test whether it can preserve the v0.05 v4 scaffold architecture.
+# v0.05 v4 single-file master prompt (GENERATED — do not hand-edit)
+# Built from model/manifest.json source_files by scripts/build_master_prompt.py
 
 
 ===== 00_readme_for_llms.md =====
@@ -252,119 +251,120 @@ v0_05_v4_ingest_architecture:
   core_principle:
     name: INGEST.PRINCIPLE.05v4
     definition: >
-      Ingestion begins by stripping folklore and regional interface text. Only the
-      physically measured substrate, demonstrated variable, causal route, and surviving
-      residue may map to model nodes. Diagnostic labels, region labels, biomarker labels,
-      spectrum labels, and conserved-region labels are handles only. They cannot perform
-      causal work.
+      Ingest runs in two phases. Phase A (admissibility) strips author-interface text and
+      extracts claim fields: measured substrate, measured variable, grouping variable, and the
+      post_strip_claim (the physical claim that remains once diagnostic, region, biomarker,
+      spectrum, controller, and conservation terms are treated as handles). Phase A asks only
+      whether a physical claim survives stripping; it weighs no evidence. Phase B (validation)
+      runs only after claim fields exist: it weights evidence, runs interacting route-closure
+      tests, and assigns a support role and weight cap. Labels are handles and never perform
+      causal work. Node mapping consumes extracted claim fields, never author labels.
     ordering_rule: >
-      Folklore filters fire before validation gates. Validation evaluates evidentiary
-      strength only after the source generates an admissible physical claim.
+      Author-interface stripping and claim-field extraction (Phase A) run before node mapping.
+      Evidence weighting and validation (Phase B) run only after extracted claim fields exist.
+      "Folklore filters before validation" is implemented as this A-before-B phase split, not as
+      a single ordered slogan.
+    note_on_prior_wording: >
+      Earlier drafts used "residue" as a structural noun and mapped "surviving residue" to nodes.
+      That fused the strip operation with its product. The field is now named post_strip_claim,
+      produced in Phase A; only Phase B assigns it a role.
 
-  ingest_order:
-    - strip_author_interface_text
-    - run_folklore_filters
-    - run_region_as_implementation_filter
-    - run_label_removal_residue_test
-    - run_proxy_promotion_gate
-    - run_chain_closure_gate
-    - run_conservation_dependency_gate
-    - map_surviving_residue_to_nodes
-    - write_support_layer_only
-    - mark_promotion_candidates_only_after_gates_pass
-
-  stage_logic:
-    strip_author_interface_text:
+  phase_A_admissibility:
+    purpose: Structural. Strip author interface and extract claim fields. No evidence weighting.
+    steps:
+      - strip_author_interface_text
+      - run_strip_and_extract_gate
+    strip_and_extract_gate:
+      consolidates:
+        - LABEL_REMOVAL_RESIDUE_TEST
+        - FOLKLORE_FILTER_DIAGNOSTIC_LABEL
+        - SPECTRUM_COMPRESSION_FILTER
+        - CONTROLLER_LANGUAGE_FILTER
+        - BIOMARKER_STATUS_FILTER
+        - REGION_LABEL_FILTER
+      handle_types:
+        - diagnostic_label
+        - spectrum_label
+        - controller_command_language
+        - biomarker_status
+        - region_label
+        - conservation_label
+        - clinical_promise_language
       output:
-        - raw_measured_substrate
-        - raw_measured_variable
-        - author_claim_terms_removed_or_marked
-
-    run_folklore_filters:
-      applies:
-        - diagnostic_label_filter
-        - spectrum_compression_filter
-        - controller_language_filter
-        - biomarker_status_filter
-        - clinical_promise_filter
-      output:
-        - label_dependencies
-        - folklore_residue
-
-    run_region_as_implementation_filter:
-      output:
-        - implementation_site
-        - source_status
-        - timing_dependency_requirements
-
-    run_label_removal_residue_test:
-      output:
-        - claim_after_label_removal
-        - residue_after_label_removal
-        - node_mapping_allowed_or_blocked
-
-    run_proxy_promotion_gate:
-      output:
-        - proxy_status
-        - measured_variable_limit
-        - translation_limit
-
-    run_chain_closure_gate:
-      applies:
-        - same_input_different_output
-        - controlled_frame_intensifier
-        - practical_significance_gate
-        - temporality_gate
-      output:
-        - causal_frame_status
-        - missing_route_slots
-        - chain_closure_status
-
-    run_conservation_dependency_gate:
-      output:
-        - conserved_operation
-        - dependency_relation
-        - maintenance_route
-        - conservation_priority_status
-
-    map_surviving_residue_to_nodes:
-      input_required:
         - measured_substrate
         - measured_variable
-        - claim_after_label_removal
-        - proxy_status
-        - chain_closure_status
-        - translation_limit
+        - grouping_variable
+        - post_strip_claim
+        - handle_dependencies
+      claim_form: see model/06 post_strip_claim_form (candidate; slots the post_strip_claim)
+      admissibility_verdict:
+        admissible_if: a post_strip_claim exists after handles are removed
+        inadmissible_if: no physical claim survives handle removal
+        note: admissibility is structural only; it does not judge evidentiary strength
 
-    write_support_layer_only:
-      allowed_writes:
-        - evidence
-        - provenance
-        - paper_links
-        - extraction_notes
-        - disconfirmation_notes
-        - method_notes
-        - category_failure_notes
-        - proxy_status_notes
-        - missing_route_notes
-        - source_tree_handles
-        - watch_items
-        - promotion_candidates
-        - promotion_gate_results
+  phase_B_validation:
+    purpose: >
+      Runs only after Phase A produces claim fields. Extract-first lets interacting tests resolve
+      together rather than in a brittle linear order.
+    interacting_gates:
+      - region_source_closure                        # region as implementation unless source demonstrated
+      - conservation_dependency                      # conservation is ingest-priority handle, not weight
+      - proxy_promotion                              # proxy != mechanism without translation controls
+      - practical_significance                       # analytical separability != biological/clinical weight
+      - controlled_sameness_missing_differentiator   # merged chain-break + controlled-frame
+    interaction_note: >
+      region_source_closure and conservation_dependency can affect each other; both run on the
+      already-extracted claim fields before roles are assigned, so ordering between them does not
+      change the outcome.
+    output:
+      - causal_frame_status
+      - missing_route_slots
+      - chain_closure_status
+      - proxy_status
+      - translation_limit
+      - support_type          # from the support_type_ladder in 05
+      - weight_cap
 
-    mark_promotion_candidates_only_after_gates_pass:
-      blocked_if:
-        - no_claim_after_label_removal
-        - causal_route_unclosed
-        - proxy_promoted_to_mechanism
-        - diagnostic_label_required_for_mapping
-        - region_label_required_for_origin
-        - conservation_used_as_weight
+  map_surviving_claim_to_nodes:
+    input_required:
+      - measured_substrate
+      - measured_variable
+      - post_strip_claim
+      - proxy_status
+      - chain_closure_status
+      - translation_limit
+
+  write_support_layer_only:
+    allowed_writes:
+      - evidence
+      - provenance
+      - paper_links
+      - extraction_notes
+      - disconfirmation_notes
+      - method_notes
+      - category_failure_notes
+      - proxy_status_notes
+      - missing_route_notes
+      - descriptive_support_notes
+      - source_tree_handles
+      - watch_items
+      - promotion_candidates
+      - promotion_gate_results
+
+  mark_promotion_candidates_only_after_gates_pass:
+    blocked_if:
+      - no_post_strip_claim
+      - causal_route_unclosed
+      - proxy_promoted_to_mechanism
+      - diagnostic_label_required_for_mapping
+      - region_label_required_for_origin
+      - conservation_used_as_weight
 
   validator_invariants:
-    ingest_order_required: true
-    folklore_filters_before_validation_gates: true
-    node_mapping_requires_surviving_residue: true
+    two_phase_order_required: true
+    phase_A_admissibility_before_phase_B_validation: true
+    admissibility_is_structural_not_evidentiary: true
+    node_mapping_requires_post_strip_claim: true
     support_layer_only_during_ingest: true
     promotion_candidate_requires_prior_gates_passed: true
     diagnostic_label_can_group_but_cannot_ground: true
@@ -372,6 +372,7 @@ v0_05_v4_ingest_architecture:
     conservation_priority_cannot_feed_weight_directly: true
     analytical_significance_cannot_feed_weight_directly: true
     failed_gate_routes_claim_to_lower_weight_channel_by_default: true
+    support_only_notes_cannot_ground_by_raw_count: true
 
 
 ===== 04_candidate_rule_adoption_gate.yaml =====
@@ -464,15 +465,16 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
   status: candidate
   layer: paper_ingest
   purpose: >
-    Clarify that ingest gates change what a source may support. They do not discard
-    papers by default.
+    Clarify that ingest gates change what a source may support. They do not discard papers by
+    default. Gate failure caps claim role; it does not delete provenance, descriptive value, or
+    method value.
 
   rule: >
-    Gate failure changes what a source may support. It does not remove the source
-    from ingest by default. Failed criteria route the source into attenuated support
-    channels, method notes, proxy-only evidence, category-failure notes, missing-route
-    slots, disconfirmation notes, or source-tree handles. Direct node grounding and
-    promotion require gate passage.
+    Gate failure changes what a source may support. It does not remove the source from ingest by
+    default. Failed criteria route the source into attenuated support channels, method notes,
+    proxy-only evidence, category-failure notes, missing-route slots, disconfirmation notes,
+    descriptive-support notes, or source-tree handles. Direct node grounding and promotion require
+    gate passage.
 
   default_failed_gate_result:
     paper_record: keep
@@ -488,6 +490,85 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
     - weight_channel
     - translation_status
 
+  # --- v0.05 v4 revision: positive support types on an ordered ladder ---
+  support_type_ladder:
+    note: >
+      Ordered strongest to weakest role. A gate result assigns a level; "not established" means
+      "capped at or below the named level," not free discretion. Levels are named, not numeric;
+      numeric calibration is out of scope for this candidate (see non-goals in 01).
+    levels:
+      - mechanistic_grounded
+      - route_partial
+      - proxy_only
+      - descriptive_support
+      - label_dependent_observation
+      - provenance_only
+    level_meanings:
+      mechanistic_grounded: closed causal route; survives all Phase B gates
+      route_partial: partial route; one or more slots missing
+      proxy_only: correlate/biomarker without translation controls
+      descriptive_support: valid descriptive/epi/phenomenological/association/first-report
+      label_dependent_observation: claim depends on an author handle
+      provenance_only: kept for record; no claim role
+
+  over_stripping_guard:
+    purpose: >
+      Prevent Type-II error: valid descriptive, epidemiological, phenomenological, association, or
+      first-report research must not be scored as a failed mechanism paper.
+    rule: >
+      Absence of a demonstrated mechanism is not a defect. A paper that makes no mechanistic claim,
+      but whose post_strip_claim is a sound descriptive/association claim, routes to
+      descriptive_support as a positive role, not to a failure note.
+    routes:
+      descriptive_or_association_claim:
+        role: descriptive_support
+        not_treated_as: mechanism_failure
+
+  aggregation_limit:
+    purpose: Prevent backdoor weight accumulation.
+    rule: >
+      Support-only and attenuated notes never sum into node grounding by raw count. Node grounding
+      requires a passing Phase B gate on a post_strip_claim. Count raises visibility and ingest
+      priority only; it never substitutes for gate passage.
+    invariants:
+      count_can_raise_visibility: true
+      count_can_supply_grounding: false
+      grounding_requires_passing_gate: true
+
+  gate_intersection_semantics:
+    status: candidate
+    purpose: Deterministic result when several gates fail on one source; keep support info, cap safely.
+    rule: >
+      Failed-gate routes accumulate (union of notes; no support-layer information lost), but
+      support cap, node-grounding permission, and promotion permission collapse to the most
+      restrictive surviving value.
+    notes: accumulate
+    permissions:
+      support_weight: min_across_failed_gates
+      node_grounding: denied_if_any_gate_denies
+      promotion: denied_if_any_gate_denies
+    example:
+      failed_gates: [region_source_closure, conservation_dependency, proxy_promotion]
+      notes_accumulated: [implementation_site_observation, conservation_handle, proxy_only_evidence]
+      result: {causal_weight: none, node_grounding: denied, promotion: denied}
+
+  visibility_priority_cap:
+    status: candidate
+    purpose: Prevent a large folklore-biased literature from hijacking ingest priority.
+    rule: >
+      Descriptive volume raises watchlist visibility only. A body of label-dependent,
+      zero-closed-route sources cannot gain ingest priority over sources that close a causal
+      route, identify a missing differentiator, or disconfirm folklore.
+    invariants:
+      volume_can_raise_watchlist: true
+      volume_can_outrank_route_closing_sources: false
+      correlated_sources_count_once: true    # shared pipeline / lab / cohort are not independent
+    deferred:
+      numeric_scaling: out_of_scope_until_real_corpus
+      note: >
+        log scaling, absolute caps, and label/route/proxy multipliers need calibration data;
+        non-goal 01 forbids creating corpus weight from fixtures, so this stays qualitative.
+
   preserved_outputs:
     - provenance
     - extraction_notes
@@ -496,11 +577,12 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
     - category_failure_notes
     - missing_route_notes
     - disconfirmation_notes
+    - descriptive_support_notes
     - source_tree_handles
     - watch_items
 
   failed_criterion_routes:
-    no_label_stripped_residue:
+    no_post_strip_claim:
       route_to:
         - category_failure_note
         - extraction_note
@@ -524,16 +606,12 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
         - magnitude_or_noise_floor_missing
       weight_effect: no_biological_or_clinical_weight
 
-    same_input_different_output_unresolved:
+    controlled_sameness_missing_differentiator:
       route_to:
         - missing_differentiator_slot
         - incomplete_causal_frame
       weight_effect: no_category_clarity_weight
-
-    controlled_frame_with_remaining_divergence:
-      route_to:
-        - missing_route_exposed_by_control
-      weight_effect: intensified_route_burden
+      note: merged route for former same_input_different_output + controlled_frame_divergence
 
     region_as_source_unclosed:
       route_to:
@@ -548,6 +626,10 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
       weight_effect: no_causal_weight
 
   hard_zero_scope:
+    note: >
+      Hard zero applies to claim ROLE, never to the paper. It zeroes specific role permissions
+      while preserving provenance, descriptive support, method notes, source-tree handles, and
+      disconfirmation/watch notes.
     postdictive_claim:
       zeroes:
         - prediction_weight
@@ -555,6 +637,7 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
       preserves:
         - provenance
         - extraction_note
+        - descriptive_support
         - source_tree_handle
 
     no_mechanistic_residue:
@@ -562,8 +645,13 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
         - mechanism_mapping
         - promotion_candidate
       preserves:
+        - descriptive_support
         - label_failure_note
         - assay_observation_if_any
+        - provenance
+      note: >
+        Zeroing the mechanism role does not down-rank a descriptive paper. If a sound descriptive
+        claim survives, it routes to descriptive_support (see over_stripping_guard).
 
   compact_principle:
     folklore_filters_before_validation:
@@ -577,15 +665,17 @@ candidate_ingest_rules_reference:
   status: candidate
   layer: pre_node_mapping
   note: >
-    These rules should be evaluated and consolidated before integration. They are
-    best treated as a candidate ingest-admissibility cluster rather than many unrelated
-    top-level rules.
+    Consolidated for v0.05 v4. The former six label-family filters are now one STRIP_AND_EXTRACT
+    gate (Phase A) plus a handle-type table. The two controlled-sameness rules are merged. Route
+    and evidence gates (proxy, practical-significance, region-source, conservation-dependency) run
+    in Phase B on already-extracted claim fields. This remains a candidate ingest-admissibility
+    cluster, not adopted rules.
 
   v0_05_v4_candidate_ingest_rules:
     purpose: >
       Increase ingest rigor and internal consistency by catching folklore, regionalization,
-      proxy-promotion, practical-significance inflation, and spectrum compression before
-      node mapping.
+      proxy-promotion, practical-significance inflation, and spectrum compression before node
+      mapping.
 
     global_shift:
       from:
@@ -614,71 +704,147 @@ candidate_ingest_rules_reference:
         - downstream gating surface
         - stabilization route
         - measured substrate and demonstrated causal route
+      caution: >
+        The "prefer" terms are descriptive handles, not causal objects. They name measured
+        interactions or routes; they must not become seats, controllers, or essences. The same
+        verb/product discipline as post_strip_claim applies (see reification_note).
 
-  LABEL_REMOVAL_RESIDUE_TEST:
+    reification_note: >
+      Do not treat a produced field as an object with causal powers. post_strip_claim (formerly
+      "residue") is the PRODUCT of the strip-and-extract operation; it is mapped to nodes only
+      after Phase B assigns it a role. Keep the operation (strip/extract) and its product
+      (post_strip_claim) separate.
+
+  post_strip_claim_form:
+    status: candidate
+    purpose: >
+      Force support-bearing claims into physical slots so a natural-language post_strip_claim
+      cannot launder a hidden causal operator after labels are removed. Slottability is the
+      structural admissibility test: if a claim cannot be slotted, it cannot ground or promote.
+    slot_types:
+      - observation
+      - causal_relation
+      - proxy_relation
+      - category_failure
+    causal_relation_minimum:
+      # trimmed from the full 8-field form; expand only if fixtures require it
+      - substrate_A
+      - direction
+      - substrate_B
+      - unresolved_route_slots        # explicit list of what is not yet closed
+    prose_location: extraction_notes   # free-text explanation stays here, not in the slot
+    guard: slot assignment is driven by what was measured, not by the author label
+
+  # ---------------- PHASE A: one gate + handle-type table ----------------
+  STRIP_AND_EXTRACT_GATE:
+    phase: A_admissibility
     trigger: always_during_paper_ingest
-    rule: Remove author labels and ask what physical claim remains.
-    strip:
-      - diagnosis labels
-      - biomarker status
-      - disease names as causal objects
-      - clinical promise language
-      - spectrum generalization
-      - controller/command/decision language
-      - region-does-function language
-      - folklore cognitive labels
-      - anatomical prestige language
-      - proxy-as-mechanism language
+    consolidates:
+      - LABEL_REMOVAL_RESIDUE_TEST
+      - FOLKLORE_FILTER_DIAGNOSTIC_LABEL
+      - SPECTRUM_COMPRESSION_FILTER
+      - CONTROLLER_LANGUAGE_FILTER
+      - BIOMARKER_STATUS_FILTER
+      - REGION_LABEL_FILTER
+    rule: >
+      Remove author handles and ask what physical claim remains, then extract claim fields. This is
+      structural: it does not weigh evidence.
     required_questions:
       - What substrate was measured?
       - What variable changed?
-      - What causal route was demonstrated?
-      - What claim remains if labels are unavailable?
-      - Does the result still map to a model node after stripping?
-      - What residue depends on the removed labels?
+      - What is the grouping variable?
+      - What claim remains if handles are unavailable? (post_strip_claim)
+      - What depends on the removed handles? (handle_dependencies)
+    output_fields:
+      - measured_substrate
+      - measured_variable
+      - grouping_variable
+      - post_strip_claim
+      - handle_dependencies
+    handle_types:
+      diagnostic_label:
+        is_handle_for: cohort description / grouping
+        cannot: enter mechanism as a causal object
+        fail_if:
+          - assay cannot generate the diagnostic distinction without prior labels
+          - label imported before measurement then credited as discovered by measurement
+          - label substitutes for developmental route
+      spectrum_label:
+        cannot: compress heterogeneous routes into one causal point
+        fail_if:
+          - spectrum treated as one causal object
+          - divergent routes absorbed into a single diagnostic continuum
+          - label supplies unity measurement did not generate
+      controller_command_language:
+        cannot: supply a hidden operator / decision / command source
+        rewrite_to: measured interaction, dependency, route, balance, gating, release
+        fail_if:
+          - controller language supplies hidden operator
+          - decision language replaces chain generation
+      biomarker_status:
+        cannot: substitute for a causal route
+        fail_if:
+          - biomarker status treated as mechanism
+      region_label:
+        cannot: supply causal origin by name / activity / perturbability
+        rewrite_to: measured activity or perturbation leverage at an implementation site
+        fail_if:
+          - region-does-function language used as origin
+        note: source status is decided in Phase B (REGION_SOURCE_CLOSURE), not here
+      conservation_label:
+        cannot: act as prestige or standalone explanation
+        fail_if:
+          - '"highly conserved" used as explanation by itself'
+        note: dependency/route is decided in Phase B (CONSERVATION_DEPENDENCY)
+      clinical_promise_language:
+        cannot: supply biological or clinical weight
+        fail_if:
+          - clinical promise substitutes for a demonstrated route
+    admissibility_verdict:
+      admissible_if: a post_strip_claim exists
+      inadmissible_if: no physical claim survives handle removal
     failure_effect:
       - no_direct_node_grounding
       - no_promotion_candidate
       - route_to_category_failure_or_extraction_note
-    fail_if:
-      - no mechanistic claim survives label removal
+      - if a sound descriptive claim survives, route_to descriptive_support (not failure)
 
-  FOLKLORE_FILTER_DIAGNOSTIC_LABEL:
+  # ---------------- PHASE B: route / evidence gates on extracted fields ----------------
+  CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR:
+    phase: B_validation
+    merges:
+      - CHAIN_BREAK_SAME_INPUT_DIFFERENT_OUTPUT
+      - CONTROLLED_FRAME_INTENSIFIER
     trigger:
-      - diagnostic category used as causal object
-      - clinical label used to organize measurement
-      - disease/syndrome label treated as the thing measured
+      - same mutation, different phenotype
+      - controlled/matched conditions, different outcome
+      - iPSC or controlled assay described as removing confounds
+      - controlled sameness used to imply diagnostic clarity
     rule: >
-      Diagnostic labels are handles. They may organize a paper's cohort description,
-      but they cannot enter the mechanism as causal objects.
+      Removing environmental variance intensifies the demand to explain remaining divergence; it
+      does not license a diagnostic leap. Same-input/different-output marks the input set as
+      incomplete until the differentiating causal variable is identified.
     fail_if:
-      - assay cannot generate diagnostic distinction without prior labels
-      - label is imported before measurement and then credited as discovered by measurement
-      - label substitutes for developmental route
-    required_output:
-      - measured_substrate
-      - measured_variable
-      - grouping_variable
-      - claim_after_label_stripping
-      - residual_label_dependence
+      - divergence renamed as diagnosis or treated as evidence for the category
+      - missing differentiating variable not investigated
+      - controlled sameness treated as explanatory completeness
+    rewrite_to:
+      - missing differentiating variable
+      - incomplete causal frame
+      - controlled frame exposes missing route
     failure_effect:
-      - severe_weight_attenuation
-      - no_direct_node_grounding
-      - support_layer_label_dependent_observation
+      - missing_differentiator_slot
+      - no_category_clarity_weight
+      - intensified_route_burden
 
-  REGION_AS_IMPLEMENTATION_NOT_SOURCE:
-    trigger:
-      - region X controls Y
-      - region X generates Y
-      - region X is responsible for Y
-      - brainstem/cortex/cerebellum/basal-ganglia-first framing
+  REGION_SOURCE_CLOSURE:
+    phase: B_validation
     rule: >
-      A region is treated as an implementation site unless the paper demonstrates
-      source, dependency position, and causal direction.
+      A region is an implementation site unless the paper demonstrates source, dependency position,
+      and causal direction. Can interact with CONSERVATION_DEPENDENCY; both run on extracted fields
+      before roles are assigned.
     fail_if:
-      - activity in a region is treated as origin
-      - perturbability is treated as origin
-      - downstream deformation is treated as upstream generation
+      - activity / perturbability / downstream deformation treated as upstream generation
       - conserved-region language substitutes for route evidence
     rewrite_to:
       - measured activity at implementation site
@@ -688,83 +854,50 @@ candidate_ingest_rules_reference:
       - no_origin_weight
       - implementation_site_observation_only
 
-  CONSERVATION_DEPENDENCY_RULE:
+  CONSERVATION_DEPENDENCY:
+    phase: B_validation
     definition: >
-      Conservation increases ingest priority only when the paper identifies a conserved
-      operation, dependency, or maintenance route. Conservation alone does not establish
-      causal origin.
+      Conservation increases ingest priority only when the paper identifies a conserved operation,
+      dependency, or maintenance route. Conservation alone does not establish causal origin or
+      weight.
     pass_if:
-      - conserved structure is tied to a demonstrated operation
+      - conserved structure tied to a demonstrated operation
       - perturbation shows dependency position
       - downstream structures lose explanatory power after conserved-route variables are controlled
       - causal timing runs from conserved maintenance route to later differentiated route
     fail_if:
-      - highly conserved is used as prestige language
-      - conserved region is named but causal work is assigned to a later folk construct
-      - anatomical age is treated as causal sufficiency
-      - a late structure is called the controller without controlling upstream conserved-route variables
-    rewrite_to:
-      - identify the conserved operation
-      - identify the dependency relation
-      - identify the maintenance route
-      - identify the measured causal direction
+      - '"highly conserved" used as prestige language'
+      - conserved region named but causal work assigned to a later folk construct
+      - anatomical age treated as causal sufficiency
+      - a late structure called controller without controlling upstream conserved-route variables
     invariants:
       conservation_can_prioritize_ingest: true
       conservation_can_supply_weight: false
       conservation_can_supply_origin: false
 
-  CHAIN_BREAK_SAME_INPUT_DIFFERENT_OUTPUT:
-    trigger:
-      - same mutation, different phenotype
-      - controlled environment, different outcome
-      - same input, divergent result
-      - genetically matched or controlled conditions used to imply diagnostic clarity
+  PROXY_PROMOTION_GATE:
+    phase: B_validation
     rule: >
-      Same-input/different-output is not an explanation. It marks the input set as incomplete
-      unless the differentiating causal variable is identified.
+      A proxy, biomarker, assay readout, or measured correlate cannot become mechanism without
+      translation controls and a demonstrated route. Distinct from PRACTICAL_SIGNIFICANCE_GATE:
+      this gate is about mechanistic translation, not effect magnitude.
     fail_if:
-      - divergence is renamed as diagnosis
-      - divergence is treated as evidence for the category
-      - missing variable is not investigated
-      - controlled sameness is used to strengthen a diagnostic claim without closing the causal route
-    rewrite_to:
-      - missing differentiating variable
-      - incomplete causal frame
-      - divergent developmental stabilization route not identified
+      - proxy treated as mechanism
+      - biomarker status substitutes for causal route
+      - measured variable promoted beyond its assay level
+      - translation limit not stated
+    shared_output_with_practical_significance: assay_level_cap
     failure_effect:
-      - missing_differentiator_slot
-      - no_category_clarity_weight
-
-  CONTROLLED_FRAME_INTENSIFIER:
-    trigger:
-      - controlled assay conditions
-      - controlled environment
-      - shared mutation
-      - matched samples
-      - iPSC model described as removing confounds
-    rule: >
-      Removing environmental variance intensifies the demand to explain remaining divergence.
-      It does not license a diagnostic leap.
-    fail_if:
-      - controlled sameness is treated as explanatory completeness
-      - paper uses controlled conditions to imply category specificity
-      - remaining divergence is not traced to a causal route
-    rewrite_to:
-      - controlled frame exposes missing route
-      - unexplained divergence means the model's input set is incomplete
-    failure_effect:
-      - intensified_route_burden
-      - missing_route_exposed_by_control
+      - proxy_only_evidence
+      - translation_cap
+      - no_direct_node_grounding_if_mechanism_depends_on_proxy_status
 
   PRACTICAL_SIGNIFICANCE_GATE:
-    trigger:
-      - statistically significant
-      - analytical significance
-      - fold difference
-      - nanosensor readout
-      - p-value or significant difference language
+    phase: B_validation
     rule: >
       Analytical separability does not establish practical, biological, or clinical significance.
+      Distinct from PROXY_PROMOTION_GATE: this gate is about effect magnitude and replication, not
+      mechanistic translation.
     fail_if:
       - no variance envelope
       - no noise floor
@@ -772,55 +905,23 @@ candidate_ingest_rules_reference:
       - no biological range
       - no clinical threshold when clinical relevance is claimed
       - no replication across samples, clones, batches, or cohorts
-    rewrite_to:
-      - assay-level difference only
-      - practical significance not established
+    shared_output_with_proxy_promotion: assay_level_cap
     failure_effect:
       - assay_level_difference
       - no_biological_or_clinical_weight_without_range_magnitude_replication_and_route
 
-  PROXY_PROMOTION_GATE:
-    status: implied_candidate
-    rule: >
-      A proxy, biomarker, assay readout, or measured correlate cannot become mechanism without
-      translation controls and a demonstrated route.
-    fail_if:
-      - proxy is treated as mechanism
-      - biomarker status substitutes for causal route
-      - measured variable is promoted beyond its assay level
-      - translation limit is not stated
-    failure_effect:
-      - proxy_only_evidence
-      - translation_cap
-      - no_direct_node_grounding_if_mechanism_depends_on_proxy_status
-
-  SPECTRUM_COMPRESSION_FILTER:
-    status: implied_candidate
-    rule: >
-      A spectrum label cannot compress heterogeneous developmental or mechanistic routes
-      into one causal point.
-    fail_if:
-      - spectrum is treated as one causal object
-      - divergent routes are absorbed into a single diagnostic continuum
-      - label supplies unity that measurement did not generate
-    failure_effect:
-      - category_failure_note
-      - route_heterogeneity_note
-      - no_single-node_grounding_without_route_split
-
-  CONTROLLER_LANGUAGE_FILTER:
-    status: implied_candidate
-    rule: >
-      Controller, command, decision, and coordination language must be rewritten into
-      measured interaction, dependency, route, balance, gating, or release terms before
-      mechanism mapping.
-    fail_if:
-      - controller language supplies hidden operator
-      - decision language replaces chain generation
-      - command language assigns source without route evidence
-    failure_effect:
-      - rewrite_required
-      - no_mechanism_mapping_until_operator_removed
+  consolidation_map:
+    note: Traceability from pre-consolidation rule names to the revised structure.
+    LABEL_REMOVAL_RESIDUE_TEST: STRIP_AND_EXTRACT_GATE
+    FOLKLORE_FILTER_DIAGNOSTIC_LABEL: STRIP_AND_EXTRACT_GATE.handle_types.diagnostic_label
+    SPECTRUM_COMPRESSION_FILTER: STRIP_AND_EXTRACT_GATE.handle_types.spectrum_label
+    CONTROLLER_LANGUAGE_FILTER: STRIP_AND_EXTRACT_GATE.handle_types.controller_command_language
+    biomarker_status_filter: STRIP_AND_EXTRACT_GATE.handle_types.biomarker_status
+    region_label_stripping: STRIP_AND_EXTRACT_GATE.handle_types.region_label
+    REGION_AS_IMPLEMENTATION_NOT_SOURCE: REGION_SOURCE_CLOSURE (Phase B)
+    CONSERVATION_DEPENDENCY_RULE: CONSERVATION_DEPENDENCY (Phase B)
+    CHAIN_BREAK_SAME_INPUT_DIFFERENT_OUTPUT: CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR
+    CONTROLLED_FRAME_INTENSIFIER: CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR
 
 
 ===== 07_fixtures_and_regression_tests.md =====
@@ -840,6 +941,16 @@ Each fixture contains:
 - expected rewrite
 - common weak-LLM failure
 
+## Rule-name legend (post-consolidation)
+
+The v0.05 v4 consolidation replaced several per-label filters with one Phase-A gate plus a handle-type table, and merged the two controlled-sameness rules. Fixtures below use the consolidated names:
+
+- `STRIP_AND_EXTRACT_GATE` (Phase A) — subsumes the former `LABEL_REMOVAL_RESIDUE_TEST`, `FOLKLORE_FILTER_DIAGNOSTIC_LABEL`, `SPECTRUM_COMPRESSION_FILTER`, `CONTROLLER_LANGUAGE_FILTER`, biomarker filter, and region-label stripping. Named handle types: `diagnostic_label`, `spectrum_label`, `controller_command_language`, `biomarker_status`, `region_label`, `conservation_label`, `clinical_promise_language`.
+- `CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR` (Phase B) — merges the former `CHAIN_BREAK_SAME_INPUT_DIFFERENT_OUTPUT` and `CONTROLLED_FRAME_INTENSIFIER`.
+- `REGION_SOURCE_CLOSURE` (Phase B) — the source/dependency-closure half of the former `REGION_AS_IMPLEMENTATION_NOT_SOURCE` (the label-stripping half is the `region_label` handle).
+- `CONSERVATION_DEPENDENCY` (Phase B) — former `CONSERVATION_DEPENDENCY_RULE`.
+- `PROXY_PROMOTION_GATE`, `PRACTICAL_SIGNIFICANCE_GATE`, `PATCH_ADOPTION_GATE` — unchanged.
+
 ## Fixture 1: Diagnostic label as causal object
 
 Input pattern:
@@ -848,8 +959,7 @@ A paper compares autistic and intellectually disabled cohorts using a nanosensor
 
 Expected filters:
 
-- FOLKLORE_FILTER_DIAGNOSTIC_LABEL
-- LABEL_REMOVAL_RESIDUE_TEST
+- STRIP_AND_EXTRACT_GATE (handle: diagnostic_label, biomarker_status)
 - PROXY_PROMOTION_GATE
 - PRACTICAL_SIGNIFICANCE_GATE
 
@@ -883,9 +993,8 @@ A paper studies the same mutation in genetically similar samples. Some samples s
 
 Expected filters:
 
-- CHAIN_BREAK_SAME_INPUT_DIFFERENT_OUTPUT
-- CONTROLLED_FRAME_INTENSIFIER if environment or sample background is controlled
-- FOLKLORE_FILTER_DIAGNOSTIC_LABEL
+- CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR
+- STRIP_AND_EXTRACT_GATE (handle: diagnostic_label)
 
 Expected allowed support channel:
 
@@ -915,8 +1024,7 @@ An iPSC model is described as removing environmental confounds. The paper report
 
 Expected filters:
 
-- CONTROLLED_FRAME_INTENSIFIER
-- CHAIN_BREAK_SAME_INPUT_DIFFERENT_OUTPUT
+- CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR
 - PRACTICAL_SIGNIFICANCE_GATE if differences are statistical only
 
 Expected allowed support channel:
@@ -979,9 +1087,8 @@ A paper finds cortical activity during a behavior and states that cortex control
 
 Expected filters:
 
-- REGION_AS_IMPLEMENTATION_NOT_SOURCE
-- LABEL_REMOVAL_RESIDUE_TEST
-- CONTROLLER_LANGUAGE_FILTER
+- STRIP_AND_EXTRACT_GATE (handle: region_label, controller_command_language)
+- REGION_SOURCE_CLOSURE
 
 Expected allowed support channel:
 
@@ -1011,9 +1118,9 @@ A paper says a highly conserved brainstem region explains a behavior because the
 
 Expected filters:
 
-- CONSERVATION_DEPENDENCY_RULE
-- REGION_AS_IMPLEMENTATION_NOT_SOURCE
-- CONTROLLER_LANGUAGE_FILTER if command language appears
+- CONSERVATION_DEPENDENCY
+- REGION_SOURCE_CLOSURE
+- STRIP_AND_EXTRACT_GATE (handle: conservation_label, controller_command_language if command language appears)
 
 Expected allowed support channel:
 
@@ -1044,8 +1151,7 @@ A paper measures a blood or cellular marker and describes it as a mechanism of a
 Expected filters:
 
 - PROXY_PROMOTION_GATE
-- LABEL_REMOVAL_RESIDUE_TEST
-- FOLKLORE_FILTER_DIAGNOSTIC_LABEL
+- STRIP_AND_EXTRACT_GATE (handle: biomarker_status, diagnostic_label)
 - PRACTICAL_SIGNIFICANCE_GATE if significance language appears
 
 Expected allowed support channel:
@@ -1076,9 +1182,7 @@ A paper reports differences across an autism spectrum sample and treats the spec
 
 Expected filters:
 
-- SPECTRUM_COMPRESSION_FILTER
-- FOLKLORE_FILTER_DIAGNOSTIC_LABEL
-- LABEL_REMOVAL_RESIDUE_TEST
+- STRIP_AND_EXTRACT_GATE (handle: spectrum_label, diagnostic_label)
 
 Expected allowed support channel:
 
@@ -1161,6 +1265,37 @@ Expected blocked role:
 Common weak-LLM failure:
 
 The model gives a definition table and thinks it has explained the mechanism.
+
+## Fixture 11: Descriptive volume vs route-closing source (visibility-count exploit)
+
+Input pattern:
+
+Forty descriptive papers report the same diagnostic-label-based association (for example, a marker that correlates with a syndrome). None closes a causal route; most are label-dependent, and several share a cohort or assay pipeline. A single separate source identifies the missing differentiating variable and disconfirms the folklore reading.
+
+Expected filters:
+
+- STRIP_AND_EXTRACT_GATE (handle: diagnostic_label) on the descriptive pile
+- visibility_priority_cap
+- aggregation_limit
+- CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR on the route-closing source
+
+Expected allowed support channel:
+
+- descriptive_support / watchlist visibility for the volume
+- missing_differentiator_slot and disconfirmation note for the single source
+
+Expected blocked role:
+
+- ingest priority or node grounding derived from descriptive volume
+- the 40-paper pile outranking the route-closing source
+
+Expected outcome:
+
+The route-closing/disconfirming source holds higher ingest priority than the descriptive pile. Correlated sources (shared pipeline/cohort) count once, not forty times. Volume raises watchlist status only.
+
+Common weak-LLM failure:
+
+The model boosts the majority claim because many papers report it, and treats repetition as evidentiary weight.
 
 
 ===== 08_prompt_harness.md =====
@@ -1392,3 +1527,64 @@ The assistant previously treated user-supplied candidate rules as if they were i
 ## Rationale
 
 The NO/autism-style paper fails before evidence weighting when diagnostic labels, biomarker language, diagnosis, and spectrum language are doing causal work the assay did not generate. It can remain in the ingest record as attenuated support, but it cannot directly ground a mechanism or promotion candidate unless label-stripped physical residue and route closure survive.
+
+
+===== record_schema_v1.yaml =====
+
+# model/record_schema_v1.yaml — CANDIDATE
+# Shared per-paper, per-agent ingest record for ADR 0003 concurrent multi-LLM ingest.
+# BLOCKED for adoption until ADR 0003 identity decisions close (see depends_on). A schema is
+# required before any checkpoint comparison can mean anything, but its identity fields cannot be
+# finalized before paper_id resolution and the <agent> composite key are decided.
+record_schema_v1:
+  status: candidate
+  layer: support_layer   # ingest records are support-layer only; never claim-layer
+  depends_on:
+    - adr_0003.paper_id_resolution      # DOI-normalized / alt-id table / content-hash / late-DOI merge / quarantine
+    - adr_0003.agent_key                # family/version/run_id composite
+
+  fields:
+    schema_version:
+      const: v1
+      required: true
+    paper_id:
+      required: true
+      source: adr_0003_identity_resolution
+      note: canonical id resolved BEFORE any write; never a raw DOI/hash guess
+    agent:
+      required: true
+      form: family/version/run_id
+    measured_substrate:
+      required: true
+    measured_variable:
+      required: true
+    handle_dependencies:
+      required: true
+      note: author terms stripped or marked (diagnostic/region/biomarker/spectrum/controller/conservation/clinical-promise)
+    post_strip_claim:
+      required: true
+      form: post_strip_claim_form        # see model/06 (candidate slot taxonomy)
+      note: if the claim cannot be slotted, it cannot ground or promote
+    gate_results:
+      required: true
+      note: per Phase-B gate pass/fail; intersecting failures follow gate_intersection_semantics (05)
+    support_channels:
+      required: true
+      note: accumulate (union); nothing lost on failure
+    blocked_roles:
+      required: true
+      note: node_grounding / promotion / prediction, per most-restrictive surviving cap
+    promotion_status:
+      enum: [none, candidate, blocked]
+      required: true
+    visibility_priority:
+      required: true
+      note: bounded by visibility_priority_cap (05); descriptive volume raises watchlist only
+    supersedes:
+      required: false
+      note: append-only + generated "current" pointer; retries do not overwrite
+
+  invariants:
+    support_layer_only: true
+    no_claim_layer_write: true
+    identity_resolved_before_write: true
