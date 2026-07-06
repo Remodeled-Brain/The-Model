@@ -53,7 +53,7 @@ candidate_ingest_rules_reference:
       (post_strip_claim) separate.
 
   post_strip_claim_form:
-    status: candidate
+    status: reserved_for_v0_07   # slot taxonomy is promising but its consumer (node mapping) is deferred
     purpose: >
       Force support-bearing claims into physical slots so a natural-language post_strip_claim
       cannot launder a hidden causal operator after labels are removed. Slottability is the
@@ -98,6 +98,13 @@ candidate_ingest_rules_reference:
       - grouping_variable
       - post_strip_claim
       - handle_dependencies
+      - handle_flags
+    handle_condition_semantics: >
+      Within handle_types below, the listed conditions are FLAGS raised in Phase A, not Phase A
+      failures. Phase A is structural: it fails admissibility only when no post_strip_claim survives
+      handle removal. The flags (e.g. label_precedes_measurement, region_used_as_origin) are recorded
+      in handle_flags and adjudicated by the Phase B gates, which decide role and weight. This keeps
+      evidentiary judgment out of Phase A.
     handle_types:
       diagnostic_label:
         is_handle_for: cohort description / grouping
@@ -173,6 +180,9 @@ candidate_ingest_rules_reference:
       - missing_differentiator_slot
       - no_category_clarity_weight
       - intensified_route_burden
+    not_a_rejection: >
+      "Missing differentiator" marks the input set as incomplete and routes to intensified_route_burden
+      and a missing_differentiator_slot. It never means reject or discard the paper.
 
   REGION_SOURCE_CLOSURE:
     phase: B_validation

@@ -29,6 +29,7 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
 
   # --- v0.05 v4 revision: positive support types on an ordered ladder ---
   support_type_ladder:
+    status: reserved_for_v0_07   # forward-declaration; the weighting/grounding consumer is not designed yet
     note: >
       Ordered strongest to weakest role. A gate result assigns a level; "not established" means
       "capped at or below the named level," not free discretion. Levels are named, not numeric;
@@ -74,23 +75,29 @@ INGEST.GATE_FAILURE_ROUTING.05v4:
 
   gate_intersection_semantics:
     status: candidate
-    purpose: Deterministic result when several gates fail on one source; keep support info, cap safely.
+    purpose: Deterministic result when several gates apply to one source; keep support info, cap safely.
     rule: >
-      Failed-gate routes accumulate (union of notes; no support-layer information lost), but
-      support cap, node-grounding permission, and promotion permission collapse to the most
-      restrictive surviving value.
+      Failed-gate routes accumulate (union of notes; no support-layer information lost). Permissions
+      intersect: node-grounding and promotion are denied if ANY applicable gate denies them. Only a
+      `fail` denies; `not_applicable` and `unresolved` (see record_schema gate_results) do not.
     notes: accumulate
     permissions:
-      support_weight: min_across_failed_gates
-      node_grounding: denied_if_any_gate_denies
-      promotion: denied_if_any_gate_denies
+      node_grounding: denied_if_any_applicable_gate_fails
+      promotion: denied_if_any_applicable_gate_fails
+    support_cap:
+      note: >
+        There is no single scalar minimum across gates — support-channel outputs are unrelated
+        strings on orthogonal dimensions (e.g. proxy_only vs implementation_site_observation), so no
+        total order exists. Each failing gate imposes its own channel cap independently; a source
+        carries every cap that applies. Do not attempt a numeric min across them.
     example:
       failed_gates: [region_source_closure, conservation_dependency, proxy_promotion]
       notes_accumulated: [implementation_site_observation, conservation_handle, proxy_only_evidence]
-      result: {causal_weight: none, node_grounding: denied, promotion: denied}
+      caps_applied: [no_origin_weight, no_causal_weight, capped_by_proxy_status]
+      result: {node_grounding: denied, promotion: denied}
 
   visibility_priority_cap:
-    status: candidate
+    status: reserved_for_v0_07   # invariant is sound but its consumer (priority ranking) is deferred
     purpose: Prevent a large folklore-biased literature from hijacking ingest priority.
     rule: >
       Descriptive volume raises watchlist visibility only. A body of label-dependent,

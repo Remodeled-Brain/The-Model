@@ -8,7 +8,7 @@ record_schema_v1:
   layer: support_layer   # ingest records are support-layer only; never claim-layer
   depends_on:
     - adr_0003.paper_id_resolution      # DOI-normalized / alt-id table / content-hash / late-DOI merge / quarantine
-    - adr_0003.agent_key                # family/version/run_id composite
+    - adr_0003.agent_key                # family/version path key + run_id as a record field
 
   fields:
     schema_version:
@@ -20,11 +20,17 @@ record_schema_v1:
       note: canonical id resolved BEFORE any write; never a raw DOI/hash guess
     agent:
       required: true
-      form: family/version/run_id
+      form: family/version              # model identity = path key (ADR 0003 identity split)
+    run_id:
+      required: true
+      note: run identity; provenance field, NOT a path component (ADR 0003 identity split)
     measured_substrate:
       required: true
     measured_variable:
       required: true
+    grouping_variable:
+      required: true
+      note: cohort/grouping variable preserved from Phase A; a handle, never causal
     handle_dependencies:
       required: true
       note: author terms stripped or marked (diagnostic/region/biomarker/spectrum/controller/conservation/clinical-promise)
@@ -34,7 +40,11 @@ record_schema_v1:
       note: if the claim cannot be slotted, it cannot ground or promote
     gate_results:
       required: true
-      note: per Phase-B gate pass/fail; intersecting failures follow gate_intersection_semantics (05)
+      per_gate_state: [pass, fail, not_applicable, unresolved]
+      note: >
+        each Phase-B gate records one state; not_applicable and unresolved are distinct from fail.
+        intersecting results follow gate_intersection_semantics (05): only fail denies permissions;
+        not_applicable and unresolved never grant grounding but are not treated as fail.
     support_channels:
       required: true
       note: accumulate (union); nothing lost on failure

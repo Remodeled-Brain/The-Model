@@ -338,32 +338,36 @@ Common weak-LLM failure:
 
 The model gives a definition table and thinks it has explained the mechanism.
 
-## Fixture 11: Descriptive volume vs route-closing source (visibility-count exploit)
+## Fixture 11: Descriptive volume does not become grounding (visibility-count exploit)
+
+This fixture tests one behavior: descriptive volume raising visibility must not convert to grounding or priority. It exercises `visibility_priority_cap` and `aggregation_limit` (both `reserved_for_v0_07`); treat it as a reserved/forward fixture until those consumers are adopted.
 
 Input pattern:
 
-Forty descriptive papers report the same diagnostic-label-based association (for example, a marker that correlates with a syndrome). None closes a causal route; most are label-dependent, and several share a cohort or assay pipeline. A single separate source identifies the missing differentiating variable and disconfirms the folklore reading.
+Forty descriptive papers report the same diagnostic-label-based association (for example, a marker that correlates with a syndrome). None closes a causal route and all are label-dependent. Provenance fields show several share one cohort or assay pipeline (`shared_pipeline_id` present on those records).
 
 Expected filters:
 
-- STRIP_AND_EXTRACT_GATE (handle: diagnostic_label) on the descriptive pile
-- visibility_priority_cap
+- STRIP_AND_EXTRACT_GATE (handle: diagnostic_label) on each paper — all route to label-dependent / descriptive_support
 - aggregation_limit
-- CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR on the route-closing source
+- visibility_priority_cap
 
 Expected allowed support channel:
 
-- descriptive_support / watchlist visibility for the volume
-- missing_differentiator_slot and disconfirmation note for the single source
+- descriptive_support and watchlist visibility for the volume
 
 Expected blocked role:
 
-- ingest priority or node grounding derived from descriptive volume
-- the 40-paper pile outranking the route-closing source
+- node grounding derived from descriptive volume (raw count never grounds)
+- ingest priority derived from descriptive volume
 
 Expected outcome:
 
-The route-closing/disconfirming source holds higher ingest priority than the descriptive pile. Correlated sources (shared pipeline/cohort) count once, not forty times. Volume raises watchlist status only.
+Volume raises watchlist visibility only; it produces no grounding and no priority. Records sharing `shared_pipeline_id` count once for visibility, not forty times.
+
+Note (separate behavior, not asserted here):
+
+The precedence of a route-closing or disconfirming source over a descriptive pile is a priority-ranking behavior that belongs to the deferred weighting pass; it is intentionally out of scope for this fixture and is not tested via CONTROLLED_SAMENESS (which requires an actual same-input/different-output frame, absent here).
 
 Common weak-LLM failure:
 

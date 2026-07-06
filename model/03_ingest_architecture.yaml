@@ -54,7 +54,11 @@ v0_05_v4_ingest_architecture:
         - grouping_variable
         - post_strip_claim
         - handle_dependencies
-      claim_form: see model/06 post_strip_claim_form (candidate; slots the post_strip_claim)
+        - handle_flags   # structural markers (e.g. label_precedes_measurement) adjudicated in Phase B
+      phase_A_is_structural: >
+        Phase A raises handle_flags but does not adjudicate them. It fails admissibility only when no
+        post_strip_claim survives handle removal. All evidentiary judgment is deferred to Phase B.
+      claim_form: see model/06 post_strip_claim_form (reserved_for_v0_07)
       admissibility_verdict:
         admissible_if: a post_strip_claim exists after handles are removed
         inadmissible_if: no physical claim survives handle removal
@@ -70,6 +74,10 @@ v0_05_v4_ingest_architecture:
       - proxy_promotion                              # proxy != mechanism without translation controls
       - practical_significance                       # analytical separability != biological/clinical weight
       - controlled_sameness_missing_differentiator   # merged chain-break + controlled-frame
+    adjudicates_handle_flags: >
+      Phase B consumes the handle_flags raised in Phase A (e.g. label_precedes_measurement,
+      region_used_as_origin, proxy_present) and decides role and weight from them. The flags are the
+      evidentiary questions; Phase A only recorded them.
     interaction_note: >
       region_source_closure and conservation_dependency can affect each other; both run on the
       already-extracted claim fields before roles are assigned, so ordering between them does not

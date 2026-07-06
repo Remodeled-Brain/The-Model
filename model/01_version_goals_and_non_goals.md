@@ -17,7 +17,7 @@ The foundation for this version is:
 - conserved dependency
 - routed maintenance
 - demonstrated causal chain
-- folklore-stripped residue
+- the folklore-stripped physical claim (`post_strip_claim`)
 
 ## Global shift
 
@@ -37,7 +37,7 @@ Move to:
 - demonstrated causal chain first
 - region as implementation site unless source is demonstrated
 - diagnostic, biomarker, spectrum, and region labels as handles only
-- physical residue before node mapping
+- `post_strip_claim` before node mapping
 
 ## Core principle
 
@@ -49,7 +49,7 @@ Validation evaluates evidentiary strength only after the source generates an adm
 
 INGEST.PRINCIPLE.05v4:
 
-Ingestion begins by stripping folklore and regional interface text. Only the physically measured substrate, demonstrated variable, causal route, and surviving residue may map to model nodes. Diagnostic labels, region labels, biomarker labels, spectrum labels, and conserved-region labels are handles only. They cannot perform causal work.
+Ingest runs in two phases. Phase A (admissibility) strips folklore and regional interface text and extracts claim fields — measured substrate, measured variable, grouping variable, and the `post_strip_claim` that remains once labels are treated as handles. Phase B (validation) then weights evidence and assigns a role. Only the extracted `post_strip_claim` may map to model nodes, and only after Phase B. Diagnostic labels, region labels, biomarker labels, spectrum labels, and conserved-region labels are handles only. They cannot perform causal work.
 
 ## Non-goals
 

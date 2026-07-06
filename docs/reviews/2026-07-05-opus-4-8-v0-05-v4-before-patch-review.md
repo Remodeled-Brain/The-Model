@@ -74,6 +74,19 @@ A follow-up round relayed Gemini feedback (via ChatGPT). It was gated the same w
 
 Not done in-sandbox: regeneration of `10_single_file_master_prompt.txt` — build tooling is correct and compiles, but the mounted `manifest.json` was served truncated (file-sync artifact); regenerate with `python scripts/build_master_prompt.py` locally.
 
+## Third round — external reviews reconciled (candidate)
+
+The batch was sent to the other LLMs to gate. Two reviews returned; Fable did not (safeguard bounce). Both remain candidate.
+
+- **ChatGPT** — hold-from-adoption plus concrete defects and a minimal safe-adoption set. Verified independently: `01`/`09` still carried retired `residue`/rule names; `record_schema_v1` omitted `grouping_variable`; `min_across_failed_gates` is not implementable across orthogonal string outputs. Conceded.
+- **Gemini** — accept, but on a partial read (opened `00`, `02`, `09`, `03`, `06`, CONTRIBUTING only; never `05`, `07`, `record_schema_v1`, or ADR 0003 — the files holding the defects), and praise-weighted. Treated as confirmation of the core it did read, not as a rebuttal of ChatGPT.
+
+The two **converge on the core** (two-phase A/B split, `STRIP_AND_EXTRACT_GATE`, `post_strip_claim`, failure-routing); divergence is confined to files Gemini skipped.
+
+Applied (changelog `changelog.d/2026-07-05-claude-review-reconciliation.md`): `01`/`09` terminology sync; `grouping_variable` + `not_applicable`/`unresolved` gate states; dropped the unimplementable `min`; `reserved_for_v0_07` on the ladder / visibility cap / claim form / (implicitly) record schema; Phase-A conditions → `handle_flags` adjudicated in Phase B; controlled-sameness non-reject guard; Fixture 11 tightened; ADR 0003 DOI path-safety + model/run identity split + supersession (still CANDIDATE); CONTRIBUTING adopted-vs-candidate clarification.
+
+Still open: checkpoint-4 input/framing, retirement guards, consensus mechanisms (ADR 0003); support-type ladder boundaries.
+
 ## Not superseding
 
 This note is an audit record only. `AGENTS.md`, ADR 0002, ADR 0003, and `model/00`–`06` remain authoritative. No claim-layer changes were made. Nothing here is adopted.

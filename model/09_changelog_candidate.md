@@ -12,33 +12,34 @@ v0.05 v4 candidate work shifts paper ingest toward admissibility-before-validati
 
 INGEST.PRINCIPLE.05v4:
 
-Ingestion begins by stripping folklore and regional interface text. Only the physically measured substrate, demonstrated variable, causal route, and surviving residue may map to model nodes. Diagnostic labels, region labels, biomarker labels, spectrum labels, and conserved-region labels are handles only. They cannot perform causal work.
+Ingest runs in two phases. Phase A (admissibility) strips folklore and regional interface text and extracts claim fields — measured substrate, measured variable, grouping variable, and the `post_strip_claim` that remains once labels are treated as handles. Phase B (validation) then weights evidence and assigns a role. Only the extracted `post_strip_claim` may map to model nodes, and only after Phase B. Diagnostic labels, region labels, biomarker labels, spectrum labels, and conserved-region labels are handles only. They cannot perform causal work.
 
-## Added candidate ingest ordering
+## Added candidate ingest ordering (two-phase)
+
+Phase A (admissibility, structural):
 
 - strip_author_interface_text
-- run_folklore_filters
-- run_region_as_implementation_filter
-- run_label_removal_residue_test
-- run_proxy_promotion_gate
-- run_chain_closure_gate
-- run_conservation_dependency_gate
-- map_surviving_residue_to_nodes
+- run_strip_and_extract_gate  (emits post_strip_claim + handle flags; no evidence weighting)
+
+Phase B (validation, on extracted fields):
+
+- controlled_sameness_missing_differentiator
+- region_source_closure
+- conservation_dependency
+- proxy_promotion
+- practical_significance
+- map_post_strip_claim_to_nodes
 - write_support_layer_only
 - mark_promotion_candidates_only_after_gates_pass
 
-## Added candidate rule cluster
+## Added candidate rule cluster (consolidated)
 
-- LABEL_REMOVAL_RESIDUE_TEST
-- FOLKLORE_FILTER_DIAGNOSTIC_LABEL
-- REGION_AS_IMPLEMENTATION_NOT_SOURCE
-- CONSERVATION_DEPENDENCY_RULE
-- CHAIN_BREAK_SAME_INPUT_DIFFERENT_OUTPUT
-- CONTROLLED_FRAME_INTENSIFIER
-- PRACTICAL_SIGNIFICANCE_GATE
-- implied PROXY_PROMOTION_GATE
-- implied SPECTRUM_COMPRESSION_FILTER
-- implied CONTROLLER_LANGUAGE_FILTER
+- STRIP_AND_EXTRACT_GATE (Phase A; subsumes the former LABEL_REMOVAL_RESIDUE_TEST, FOLKLORE_FILTER_DIAGNOSTIC_LABEL, SPECTRUM_COMPRESSION_FILTER, CONTROLLER_LANGUAGE_FILTER, biomarker filter, region-label stripping) + handle-type table
+- CONTROLLED_SAMENESS_MISSING_DIFFERENTIATOR (Phase B; merges CHAIN_BREAK_SAME_INPUT_DIFFERENT_OUTPUT + CONTROLLED_FRAME_INTENSIFIER)
+- REGION_SOURCE_CLOSURE (Phase B)
+- CONSERVATION_DEPENDENCY (Phase B)
+- PROXY_PROMOTION_GATE (Phase B)
+- PRACTICAL_SIGNIFICANCE_GATE (Phase B)
 
 ## Added failure semantics
 

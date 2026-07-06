@@ -39,7 +39,7 @@ Intended multi-pass pipeline, with **two comparison checkpoints** in the early s
 
 Two agents can independently assign different ids to the same paper (DOI vs preprint vs PDF-render variant), fragmenting one paper into multiple record trees. Resolve identity **before** writing a canonical path:
 
-1. **DOI normalization** — lowercase, strip resolver prefix, canonical form; DOI is primary `paper_id` when present.
+1. **DOI normalization + path-safe encoding** — lowercase, strip resolver prefix, canonical form; DOI is primary `paper_id` when present. Raw DOIs contain `/` and other reserved characters and are **not path-safe**, so the id used as a directory name must be path-safe-encoded (percent-encode or a defined reversible substitution). The human-readable DOI is retained as a field on the record.
 2. **Alternate-identifier table** — map PMID/arXiv/preprint ids to the canonical `paper_id`.
 3. **Content-hash canonicalization** — fallback when no DOI: hash normalized text (strip whitespace, encoding, and PDF-render variance) so re-exports of the same paper collide rather than fragment.
 4. **Late-arriving-DOI merge path** — when an agent later resolves a DOI for a hash-keyed paper, a serialized merge job re-parents the hash tree under the DOI `paper_id` and leaves a redirect.
@@ -47,9 +47,9 @@ Two agents can independently assign different ids to the same paper (DOI vs prep
 
 ## Record identity, schema, and crash semantics (revised)
 
-- **`<agent>` granularity.** `<agent>` is not just "claude"/"chatgpt". It is a composite key `family/version/run_id` (e.g. `claude/opus-4-8/2026-07-05T…`). Weighting comparison across unpinned model versions is otherwise meaningless.
+- **Model identity vs run identity — keep them separate.** The `<agent>` path token is **model identity only**: `family/version` (e.g. `claude/opus-4-8`), which is the stable key comparisons group on. **Run identity (`run_id`) is a record field, not a path component** — putting run_id in the path explodes directory cardinality (a new tree per run) and fragments the very comparison inputs this design exists to keep clean. So: path = `ingest/<paper_id>/<family>/<version>/record.yaml`; `run_id`, timestamp, and tool version live inside the record as provenance.
 - **Shared `record.yaml` schema, versioned, shipped before any checkpoint.** Checkpoint comparison over unschematized records has no defined meaning. Schema versioning lets comparisons detect and handle format drift.
-- **Append-only + supersession.** Records are append-only; a `supersedes:` field plus a generated `current` pointer selects the live record per (paper, agent). Retries do not silently overwrite.
+- **Append-only + supersession (disambiguated).** Records are append-only. Each carries a monotonic `seq` (or ISO timestamp) and an optional `supersedes:` naming the record it replaces. The live record per (paper, model-identity) is chosen by a **serialized derived build** (not by concurrent writers): it is the newest record not named in any `supersedes:`, ties broken by `seq` then content hash. The `current` pointer is an output of that build, never hand-set. Retries append a new record and supersede the old; they never overwrite.
 - **Crash/retry = temp-write-then-atomic-rename.** Write to a temp path, `fsync`, then atomic rename into place, so a crash mid-write never leaves a partial canonical record.
 
 ## Checkpoint 4 (weighting comparison) — specified
@@ -60,7 +60,8 @@ Two agents can independently assign different ids to the same paper (DOI vs prep
 ## Open blockers (must resolve before adoption)
 
 - **`paper_id` resolution + merge/quarantine policy** — the algorithm and the late-DOI merge/redirect behavior.
-- **`<agent>` composite-key format** — exact `family/version/run_id` encoding.
+- **Path-safe `paper_id` encoding** — the exact reversible DOI→path scheme.
+- **Model-identity path key** — confirm `family/version` as the path token, with `run_id` as a record field (not a path component).
 - **`record.yaml` schema v1** — fields and version marker, shipped before any checkpoint.
 - **Append-only vs supersession details** — `current`-pointer generation and conflict handling.
 - **Substrate + migration trigger numbers** — confirm the git→DB thresholds against real runs.

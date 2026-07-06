@@ -4,7 +4,7 @@ This file is the single source of truth for *how* to work in this repo, regardle
 
 ## 1. Canonical vs candidate — do not confuse them
 
-- The canonical, adopted model lives in `model/`. Treat it as truth.
+- `model/` is the canonical *location*, but it holds **both adopted and candidate material** — status is per-file, read each file's `status:` field (or a candidate banner). Do not assume everything in `model/` is adopted truth; a file marked `status: candidate` (or `reserved_for_v0_07`) is not.
 - New rules, patches, and changes are **candidate** until the user *explicitly* says "adopted" / "approved."
 - **Never** rewrite candidate material as if it were integrated. This is the single most important rule and the one most often broken. See `model/04_candidate_rule_adoption_gate.yaml`.
 
