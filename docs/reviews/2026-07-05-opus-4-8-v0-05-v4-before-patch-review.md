@@ -76,12 +76,14 @@ Not done in-sandbox: regeneration of `10_single_file_master_prompt.txt` — buil
 
 ## Third round — external reviews reconciled (candidate)
 
-The batch was sent to the other LLMs to gate. Two reviews returned; Fable did not (safeguard bounce). Both remain candidate.
+The batch was sent to the other LLMs to gate. Three reviews returned — ChatGPT, Gemini, and (later) Fable. All remain candidate.
 
 - **ChatGPT** — hold-from-adoption plus concrete defects and a minimal safe-adoption set. Verified independently: `01`/`09` still carried retired `residue`/rule names; `record_schema_v1` omitted `grouping_variable`; `min_across_failed_gates` is not implementable across orthogonal string outputs. Conceded.
 - **Gemini** — accept, but on a partial read (opened `00`, `02`, `09`, `03`, `06`, CONTRIBUTING only; never `05`, `07`, `record_schema_v1`, or ADR 0003 — the files holding the defects), and praise-weighted. Treated as confirmation of the core it did read, not as a rebuttal of ChatGPT.
 
-The two **converge on the core** (two-phase A/B split, `STRIP_AND_EXTRACT_GATE`, `post_strip_claim`, failure-routing); divergence is confined to files Gemini skipped.
+- **Fable** — the deepest read (all modular files, from HEAD since its working tree was truncated/corrupt — the same sync corruption seen elsewhere). Largely converges with ChatGPT and pre-validates the reconciliation: its Item 2 (`min` depends on the ladder) is superseded by our removing `min` entirely; Item 3 split, Item 6.1 (`run_id` out of the path key), and Fixture 11 scoping were already applied. New/correct points folded in (see `changelog.d/2026-07-06-claude-fable-fold-in.md`): the Phase-A `not_evidentiary` invariant contradiction (Item 1), checkpoint-4 retirement mechanics shipped while HOLD (Item 6.2), content-hash stated as solved though a noisy proxy across PDF pipelines (Item 6.3), and stale `model/10` (cross-cutting). Divergence to note: Fable keeps the trimmed 4-field `post_strip_claim_form` active, whereas ChatGPT and this reconciliation mark it `reserved_for_v0_07` — left reserved, flagged for the user.
+
+All three **converge on the core** (two-phase A/B split, `STRIP_AND_EXTRACT_GATE`, `post_strip_claim`, failure-routing); divergence was confined to files Gemini skipped, and Fable independently confirmed both the core and the coherence defects.
 
 Applied (changelog `changelog.d/2026-07-05-claude-review-reconciliation.md`): `01`/`09` terminology sync; `grouping_variable` + `not_applicable`/`unresolved` gate states; dropped the unimplementable `min`; `reserved_for_v0_07` on the ladder / visibility cap / claim form / (implicitly) record schema; Phase-A conditions → `handle_flags` adjudicated in Phase B; controlled-sameness non-reject guard; Fixture 11 tightened; ADR 0003 DOI path-safety + model/run identity split + supersession (still CANDIDATE); CONTRIBUTING adopted-vs-candidate clarification.
 

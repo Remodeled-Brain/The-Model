@@ -129,7 +129,11 @@ v0_05_v4_ingest_architecture:
   validator_invariants:
     two_phase_order_required: true
     phase_A_admissibility_before_phase_B_validation: true
-    admissibility_is_structural_not_evidentiary: true
+    admissibility_flags_in_phase_A_evidentiary_adjudication_in_phase_B: true
+    # Phase A records handle_flags (structural markers) and decides only whether a post_strip_claim
+    # exists; the evidentiary predicates behind those flags are adjudicated by Phase B gates, not A.
+    # (Deeper follow-up: relabel 06 handle_types `fail_if` -> `flags` and move any predicate that
+    #  weighs method/route evidence to its Phase B gate. Tracked as an open item.)
     node_mapping_requires_post_strip_claim: true
     support_layer_only_during_ingest: true
     promotion_candidate_requires_prior_gates_passed: true

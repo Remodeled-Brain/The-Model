@@ -41,7 +41,7 @@ Two agents can independently assign different ids to the same paper (DOI vs prep
 
 1. **DOI normalization + path-safe encoding** — lowercase, strip resolver prefix, canonical form; DOI is primary `paper_id` when present. Raw DOIs contain `/` and other reserved characters and are **not path-safe**, so the id used as a directory name must be path-safe-encoded (percent-encode or a defined reversible substitution). The human-readable DOI is retained as a field on the record.
 2. **Alternate-identifier table** — map PMID/arXiv/preprint ids to the canonical `paper_id`.
-3. **Content-hash canonicalization** — fallback when no DOI: hash normalized text (strip whitespace, encoding, and PDF-render variance) so re-exports of the same paper collide rather than fragment.
+3. **Content-hash canonicalization (OPEN — noisy proxy, not solved).** Fallback when no DOI. An *exact* hash of "normalized text" will **not** collide reliably across different PDF-extraction pipelines (OCR, ligatures, hyphenation, figure text), so it can fragment the same paper — the very failure it targets. Treat as an unresolved blocker: needs a near-duplicate/similarity threshold, or explicit reliance on the late-DOI merge path rather than the hash alone.
 4. **Late-arriving-DOI merge path** — when an agent later resolves a DOI for a hash-keyed paper, a serialized merge job re-parents the hash tree under the DOI `paper_id` and leaves a redirect.
 5. **Pending/quarantine state** — unresolved identity writes to `ingest/_pending/<hash>/…`, never to a canonical `paper_id` path, until resolution.
 
@@ -52,10 +52,14 @@ Two agents can independently assign different ids to the same paper (DOI vs prep
 - **Append-only + supersession (disambiguated).** Records are append-only. Each carries a monotonic `seq` (or ISO timestamp) and an optional `supersedes:` naming the record it replaces. The live record per (paper, model-identity) is chosen by a **serialized derived build** (not by concurrent writers): it is the newest record not named in any `supersedes:`, ties broken by `seq` then content hash. The `current` pointer is an output of that build, never hand-set. Retries append a new record and supersede the old; they never overwrite.
 - **Crash/retry = temp-write-then-atomic-rename.** Write to a temp path, `fsync`, then atomic rename into place, so a crash mid-write never leaves a partial canonical record.
 
-## Checkpoint 4 (weighting comparison) — specified
+## Checkpoint 4 (weighting comparison) — RESERVED, input undecided (blocker)
 
-- **Input must be stated.** If checkpoint 4 runs on **pre-consensus** ingest, weighting divergence is confounded with ingest divergence and the retirement criterion is ill-posed → in that case **hold or cut**. If it runs on **post-consensus** ingest, all agents weight identical input, so divergence is model-to-model scoring variance → **reframe checkpoint 4 as model-QA, not data-consensus.**
-- **Retirement guards.** Retire-on-agreement is unsafe for swappable/correlated LLMs. Any retirement criterion must include: reset-on-model-change, reopen-on-drift, disagreement sampling, and bias/correlation review (agreement can be shared bias, not correctness). A retire-only, never-reopen gate is not acceptable for a non-stationary agent set.
+Checkpoint 4 is **held**: its pre- vs post-consensus input is undecided, and its retirement criterion is ill-posed until that input is fixed. Specifying retirement machinery now would be premature elaboration for an undecided consumer, so it is **not** specified here.
+
+Recorded only as the constraints any future design must satisfy (not adopted):
+
+- **Input decides everything.** Pre-consensus input confounds weighting divergence with ingest divergence (→ likely cut). Post-consensus input makes divergence pure model-to-model variance (→ reframe as model-QA, not data-consensus).
+- **If it ever ships,** retirement cannot be retire-on-agreement alone (agreement can be shared bias): it would need reset-on-model-change, reopen-on-drift, and correlation review. But none of that is designed until the input question closes.
 
 ## Open blockers (must resolve before adoption)
 
