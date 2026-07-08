@@ -1,0 +1,6 @@
+# Normalize all text files to LF in the repo and on checkout.
+# Stops the CRLF churn that the history rewrite introduced.
+* text=auto eol=lf
+
+# Explicit binary (never touch): the frozen porting-packet zip
+*.zip binary
