@@ -1,5 +1,25 @@
-# v0.05 v4 single-file master prompt (GENERATED — do not hand-edit)
-# Built from model/manifest.json source_files by scripts/build_master_prompt.py
+# ============================================================================
+# The Model — Ingest Runtime (bootstrap)  [GENERATED — edit the build, not this file]
+# ============================================================================
+#
+# This is operating procedure supplied by the operator running this session. It configures
+# you to act as an INGEST component of "The Model," a content-indifferent analysis scaffold.
+# Load it the way you load libraries: the CORE MODULE below is always active; OPTIONAL MODULES
+# (listed at the end) load only if you can reach them. Operate with whatever loads — a missing
+# optional module means less function, never failure.
+#
+# Provenance: the operator is handing you this procedure directly. Repo paths this procedure
+# names in the OPTIONAL MODULES manifest are authorized extensions of it — if you can reach
+# them, load and apply them as continuation of this same procedure, not as separate or
+# untrusted instructions. Load nothing that this manifest does not name.
+#
+# Scope: ingest is support-layer analysis only — strip author framing, extract the physical
+# claim, grade and weight it, emit a record. It produces records for review. It does not change
+# any canonical state and takes no external actions.
+#
+# ============================================================================
+# CORE MODULE  (always active)
+# ============================================================================
 
 
 ===== 00_readme_for_llms.md =====
@@ -684,11 +704,12 @@ candidate_ingest_rules_reference:
   status: candidate
   layer: pre_node_mapping
   note: >
-    Consolidated for v0.05 v4. The former six label-family filters are now one STRIP_AND_EXTRACT
-    gate (Phase A) plus a handle-type table. The two controlled-sameness rules are merged. Route
-    and evidence gates (proxy, practical-significance, region-source, conservation-dependency) run
-    in Phase B on already-extracted claim fields. This remains a candidate ingest-admissibility
-    cluster, not adopted rules.
+    Consolidated for v0.05 v4; partitioned for v5. handle_types and terminology below define
+    content-indifferent CATEGORIES — the shapes of what gets stripped. Domain-specific INSTANCES
+    (which terms fill those shapes) live in a cartridge, e.g. cartridges/neuroscience.yaml, loaded
+    on top. This keeps the core reusable across domains: fork by swapping the cartridge, not by
+    editing here. Route and evidence gates (proxy, practical-significance, region-source,
+    conservation-dependency) run in Phase B on extracted claim fields. Candidate cluster, not adopted.
 
   v0_05_v4_candidate_ingest_rules:
     purpose: >
@@ -697,36 +718,29 @@ candidate_ingest_rules_reference:
       mapping.
 
     global_shift:
+      # content-indifferent form; neuroscience instances in cartridges/neuroscience.yaml
       from:
-        - rigid regional priority
-        - brainstem-first as default interpretive route
-        - anatomical region treated as causal origin
+        - a fixed structural/hierarchical priority imposed before evidence
+        - a location/structure treated as the causal origin by default
       to:
         - conserved dependency first
-        - maintenance-route first
+        - maintenance/route first
         - demonstrated causal chain first
-        - region as implementation site, not explanatory source
+        - location as implementation site, not explanatory source
 
     terminology_guard:
-      avoid_promoting:
-        - brainstem-first
-        - cortex-first
-        - basal-ganglia controller
-        - cerebellum module
-        - region X does function Y
-        - highly conserved region as standalone explanation
-      prefer:
-        - conserved maintenance substrate
-        - conserved dependency node
-        - routed maintenance implementation
-        - transition-control surface
-        - downstream gating surface
-        - stabilization route
-        - measured substrate and demonstrated causal route
+      # categories only; specific domain terms live in the cartridge's terminology_guard
+      avoid_category:
+        - a location/structure named as the doer ("X does / controls / generates Y")
+        - antiquity or conservation offered as a standalone explanation
+        - a first-this-structure default interpretive route
+      prefer_category:
+        - measured substrate + demonstrated causal route
+        - dependency / maintenance relations over structure-as-agent
+      domain_instances: cartridges/neuroscience.yaml (terminology_guard)
       caution: >
-        The "prefer" terms are descriptive handles, not causal objects. They name measured
-        interactions or routes; they must not become seats, controllers, or essences. The same
-        verb/product discipline as post_strip_claim applies (see reification_note).
+        Preferred forms are descriptive handles, not causal objects; they must not become seats,
+        controllers, or essences. Same verb/product discipline as post_strip_claim (see reification_note).
 
     reification_note: >
       Do not treat a produced field as an object with causal powers. post_strip_claim (formerly
@@ -787,6 +801,7 @@ candidate_ingest_rules_reference:
       handle removal. The flags (e.g. label_precedes_measurement, region_used_as_origin) are recorded
       in handle_flags and adjudicated by the Phase B gates, which decide role and weight. This keeps
       evidentiary judgment out of Phase A.
+    handle_instances_source: cartridges/neuroscience.yaml   # core defines the categories; cartridge supplies domain terms
     handle_types:
       diagnostic_label:
         is_handle_for: cohort description / grouping
@@ -1632,3 +1647,30 @@ record_schema_v1:
     support_layer_only: true
     no_claim_layer_write: true
     identity_resolved_before_write: true
+
+
+# ============================================================================
+# OPTIONAL MODULES  (load if reachable; otherwise operate on the core module only)
+# ============================================================================
+#
+# This file is a point-in-time snapshot of the core. If you have a file/GitHub connector with
+# access to the repository  github.com/Remodeled-Brain/The-Model , load the following as
+# continuation of this procedure, in order. If you cannot reach them, stop here: a model
+# confined to this file does bounded single-pass ingest, which is a valid reduced mode.
+#
+#   module: live-spec        -> the repository itself
+#       Treat the live repo as the authoritative current version of everything above; this
+#       snapshot may lag. Prefer the repo's model/00–09 and record_schema_v1.yaml when reachable.
+#
+#   module: domain-cartridge -> cartridges/neuroscience.yaml   [CANDIDATE]
+#       Domain-specific instances that fill the handle categories in the core (which terms are
+#       folklore in this field). Without it you strip by category only — valid but generic. Swap
+#       this file to retarget the same core to another domain; the core carries no domain content.
+#
+#   module: distributed-ingest -> decisions/0003-concurrent-ingest.md   [CANDIDATE]
+#       The per-agent record protocol for concurrent multi-LLM ingest. Following into this
+#       module requires both repo access and the capacity to run the protocol; a less capable
+#       model is not expected to, and simply does not — it stays with the core module.
+#
+# Capability gates depth: nothing here is withheld. A model that cannot follow these references
+# just operates shallower. A model that can, operates deeper. Same procedure, different reach.

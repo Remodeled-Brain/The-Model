@@ -2,11 +2,12 @@ candidate_ingest_rules_reference:
   status: candidate
   layer: pre_node_mapping
   note: >
-    Consolidated for v0.05 v4. The former six label-family filters are now one STRIP_AND_EXTRACT
-    gate (Phase A) plus a handle-type table. The two controlled-sameness rules are merged. Route
-    and evidence gates (proxy, practical-significance, region-source, conservation-dependency) run
-    in Phase B on already-extracted claim fields. This remains a candidate ingest-admissibility
-    cluster, not adopted rules.
+    Consolidated for v0.05 v4; partitioned for v5. handle_types and terminology below define
+    content-indifferent CATEGORIES — the shapes of what gets stripped. Domain-specific INSTANCES
+    (which terms fill those shapes) live in a cartridge, e.g. cartridges/neuroscience.yaml, loaded
+    on top. This keeps the core reusable across domains: fork by swapping the cartridge, not by
+    editing here. Route and evidence gates (proxy, practical-significance, region-source,
+    conservation-dependency) run in Phase B on extracted claim fields. Candidate cluster, not adopted.
 
   v0_05_v4_candidate_ingest_rules:
     purpose: >
@@ -15,36 +16,29 @@ candidate_ingest_rules_reference:
       mapping.
 
     global_shift:
+      # content-indifferent form; neuroscience instances in cartridges/neuroscience.yaml
       from:
-        - rigid regional priority
-        - brainstem-first as default interpretive route
-        - anatomical region treated as causal origin
+        - a fixed structural/hierarchical priority imposed before evidence
+        - a location/structure treated as the causal origin by default
       to:
         - conserved dependency first
-        - maintenance-route first
+        - maintenance/route first
         - demonstrated causal chain first
-        - region as implementation site, not explanatory source
+        - location as implementation site, not explanatory source
 
     terminology_guard:
-      avoid_promoting:
-        - brainstem-first
-        - cortex-first
-        - basal-ganglia controller
-        - cerebellum module
-        - region X does function Y
-        - highly conserved region as standalone explanation
-      prefer:
-        - conserved maintenance substrate
-        - conserved dependency node
-        - routed maintenance implementation
-        - transition-control surface
-        - downstream gating surface
-        - stabilization route
-        - measured substrate and demonstrated causal route
+      # categories only; specific domain terms live in the cartridge's terminology_guard
+      avoid_category:
+        - a location/structure named as the doer ("X does / controls / generates Y")
+        - antiquity or conservation offered as a standalone explanation
+        - a first-this-structure default interpretive route
+      prefer_category:
+        - measured substrate + demonstrated causal route
+        - dependency / maintenance relations over structure-as-agent
+      domain_instances: cartridges/neuroscience.yaml (terminology_guard)
       caution: >
-        The "prefer" terms are descriptive handles, not causal objects. They name measured
-        interactions or routes; they must not become seats, controllers, or essences. The same
-        verb/product discipline as post_strip_claim applies (see reification_note).
+        Preferred forms are descriptive handles, not causal objects; they must not become seats,
+        controllers, or essences. Same verb/product discipline as post_strip_claim (see reification_note).
 
     reification_note: >
       Do not treat a produced field as an object with causal powers. post_strip_claim (formerly
@@ -105,6 +99,7 @@ candidate_ingest_rules_reference:
       handle removal. The flags (e.g. label_precedes_measurement, region_used_as_origin) are recorded
       in handle_flags and adjudicated by the Phase B gates, which decide role and weight. This keeps
       evidentiary judgment out of Phase A.
+    handle_instances_source: cartridges/neuroscience.yaml   # core defines the categories; cartridge supplies domain terms
     handle_types:
       diagnostic_label:
         is_handle_for: cohort description / grouping
