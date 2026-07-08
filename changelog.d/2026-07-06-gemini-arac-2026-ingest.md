@@ -1,0 +1,1 @@
+- **[candidate]** Ran the Arac et al. 2026 paper (Arm Dominance) through the v0.05 v4 candidate ingest architecture gates to demonstrate successful folklore-stripping of hemispheric dominance in favor of acquired control policy. Output saved to `conformance/results/2026-07-06-gemini-arac-2026-ingest.md`. (gemini, 2026-07-06)
