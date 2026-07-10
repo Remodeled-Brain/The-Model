@@ -1,0 +1,65 @@
+evidence_binding_contract:
+  status: candidate
+  layer: primary_runtime
+  purpose: >
+    Bind corpus records to the chain segments required by an answerability plan without allowing
+    paper framing, recency, volume, or model agreement to substitute for causal closure.
+
+  corpus_modes:
+    frozen:
+      rule: runtime remains fully operable against a fixed reviewed corpus
+    adaptive:
+      rule: ingest may add, supersede, attenuate, or disconfirm support records
+
+  retrieval_keys:
+    - measured_substrate
+    - measured_variable
+    - dependency_relation
+    - timing_relation
+    - perturbation
+    - state_transition
+    - constraint
+    - missing_route_slot
+    - disconfirmation_target
+
+  binding_unit:
+    definition: one evidence record bound to one or more explicit chain segments
+    required_fields:
+      - provenance
+      - supported_segment
+      - support_role
+      - translation_limit
+      - closure_state
+      - recency_status
+      - independence_status
+
+  recency_policy:
+    rule: >
+      Recent evidence receives search and supersession priority because the corpus is adaptive.
+      Recency does not supply causal weight. Older evidence remains load-bearing when later work
+      does not replace its measurement, route, or dependency result.
+    required_checks:
+      - does_new_work_measure_the_same_variable
+      - does_new_work_close_or_reopen_the_same_route
+      - is_the_new_result_independent
+      - does_it_change_only_language_or_actual_empirical_support
+
+  intersection_rules:
+    - support attaches to the segment actually measured
+    - proxy evidence cannot bind directly to mechanism without translation closure
+    - implementation-site evidence cannot bind to source without timing and dependency closure
+    - repeated correlated reports cannot create grounding by count
+    - disconfirming evidence binds to the exact segment it breaks
+    - unresolved evidence remains visible without granting closure
+
+  output_schema:
+    bindings: list
+    segment_closure: map
+    conflicts: list
+    supersession_candidates: list
+    unresolved_evidence: list
+    corpus_mode: [frozen, adaptive]
+
+  ingest_boundary: >
+    Ingest produces reviewed support records for this binder. It does not define the source
+    question, compile the question, or decide the answer shape.
