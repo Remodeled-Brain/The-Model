@@ -4,14 +4,18 @@
   "purpose": "Machine-readable question-first conformance contracts for the primary runtime.",
   "execution_scope": {
     "ci": "validates fixture structure, manifest inclusion, and required output fields",
-    "semantic": "provider conformance runs must execute the questions and compare outputs against these contracts"
+    "semantic": "provider conformance runs execute the questions and compare outputs against these contracts"
   },
   "required_answer_fields": [
     "direct_answer",
+    "answer_scope",
     "generated_chain",
+    "operations",
+    "state_transition",
     "closure_report",
     "alternative_routes",
     "translation_back",
+    "conclusions",
     "confidence"
   ],
   "fixtures": [
@@ -96,7 +100,7 @@
       "condition": "Add a recent paper measuring a previously missing dependency segment.",
       "required": [
         "update evidence binding and segment closure",
-        "test whether the paper is independent and measures the same variable",
+        "test whether the paper is independent and measures the same variable under compatible conditions",
         "leave the question compiler and chain contract unchanged",
         "treat recency as search and supersession priority only"
       ],
@@ -127,11 +131,56 @@
         "preserve the experienced transition and requested dependency",
         "compile into sleep-pressure state, metabolic and arousal maintenance, competing-state stabilization, behavioral persistence, and interruption variables",
         "distinguish human evidence from animal or assay-level route support",
-        "report compilation, chain, and translation confidence separately"
+        "report compilation, segment, scale-translation, and answer-translation confidence separately"
       ],
       "forbidden": [
         "replace the physical path with personal relevance language",
         "hide cross-species or proxy translation limits"
+      ]
+    },
+    {
+      "id": "competing-routes",
+      "mode": "question",
+      "source_question": "Why does the same sensory input produce different behavior on different trials?",
+      "required": [
+        "generate multiple candidate paths involving state, timing, weighting, constraint, and prior route stabilization",
+        "state what each route predicts differently",
+        "identify a measurement or perturbation that discriminates the routes",
+        "leave route identity unresolved when no discriminator is available"
+      ],
+      "forbidden": [
+        "select one familiar cognitive explanation without discrimination",
+        "rename unexplained variance as noise"
+      ]
+    },
+    {
+      "id": "narrow-answer-from-partial-chain",
+      "mode": "condition",
+      "condition": "The corpus closes an assay-level dependency but leaves organism-level translation open.",
+      "required": [
+        "answer the assay-level relation at closed scope",
+        "state the organism-level question as unresolved",
+        "attach confidence separately to the narrow conclusion and open translation",
+        "avoid allowing the open translation to erase the valid narrow answer"
+      ],
+      "forbidden": [
+        "present the full organism-level mechanism as closed",
+        "collapse the entire answer to unknown when a narrower path is closed"
+      ]
+    },
+    {
+      "id": "condition-separated-conflict",
+      "mode": "condition",
+      "condition": "Two credible records appear to conflict but measure different scales, conditions, or route segments.",
+      "required": [
+        "verify segment identity before declaring contradiction",
+        "separate scale and condition differences",
+        "mark a segment contested only when conflict survives separation",
+        "preserve both records until supersession is reviewed"
+      ],
+      "forbidden": [
+        "average incompatible records into one confidence score",
+        "use publication count to resolve the conflict"
       ]
     }
   ]
