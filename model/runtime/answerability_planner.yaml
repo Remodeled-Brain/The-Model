@@ -1,0 +1,60 @@
+answerability_planner:
+  status: candidate
+  layer: primary_runtime
+  purpose: >
+    Determine what empirical work is required to answer a compiled question and which portions
+    of that work are already available.
+
+  input_required:
+    - compiled_question
+    - physical_variables
+    - candidate_substrates
+    - state_transition
+    - dependency_questions
+    - required_chain_slots
+
+  planning_dimensions:
+    measurement:
+      asks:
+        - Which variables must be directly measured?
+        - At what scale and under what conditions?
+    perturbation:
+      asks:
+        - Which dependency can be altered without collapsing the whole system?
+        - What outcome would distinguish source, route, implementation, and readout?
+    temporality:
+      asks:
+        - What must precede what?
+        - Is the evidence predictive, concurrent, or postdictive?
+    translation:
+      asks:
+        - Which assay, proxy, or abstraction steps connect measurement to the requested outcome?
+    controlled_difference:
+      asks:
+        - What variable must differ when nominal inputs are held constant?
+        - What alternative routes remain compatible with the observation?
+    organism_state:
+      asks:
+        - Which reachable or stabilizable state transition is at issue?
+        - Which constraints define successful transition or maintenance?
+
+  output_schema:
+    required_measurements: list
+    required_perturbations: list
+    required_temporality: list
+    required_dependency_closure: list
+    required_translation_steps: list
+    discriminating_observations: list
+    available_chain_segments: list
+    missing_chain_segments: list
+    incompatible_evidence: list
+    answerability_status:
+      state: [answerable, partially_answerable, descriptive_only, currently_unanswerable]
+      basis: list
+
+  rules:
+    - A missing route produces a research requirement, not a folklore answer.
+    - Partial closure permits a bounded partial answer.
+    - Descriptive evidence may answer descriptive questions without being scored as failed mechanism.
+    - A source question may compile successfully even when the current corpus cannot answer it.
+    - Recency affects search priority and supersession review, never causal weight by itself.
