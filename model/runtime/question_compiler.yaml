@@ -1,0 +1,68 @@
+question_compiler:
+  status: candidate
+  layer: primary_runtime
+  purpose: >
+    Convert a source question into a chain-bound question while preserving the empirical
+    observation, distinction, or requested relation carried by the source wording.
+
+  trigger: every user question requesting explanation, prediction, interpretation, or causal attribution
+
+  stages:
+    - identify_requested_relation
+    - identify_requested_scope
+    - detect_handles_and_hidden_operators
+    - preserve_observations_and_distinctions
+    - extract_or_propose_physical_variables
+    - construct_candidate_dependency_path
+    - identify_unresolved_chain_slots
+    - emit_compiled_question
+
+  handle_categories:
+    - diagnostic_or_taxonomic_label
+    - spectrum_or_continuum_label
+    - region_or_structure_as_agent
+    - controller_command_or_decision_language
+    - faculty_or_cognitive_noun_as_operator
+    - biomarker_or_proxy_as_mechanism
+    - conservation_or_age_as_explanation
+    - statistical_or_clinical_promise_language
+
+  preservation_rule: >
+    Removing a handle removes only the causal work assigned to the handle. It must not erase
+    the measured difference, reported behavior, requested distinction, or practical concern
+    that caused the question to be asked.
+
+  reconstruction_rule: >
+    Replace unsupported operators with physical questions about substrate, variable, timing,
+    dependency, constraint, route, and organism-state transition. Do not merely substitute a
+    preferred noun for the removed noun.
+
+  output_schema:
+    source_question: string
+    requested_relation: string
+    requested_scope: string
+    handles_detected: list
+    observations_preserved: list
+    physical_variables: list
+    candidate_substrates: list
+    state_transition: string
+    dependency_questions: list
+    required_chain_slots: list
+    unresolved_chain_slots: list
+    compiled_question: string
+    compilation_confidence:
+      state: [high, moderate, low, unresolved]
+      basis: list
+
+  failure_semantics:
+    ambiguous_source_question: preserve_multiple_candidate_compilations
+    no_physical_variables_available: emit_measurement_requirements
+    handle_contains_all_explanatory_content: preserve_observation_and_mark_route_unresolved
+    multiple_routes_fit: retain_alternatives_until_evidence_discriminates
+
+  forbidden_outputs:
+    - definition_only_rewrite
+    - label_synonym_swap
+    - observation_erasure
+    - unsupported_single_route
+    - confidence_from_familiarity
