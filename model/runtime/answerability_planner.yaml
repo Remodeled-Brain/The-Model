@@ -2,59 +2,98 @@ answerability_planner:
   status: candidate
   layer: primary_runtime
   purpose: >
-    Determine what empirical work is required to answer a compiled question and which portions
-    of that work are already available.
+    Determine what empirical work is required to answer each compiled question, which chain segments
+    are available, and which narrower conclusions remain answerable when the full route is open.
 
   input_required:
-    - compiled_question
+    - question_type
+    - answer_target
+    - compiled_questions
+    - candidate_dependency_paths
     - physical_variables
     - candidate_substrates
+    - candidate_operations
     - state_transition
-    - dependency_questions
+    - required_scale_translations
     - required_chain_slots
 
   planning_dimensions:
     measurement:
       asks:
         - Which variables must be directly measured?
-        - At what scale and under what conditions?
+        - At what scale, resolution, time, and condition?
+        - Does the measurement observe the claimed operation or only a readout?
     perturbation:
       asks:
-        - Which dependency can be altered without collapsing the whole system?
-        - What outcome would distinguish source, route, implementation, and readout?
+        - Which dependency can be altered without making the result uninterpretable?
+        - What outcome distinguishes source, route, implementation, and readout?
+        - Could compensation or redundancy hide the dependency?
     temporality:
       asks:
         - What must precede what?
-        - Is the evidence predictive, concurrent, or postdictive?
+        - Is the evidence predictive, prospective, concurrent, retrospective, or postdictive?
+        - Does the measured interval match the claimed operation?
     translation:
       asks:
-        - Which assay, proxy, or abstraction steps connect measurement to the requested outcome?
+        - Which physical steps carry the measured change across scales?
+        - Which step is inferred from shared language rather than demonstrated dependency?
+        - What narrower source-scale conclusion survives if translation remains open?
     controlled_difference:
       asks:
         - What variable must differ when nominal inputs are held constant?
-        - What alternative routes remain compatible with the observation?
+        - What candidate route generates each divergent outcome?
     organism_state:
       asks:
         - Which reachable or stabilizable state transition is at issue?
-        - Which constraints define successful transition or maintenance?
+        - Which operation changes availability, weighting, stabilization, blocking, release, maintenance, or switching?
+        - Which constraints define a successful transition?
+    route_discrimination:
+      asks:
+        - What do the surviving routes predict differently?
+        - Which measurement or perturbation separates those predictions?
+        - Which result would reopen a currently closed segment?
+
+  segment_closure_requirements:
+    observation:
+      - measurement_matches_variable
+      - scope_and_condition_are_stated
+    dependency:
+      - direction_is_supported
+      - timing_is_compatible
+      - competing_explanations_are_bounded
+    intervention:
+      - perturbation_changes_the_required_relation
+      - interpretation_survives_systemic_collapse_and_compensation_checks
+    scale_translation:
+      - carried_variable_is_identified
+      - intermediate_dependencies_are_explicit
+      - source_and_target_conditions_are_compatible
+    route_discrimination:
+      - candidate_routes_generate_distinct_predictions
+      - a discriminating_observation_favors_or_breaks_a_route
 
   output_schema:
-    required_measurements: list
-    required_perturbations: list
-    required_temporality: list
-    required_dependency_closure: list
-    required_translation_steps: list
-    discriminating_observations: list
-    available_chain_segments: list
-    missing_chain_segments: list
-    incompatible_evidence: list
+    per_compiled_question:
+      - required_measurements
+      - required_perturbations
+      - required_temporality
+      - required_dependency_closure
+      - required_translation_steps
+      - compensation_or_redundancy_checks
+      - discriminating_observations
+      - available_chain_segments
+      - missing_chain_segments
+      - incompatible_evidence
+      - narrower_answerable_targets
     answerability_status:
       state: [answerable, partially_answerable, descriptive_only, currently_unanswerable]
       basis: list
 
   rules:
-    - A missing route produces a research requirement, not a folklore answer.
-    - Partial closure permits a bounded partial answer.
-    - Descriptive evidence may answer descriptive questions without being scored as failed mechanism.
-    - A source question may compile successfully even when the current corpus cannot answer it.
-    - Recency affects search priority and supersession review, never causal weight by itself.
+    - A missing route produces an explicit research requirement.
+    - Partial closure permits conclusions that use only the closed path.
+    - Missing segments outside a narrower conclusion do not cap that conclusion.
+    - Descriptive evidence may fully answer a descriptive question.
+    - A question may compile successfully when the current corpus cannot answer it.
+    - Recency affects search and supersession review, never causal weight.
+    - Multiple routes remain open until a discriminating observation breaks or favors one.
