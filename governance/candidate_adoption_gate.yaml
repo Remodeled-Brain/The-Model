@@ -1,0 +1,47 @@
+candidate_adoption_gate:
+  status: candidate
+  layer: governance
+  purpose: Prevent candidate proposals from entering canonical runtime state without review.
+
+  triggers:
+    - user_proposal
+    - assistant_proposal
+    - external_model_feedback
+    - paper_derived_rule
+    - architecture_change
+
+  required_checks:
+    - goal_fit
+    - layer_fit
+    - contradiction
+    - reification
+    - operation_product
+    - chain_generation
+    - redundancy
+    - failure_modes
+    - calibration
+    - coupled_file_drift
+    - minimal_patch
+
+  verdicts:
+    - accept
+    - accept_with_edits
+    - hold
+    - reject
+
+  invariants:
+    explicit_adoption_required: true
+    directional_fit_is_not_validity: true
+    model_agreement_is_not_validity: true
+    runtime_manifest_entry_requires_adoption: true
+    review_record_cannot_override_canonical_source: true
+
+  required_output:
+    - verdict
+    - layer
+    - fit
+    - contradiction_or_consistency_effect
+    - risks
+    - redundancy
+    - minimal_safe_form
+    - adoption_status
