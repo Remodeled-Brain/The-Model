@@ -1,0 +1,60 @@
+chain_contract:
+  status: candidate
+  layer: runtime_kernel
+  purpose: >
+    Define the minimum physical structure every compiled question and answer must preserve.
+
+  binding_chain:
+    - physics
+    - chemistry
+    - biology
+    - behavior
+
+  invariants:
+    chemistry_remains_physical: true
+    biology_remains_chemical_and_physical: true
+    behavior_remains_biological_chemical_and_physical: true
+    every_explanatory_term_must_degrade_to_a_physical_path: true
+    labels_may_group_but_cannot_generate: true
+    implementation_location_cannot_supply_origin_by_name: true
+    observed_difference_cannot_supply_its_missing_differentiator: true
+    proxy_cannot_supply_mechanism_without_translation: true
+    operation_and_product_remain_distinct: true
+
+  required_chain_fields:
+    - substrates
+    - measured_or_requested_variables
+    - direction_or_dependency
+    - timing
+    - constraints
+    - state_transition
+    - unresolved_route_slots
+
+  organism_state_contract:
+    definition: >
+      A behavior-level explanation identifies a reachable or stabilizable organism-state
+      transition under constraint and the physical route by which that transition becomes
+      available, weighted, released, maintained, or blocked.
+    required_questions:
+      - What organism-state relation is being changed or maintained?
+      - What physical interaction supplies the change?
+      - What dependency path carries it?
+      - What constraints limit the reachable transition?
+      - What evidence distinguishes source, route, implementation, and readout?
+
+  closure_states:
+    - closed
+    - partial
+    - descriptive_only
+    - proxy_limited
+    - label_dependent
+    - unresolved
+    - contradicted
+
+  guards:
+    - no_magic_noun_as_operator
+    - no_definition_sorting_in_place_of_generation
+    - no_region_as_source_without_dependency_and_timing
+    - no_conservation_as_weight_without_operation_and_route
+    - no_statistical_significance_as_practical_significance
+    - no_confidence_above_weakest_required_translation_step
