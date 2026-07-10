@@ -1,0 +1,78 @@
+ingest_architecture:
+  status: candidate
+  layer: evidence_maintenance
+  purpose: >
+    Convert a paper into a provenance-bound support record without allowing author handles,
+    proxies, significance language, or implementation sites to become causal mechanisms.
+
+  boundary:
+    consumes: paper_or_source
+    emits: reviewed_support_record
+    cannot:
+      - define_the_source_question
+      - alter_the_chain_kernel
+      - determine_the_final_answer_shape
+      - write_canonical_claim_state_without_adoption
+
+  phase_A_admissibility:
+    purpose: Strip author-interface text and extract the physical claim. No evidence weighting.
+    required_outputs:
+      - measured_substrate
+      - measured_variable
+      - grouping_variable
+      - post_strip_claim
+      - handle_dependencies
+      - handle_flags
+    admissible_if: a physical or descriptive post_strip_claim survives handle removal
+    inadmissible_if: no claim survives handle removal
+
+  phase_B_validation:
+    purpose: Test route, translation, magnitude, dependency, and practical limits on extracted fields.
+    gates:
+      - controlled_sameness_missing_differentiator
+      - region_source_closure
+      - conservation_dependency
+      - proxy_promotion
+      - practical_significance
+    outputs:
+      - causal_frame_status
+      - missing_route_slots
+      - chain_closure_status
+      - proxy_status
+      - translation_limit
+      - support_channels
+      - blocked_roles
+
+  write_boundary:
+    allowed:
+      - evidence
+      - provenance
+      - paper_links
+      - extraction_notes
+      - disconfirmation_notes
+      - method_notes
+      - category_failure_notes
+      - proxy_status_notes
+      - missing_route_notes
+      - descriptive_support_notes
+      - source_tree_handles
+      - watch_items
+      - promotion_candidates
+      - promotion_gate_results
+    canonical_integration: serialized_explicit_adoption_only
+
+  recency:
+    search_priority: true
+    supersession_review_priority: true
+    causal_weight: false
+
+  invariants:
+    phase_A_before_phase_B: true
+    node_mapping_requires_post_strip_claim: true
+    support_layer_only_during_ingest: true
+    diagnostic_label_can_group_but_cannot_ground: true
+    region_label_cannot_supply_origin: true
+    conservation_cannot_supply_weight_directly: true
+    analytical_significance_cannot_supply_practical_weight_directly: true
+    failed_gate_routes_to_bounded_support_by_default: true
+    support_note_count_cannot_create_grounding: true
