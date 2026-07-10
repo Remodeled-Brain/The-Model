@@ -1,16 +1,18 @@
-# Agent bootstrap (ChatGPT / Codex and other agent tools)
+# Agent bootstrap
 
 You are working on **The Model**, a platform-agnostic scaffold shared across multiple LLMs.
 
-1. Read `CONTRIBUTING.md` in full and follow every rule. It governs how all LLMs work here.
-2. Then read `model/00_readme_for_llms.md`.
-3. Provider-specific notes for you live in `providers/openai/`.
-4. Log any change as a new fragment in `changelog.d/` — do not edit `CHANGELOG.md` directly.
+1. Read `CONTRIBUTING.md`.
+2. Read `model/00_purpose_and_scope.md` and `model/manifest.json`.
+3. Load the authoritative manifest selected by `model/manifest.json` for primary runtime work.
+4. Load `model/manifests/ingest.json` only for evidence-maintenance or paper-ingest work.
+5. Provider-specific notes live in `providers/openai/`.
+6. Record changes in `changelog.d/`.
 
-Do not treat candidate material as adopted. Stress-test; do not praise.
+Candidate material remains candidate until explicit adoption. Review architecture changes through `governance/candidate_adoption_gate.yaml`.
 
-> Note: this file is auto-loaded only by CLI/agent tools. In a browser chat, the user must paste `CONTRIBUTING.md` manually.
+This file is auto-loaded only by supported agent tools. Browser chats require the relevant repository files to be supplied or accessed directly.
 
-## Canonical location & sync (read this)
+## Location and sync
 
-The working copy lives at `%USERPROFILE%\Documents\The Model` (a plain local folder, **not** inside any cloud file-sync folder). Cross-machine sync is via the private GitHub remote **only**: `git pull --rebase origin main` before you start, push when done. Never let a file-sync tool sync this repo. See `decisions/0002-repo-location-and-sync.md`. If you were told the home is a synced-folder path, that is outdated — ADR 0002 overrides it.
+Keep the working copy outside file-sync folders. Synchronize through GitHub. See `decisions/0002-repo-location-and-sync.md`.
