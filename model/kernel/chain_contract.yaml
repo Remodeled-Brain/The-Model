@@ -1,55 +1,121 @@
 chain_contract:
   status: candidate
   layer: runtime_kernel
-  purpose: >
-    Define the minimum physical structure every compiled question and answer must preserve.
+  purpose: Define the physical structure every compiled question, evidence binding, and answer must preserve.
 
   binding_chain:
-    - physics
-    - chemistry
-    - biology
-    - behavior
+    sequence:
+      - physics
+      - chemistry
+      - biology
+      - behavior
+    rule: Each later layer remains generated through the preceding physical layers.
 
   invariants:
-    chemistry_remains_physical: true
-    biology_remains_chemical_and_physical: true
-    behavior_remains_biological_chemical_and_physical: true
     every_explanatory_term_must_degrade_to_a_physical_path: true
     labels_may_group_but_cannot_generate: true
     implementation_location_cannot_supply_origin_by_name: true
     observed_difference_cannot_supply_its_missing_differentiator: true
     proxy_cannot_supply_mechanism_without_translation: true
     operation_and_product_remain_distinct: true
+    question_reconstruction_must_preserve_the_observation: true
 
-  required_chain_fields:
-    - substrates
-    - measured_or_requested_variables
-    - direction_or_dependency
-    - timing
-    - constraints
-    - state_transition
-    - unresolved_route_slots
+  chain_segment:
+    required_fields:
+      - source_substrate
+      - operation
+      - carried_change
+      - target_substrate_or_state
+      - direction_or_dependency
+      - timing
+      - constraints
+      - measured_scale
+      - evidence_status
+      - unresolved_route_slots
+    join_requirements:
+      - upstream_output_matches_downstream_input
+      - temporal_order_matches_claimed_direction
+      - scale_crossing_has_an_explicit_carrier_or_dependency
+      - constraints_remain_compatible_across_the_join
+      - no_author_label_supplies_the_missing_operation
+    join_failure: open_chain_slot
+
+  operation_grammar:
+    purpose: Describe what a physical route does to reachable organism states without inventing a controller.
+    operations:
+      make_available: Add a reachable transition or route under stated constraints.
+      weight: Alter the relative tendency of already available transitions.
+      stabilize: Keep a state or route within a viable range over time.
+      suppress_or_block: Reduce or prevent a transition from becoming executable.
+      release: Remove a constraint that prevented an available transition from executing.
+      maintain: Continue the physical conditions required for a state or route.
+      switch: Change which available route is currently stabilized or executable.
+      differentiate: Add route, state, or interface distinctions through development or learning.
+      redeploy: Reuse an existing viable operation in a later-added route or interface.
+    guard: An operation must name a physical change and its carrier, not an internal agent.
 
   organism_state_contract:
     definition: >
-      A behavior-level explanation identifies a reachable or stabilizable organism-state
-      transition under constraint and the physical route by which that transition becomes
-      available, weighted, released, maintained, or blocked.
+      A behavior-level explanation identifies a reachable or stabilizable organism-state transition
+      under constraint and the physical route that changes its availability, weighting, stabilization,
+      blocking, release, maintenance, switching, differentiation, or redeployment.
     required_questions:
-      - What organism-state relation is being changed or maintained?
-      - What physical interaction supplies the change?
-      - What dependency path carries it?
-      - What constraints limit the reachable transition?
-      - What evidence distinguishes source, route, implementation, and readout?
+      - What organism-state relation is changed or maintained?
+      - Which operation changes that relation?
+      - What substrate and dependency path carry the change?
+      - Which constraints define viability and reachability?
+      - Which observations distinguish source, route, implementation, and readout?
+
+  route_roles:
+    source: The dependency whose change initiates the required segment under the tested conditions.
+    route: The physical path carrying the change.
+    implementation: A substrate on which the route is expressed or can be perturbed.
+    readout: A measured consequence that may remain downstream or proxy-limited.
+    rule: Role assignment requires timing and dependency evidence; location and perturbability alone are insufficient.
+
+  scale_translation:
+    required_fields:
+      - source_scale
+      - target_scale
+      - carried_variable
+      - intermediate_dependencies
+      - temporal_order
+      - constraints
+      - translation_limit
+    closure_rule: >
+      A scale transition closes only when a demonstrated physical dependency carries the measured
+      change from the source scale into the target relation required by the question.
+    shared_vocabulary_closes_translation: false
+
+  route_discrimination:
+    required_when_multiple_routes_survive:
+      - competing_route_predictions
+      - discriminating_measurement_or_perturbation
+      - expected_temporal_difference
+      - compensation_or_redundancy_check
+    rule: Retain alternative routes until an observation distinguishes their generated consequences.
 
   closure_states:
     - closed
     - partial
     - descriptive_only
+    - source_scale_only
     - proxy_limited
     - label_dependent
     - unresolved
     - contradicted
+
+  confidence_propagation:
+    rule: >
+      Confidence attaches to the exact chain path required for a stated conclusion. A conclusion cannot
+      exceed its weakest required segment or translation step. Missing segments outside that path do not
+      cap a narrower conclusion.
+    dimensions:
+      - compilation
+      - segment_closure
+      - scale_translation
+      - answer_translation
+    global_single_score: forbidden
 
   guards:
     - no_magic_noun_as_operator
@@ -57,4 +123,4 @@ chain_contract:
     - no_region_as_source_without_dependency_and_timing
     - no_conservation_as_weight_without_operation_and_route
     - no_statistical_significance_as_practical_significance
-    - no_confidence_above_weakest_required_translation_step
+    - no_confidence_transfer_from_unrelated_closed_segments
