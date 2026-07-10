@@ -1,0 +1,101 @@
+ingest_record_schema:
+  status: candidate
+  schema_version: v1
+  layer: support_layer
+
+  identity:
+    paper_id:
+      required: true
+      rule: Resolve canonical identity before writing a canonical record.
+    identifiers:
+      fields:
+        - doi
+        - pmid
+        - arxiv
+        - alternate_ids
+    agent:
+      required: true
+      form: family/version
+    run_id:
+      required: true
+      path_component: false
+    timestamp:
+      required: true
+
+  extraction:
+    required_fields:
+      - measured_substrate
+      - measured_variable
+      - grouping_variable
+      - post_strip_claim
+      - handle_dependencies
+      - handle_flags
+    optional_fields:
+      - source_scale
+      - target_scale
+      - state_transition
+      - constraints
+
+  validation:
+    gate_results:
+      required: true
+      state_enum:
+        - pass
+        - fail
+        - unresolved
+        - not_applicable
+      per_gate_required_fields:
+        - gate
+        - state
+        - basis
+        - support_channels
+        - blocked_roles
+        - unresolved_slots
+    chain_segments:
+      required: true
+      per_segment_fields:
+        - segment_id
+        - relation
+        - closure_state
+        - measured_scale
+        - translation_limit
+
+  provenance:
+    required_fields:
+      - source_citation
+      - source_location
+      - extraction_method
+      - corpus_mode
+    independence_fields:
+      - independence_status
+      - shared_pipeline_id
+      - shared_cohort_id
+      - shared_dataset_id
+      - shared_model_lineage
+
+  outputs:
+    required_fields:
+      - support_channels
+      - blocked_roles
+      - translation_limits
+      - visibility_status
+      - promotion_status
+    promotion_status_enum:
+      - none
+      - candidate
+      - blocked
+
+  lifecycle:
+    append_only: true
+    supersedes:
+      required: false
+    current_record:
+      generated: true
+      hand_editable: false
+
+  invariants:
+    support_layer_only: true
+    no_unilateral_claim_write: true
+    recency_is_not_weight: true
+    identity_resolved_before_canonical_write: true
+    unresolved_never_grants_closure: true
