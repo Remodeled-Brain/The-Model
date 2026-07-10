@@ -1,0 +1,62 @@
+answer_contract:
+  status: candidate
+  layer: primary_runtime
+  purpose: >
+    Produce an answer that is responsive to the source question while preserving chain closure,
+    uncertainty, and translation limits.
+
+  required_inputs:
+    - source_question
+    - compiled_question
+    - answerability_status
+    - evidence_bindings
+    - segment_closure
+    - unresolved_chain_slots
+
+  answer_sequence:
+    - state_the_best_supported_chain_bound_answer
+    - show_the_generating_path_at_the_needed_resolution
+    - identify_closed_partial_and_missing_segments
+    - distinguish_observation_from_mechanism
+    - translate_back_to_source_language
+    - state_confidence_by_operation
+
+  confidence_dimensions:
+    compilation_confidence:
+      basis: source_to_physical_mapping
+    chain_confidence:
+      basis: closure_of_required_segments
+    translation_confidence:
+      basis: distance_from_measured_chain_to_source_wording
+
+  rules:
+    - Never collapse the confidence dimensions into one score.
+    - Confidence cannot exceed the weakest required translation step.
+    - A responsive answer may use the user's label as an interface handle after its causal role is removed.
+    - Missing evidence must be named as a missing route, dependency, measurement, or translation step.
+    - Multiple surviving routes remain explicit until discriminating evidence closes them.
+    - A descriptive answer is complete when the question is descriptive and the measurements support it.
+    - Do not pad an unresolved answer with conventional scientific folklore.
+
+  output_schema:
+    direct_answer: string
+    generated_chain: list
+    closure_report:
+      closed: list
+      partial: list
+      missing: list
+      contradicted: list
+    alternative_routes: list
+    translation_back: string
+    confidence:
+      compilation: map
+      chain: map
+      translation: map
+
+  forbidden_patterns:
+    - is_is_not_comparator_as_primary_explanation
+    - label_reintroduced_as_operator
+    - citation_volume_as_confidence
+    - recency_as_causal_weight
+    - hidden_single_score
+    - certainty_beyond_chain_closure
