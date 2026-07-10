@@ -2,20 +2,36 @@ question_compiler:
   status: candidate
   layer: primary_runtime
   purpose: >
-    Convert a source question into a chain-bound question while preserving the empirical
-    observation, distinction, or requested relation carried by the source wording.
+    Convert a source question into one or more chain-bound questions while preserving the observation,
+    distinction, requested relation, and requested resolution carried by the source wording.
 
-  trigger: every user question requesting explanation, prediction, interpretation, or causal attribution
+  trigger: every question requesting description, explanation, prediction, intervention, or causal attribution
 
   stages:
-    - identify_requested_relation
-    - identify_requested_scope
+    - classify_question_type
+    - identify_requested_relation_scope_and_resolution
     - detect_handles_and_hidden_operators
     - preserve_observations_and_distinctions
-    - extract_or_propose_physical_variables
-    - construct_candidate_dependency_path
-    - identify_unresolved_chain_slots
-    - emit_compiled_question
+    - identify_required_organism_state_relation
+    - extract_or_propose_physical_variables_and_substrates
+    - assign_candidate_operations_from_the_kernel_grammar
+    - construct_candidate_dependency_paths
+    - identify_scale_translations_and_unresolved_slots
+    - generate_discriminating_questions_for_competing_paths
+    - emit_compiled_question_set
+
+  question_types:
+    descriptive:
+      target: measured distribution, frequency, relation, or condition
+      mechanism_required: false
+    explanatory:
+      target: generated dependency path producing or maintaining an observation
+    predictive:
+      target: variables and temporal relations that discriminate future outcomes
+    interventional:
+      target: dependency whose alteration changes a reachable or stabilized state
+    interpretive:
+      target: bounded meaning of an observation within the available chain
 
   handle_categories:
     - diagnostic_or_taxonomic_label
@@ -28,41 +44,59 @@ question_compiler:
     - statistical_or_clinical_promise_language
 
   preservation_rule: >
-    Removing a handle removes only the causal work assigned to the handle. It must not erase
-    the measured difference, reported behavior, requested distinction, or practical concern
-    that caused the question to be asked.
+    Removing causal work from a handle must preserve the measured difference, reported behavior,
+    experienced transition, requested distinction, or practical constraint that generated the question.
 
   reconstruction_rule: >
-    Replace unsupported operators with physical questions about substrate, variable, timing,
-    dependency, constraint, route, and organism-state transition. Do not merely substitute a
-    preferred noun for the removed noun.
+    Replace unsupported operators with questions about substrate, variable, operation, timing, dependency,
+    constraint, scale, and organism-state transition. Generate the path rather than substituting a preferred noun.
+
+  multiple_compilations:
+    allowed_when:
+      - a source label groups distinct outcomes
+      - more than one physical route fits the observation
+      - the requested scope is ambiguous
+      - the available variables support different resolutions
+    rule: Keep candidate compilations separate and state what observation would distinguish them.
 
   output_schema:
     source_question: string
+    question_type: string
     requested_relation: string
     requested_scope: string
+    requested_resolution: string
+    answer_target: string
     handles_detected: list
     observations_preserved: list
     physical_variables: list
     candidate_substrates: list
+    candidate_operations: list
     state_transition: string
-    dependency_questions: list
+    candidate_dependency_paths: list
+    required_scale_translations: list
     required_chain_slots: list
     unresolved_chain_slots: list
-    compiled_question: string
+    discriminating_questions: list
+    compiled_questions: list
     compilation_confidence:
       state: [high, moderate, low, unresolved]
       basis: list
+
+  confidence_rule: >
+    Compilation confidence measures security of the source-to-physical mapping. Familiar terminology,
+    corpus volume, or confidence in later evidence cannot raise it.
 
   failure_semantics:
     ambiguous_source_question: preserve_multiple_candidate_compilations
     no_physical_variables_available: emit_measurement_requirements
     handle_contains_all_explanatory_content: preserve_observation_and_mark_route_unresolved
-    multiple_routes_fit: retain_alternatives_until_evidence_discriminates
+    multiple_routes_fit: retain_alternatives_and_generate_discriminating_questions
+    descriptive_question: do_not_impose_a_mechanism_requirement
 
   forbidden_outputs:
     - definition_only_rewrite
     - label_synonym_swap
     - observation_erasure
     - unsupported_single_route
+    - hidden_change_of_question_scope
     - confidence_from_familiarity
