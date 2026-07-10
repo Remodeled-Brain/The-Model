@@ -1,0 +1,87 @@
+ingest_failure_routing:
+  status: candidate
+  layer: evidence_maintenance
+  purpose: Preserve useful evidence while preventing failed roles from entering chain closure.
+
+  default:
+    source_record: keep
+    provenance: keep
+    support_notes: keep
+    direct_grounding: deny_or_cap
+    promotion: deny_until_required_gates_pass
+
+  support_channels:
+    - mechanistic_grounded
+    - route_partial
+    - source_scale_only
+    - proxy_only
+    - descriptive_support
+    - label_dependent_observation
+    - method_support
+    - disconfirmation
+    - provenance_only
+
+  channel_meanings:
+    mechanistic_grounded: Required route and translation segments are closed for the claimed scope.
+    route_partial: A physical route survives but one or more required dependency segments remain open.
+    source_scale_only: The measurement is valid at its measured scale but translation to the requested scale is open.
+    proxy_only: The measured variable correlates with the target but the translation route is open.
+    descriptive_support: A sound descriptive, epidemiological, phenomenological, association, or first-report claim.
+    label_dependent_observation: The observation survives only as a relation among pre-labeled groups.
+    method_support: The source constrains measurement, assay, perturbation, or analysis behavior.
+    disconfirmation: The source breaks an asserted segment or exposes a missing differentiator.
+    provenance_only: The source remains in the record without a support role.
+
+  gate_intersection:
+    notes: union
+    permissions: intersection
+    rule: >
+      Every applicable gate contributes its own support channel, translation limit, and blocked role.
+      A failed gate denies only the role it tests. Unresolved does not grant closure and is not treated
+      as a failed observation.
+
+  aggregation:
+    rule: >
+      Support-only records never become grounding by raw count. Correlated records count once for
+      visibility and must be grouped by shared cohort, dataset, pipeline, or model lineage.
+    count_can_raise_visibility: true
+    count_can_create_grounding: false
+    independence_required_for_accumulation: true
+
+  hard_zero_scope:
+    rule: Hard zero applies to a claimed role, never to the source itself.
+    postdictive_claim:
+      zeroes:
+        - prediction_weight
+        - direct_generative_grounding
+      preserves:
+        - descriptive_support
+        - provenance
+        - method_support
+    no_surviving_claim:
+      zeroes:
+        - mechanism_mapping
+        - promotion
+      preserves:
+        - category_failure_note
+        - provenance
+    proxy_without_translation:
+      zeroes:
+        - direct_mechanism_binding
+      preserves:
+        - proxy_only
+        - assay_observation
+        - translation_limit
+    region_without_source_closure:
+      zeroes:
+        - origin_weight
+      preserves:
+        - implementation_site_observation
+        - perturbation_leverage_note
+
+  output_required:
+    - support_channels
+    - blocked_roles
+    - translation_limits
+    - unresolved_slots
+    - preserved_observations
