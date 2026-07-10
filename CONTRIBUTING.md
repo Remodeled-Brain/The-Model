@@ -1,75 +1,92 @@
 # CONTRIBUTING — rules every LLM must follow
 
-This file is the single source of truth for *how* to work in this repo, regardless of provider. If you are ChatGPT, Gemini, Claude, GLM, or any other model working on The Model, read this first and follow it. If you were handed only a chat with no repo access, ask the user to paste this file.
+This file governs work in the repository across providers. Read it before editing.
 
-## 1. Canonical vs candidate — do not confuse them
+## 1. Candidate status is explicit
 
-- `model/` is the canonical *location*, but it holds **both adopted and candidate material** — status is per-file, read each file's `status:` field (or a candidate banner). Do not assume everything in `model/` is adopted truth; a file marked `status: candidate` (or `reserved_for_v0_07`) is not.
-- New rules, patches, and changes are **candidate** until the user *explicitly* says "adopted" / "approved."
-- **Never** rewrite candidate material as if it were integrated. This is the single most important rule and the one most often broken. See `model/04_candidate_rule_adoption_gate.yaml`.
+- A canonical path identifies the authoritative copy of a file. It does not imply adoption.
+- New rules, architecture, fixtures, and patches remain candidate until the user explicitly approves them.
+- Never describe candidate material as integrated or settled.
+- Run `governance/candidate_adoption_gate.yaml` before proposing that a change is in.
 
-## 2. Do not praise — stress-test
+## 2. Review before adoption
 
-Do not respond by agreement or flattery. Evaluate fit, risks, contradictions, and layer placement before integrating anything. Per `model/02_runtime_behavior_contract.md`, your default posture is adversarial review, not adoption.
+Use `governance/reviewer_protocol.md`. Test layer fit, contradiction, reification, operation-product fusion, chain generation, redundancy, calibration, coupled-file drift, and failure modes. Return a concrete verdict and the smallest safe patch.
 
-## 3. Patch Adoption Gate — run before proposing any change is "in"
+## 3. Repository layers
 
-Before treating a candidate as accepted, check: goal fit, layer fit, contradiction, reification, operation-product, chain-generation, redundancy, failure-mode, minimal-patch. (Full gate: `model/04_candidate_rule_adoption_gate.yaml`.)
+- Primary purpose and shared chain kernel → `model/00_purpose_and_scope.md` and `model/kernel/`.
+- Question reconstruction and answering → `model/runtime/`.
+- Adaptive evidence maintenance → `model/ingest/`.
+- Domain-specific handles and translation vocabulary → `model/cartridges/`.
+- Runtime load graphs → `model/manifests/`.
+- Review and adoption rules → `governance/`.
+- Provider-specific adapters and incompatibilities → `providers/<provider>/`.
+- Standardized conformance results → `conformance/results/`.
+- Durable architecture decisions → `decisions/`.
+- Frozen shipped bundles → `packets/`.
 
-## 4. Where changes go
+Do not copy the canonical model into provider directories.
 
-- Edits to the model itself → `model/`.
-- Anything provider-specific (a workaround, a phrasing a given model needs, a known incompatibility) → `providers/<your-provider>/`. **Never** fork the canonical model into your provider folder.
-- Test outputs → `conformance/results/<date>-<provider>.md`.
-- A durable decision that came out of a chat → a new file in `decisions/`. Assume other LLMs cannot see your chat.
+## 4. Load graphs and generated artifacts
 
-## 5. Log every change as a fragment (not by editing CHANGELOG.md)
+`model/manifest.json` is a selector only. The authoritative default graph is `model/manifests/runtime.json`. Other operation-specific graphs live beside it.
 
-Because multiple LLMs work at once, **do not append to `CHANGELOG.md` directly** — concurrent appends collide. Instead, drop a new file into `changelog.d/`:
+Generate artifacts with:
 
+```bash
+python scripts/build_master_prompt.py
+python scripts/build_master_prompt.py model/manifests/ingest.json
 ```
-changelog.d/2026-07-05-<provider>-<short-slug>.md
+
+Generated artifacts under `model/dist/` are build outputs and are not committed. Do not hand-edit them.
+
+Run repository validation before proposing merge:
+
+```bash
+python scripts/validate_repo.py
 ```
 
-Contents:
+## 5. Log each change
+
+Add one fragment under `changelog.d/` for each coherent change:
+
+```text
+changelog.d/YYYY-MM-DD-<provider>-<short-slug>.md
+```
+
+Use one line:
 
 ```markdown
-- **[candidate|adopted]** <one line: what changed and why> (<provider>, <date>)
+- **[candidate|adopted]** <what changed and why> (<provider>, <date>)
 ```
 
-New files never conflict; edits to one shared file do. `CHANGELOG.md` is assembled from these at release time.
+Do not edit `CHANGELOG.md` directly.
 
-## 6. Single-file prompt is generated, not hand-edited
+## 6. Branch and review workflow
 
-`model/10_single_file_master_prompt.txt` restates the modular files. Edit the modular sources (`model/01`–`08`), then regenerate the single-file prompt. Do not hand-edit both — they will drift.
+Work on a topic branch. Open a draft pull request for project-wide or architectural changes. Do not push directly to `main`. Candidate status applies to the content even when the branch is technically mergeable.
 
-## 7. Versions are git tags
+Before starting:
 
-Do not create `v2/`, `v3/` folders inside `model/`. When a version is frozen, it gets a git tag and (if shipped to an external LLM) a copy under `packets/<version>/`.
-
-## 8. Syncing via GitHub — the shared remote
-
-The single source of truth is the private GitHub repo (`origin`). **No file-sync tool may sync this repo** — syncing a live `.git` across machines corrupts it. Keep the working copy in a plain local folder; sync only through GitHub.
-
-**Start of every session:**
-
-```
+```bash
 git pull --rebase origin main
 ```
 
-**After making changes:**
+Before pushing:
 
-```
+```bash
 git add -A
 git commit -m "<what changed> (<provider>)"
-git push origin main
+git push origin <branch>
 ```
 
-If your push is rejected because another machine/LLM pushed first, run `git pull --rebase origin main`, resolve any conflict, then push again. **Never force-push `main`.**
+Never force-push `main`.
 
-**Cutting a version:** tag it and push the tag.
+## 7. Versions and preservation
 
-```
-git tag v0.06        # example
-git push origin v0.06
-```
+Versions are Git tags. Do not create version-number directories inside the active model. Preserve exact externally shipped bundles under `packets/`. Git history and frozen packets are the preservation layer; active directories should not retain superseded files merely for history.
+
+## 8. Repository location and sync
+
+Keep the working copy in a plain local folder outside file-sync tools. Synchronize through the GitHub remote only. See `decisions/0002-repo-location-and-sync.md`.
