@@ -21,4 +21,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Validate manifests, builds, and fixtures
-        run: python scripts/validate_repo.py
+        shell: bash
+        run: |
+          set -o pipefail
+          python scripts/validate_repo.py 2>&1 | tail -100
