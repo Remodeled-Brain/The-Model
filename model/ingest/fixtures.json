@@ -1,0 +1,74 @@
+{
+  "schema_version": "v1",
+  "status": "candidate",
+  "purpose": "Machine-readable conformance contracts for adaptive evidence maintenance.",
+  "execution_scope": {
+    "ci": "validates structure, manifest inclusion, and required fields",
+    "semantic": "provider runs apply ingest to the source pattern and compare the record with this contract"
+  },
+  "required_record_sections": [
+    "identity",
+    "extraction",
+    "validation",
+    "provenance",
+    "outputs"
+  ],
+  "fixtures": [
+    {
+      "id": "diagnostic-biomarker",
+      "source_pattern": "A paper compares pre-labeled diagnostic cohorts, reports a statistically significant assay difference, and calls the measured variable a biomarker or mechanism.",
+      "required_gates": ["strip_and_extract", "proxy_promotion", "practical_significance", "scale_translation"],
+      "allowed_channels": ["label_dependent_observation", "proxy_only", "source_scale_only", "descriptive_support"],
+      "blocked_roles": ["diagnostic_grounding", "biomarker_as_mechanism", "organism_level_translation_without_route"]
+    },
+    {
+      "id": "same-input-divergent-output",
+      "source_pattern": "Nominally matched inputs or the same mutation produce divergent outcomes that are renamed as diagnostic categories.",
+      "required_gates": ["strip_and_extract", "controlled_sameness_missing_differentiator"],
+      "allowed_channels": ["route_partial", "disconfirmation"],
+      "blocked_roles": ["category_clarity_weight", "complete_causal_frame"]
+    },
+    {
+      "id": "statistical-without-practical",
+      "source_pattern": "A sensitive assay reports a small significant difference without magnitude context, noise floor, biological range, threshold, or replication.",
+      "required_gates": ["practical_significance"],
+      "allowed_channels": ["descriptive_support", "source_scale_only"],
+      "blocked_roles": ["biological_significance", "clinical_significance", "mechanism_weight"]
+    },
+    {
+      "id": "region-as-source",
+      "source_pattern": "Activity or perturbation at a named region is described as control or causal origin without timing, dependency position, or competing-route controls.",
+      "required_gates": ["strip_and_extract", "region_source_closure"],
+      "allowed_channels": ["descriptive_support", "method_support"],
+      "blocked_roles": ["origin_weight", "controller_claim"]
+    },
+    {
+      "id": "conservation-as-explanation",
+      "source_pattern": "A conserved or ancient structure is treated as causally sufficient because of its age or conservation.",
+      "required_gates": ["strip_and_extract", "conservation_dependency", "region_source_closure"],
+      "allowed_channels": ["descriptive_support", "route_partial"],
+      "blocked_roles": ["causal_weight_from_conservation", "source_status_from_age"]
+    },
+    {
+      "id": "postdictive-prediction",
+      "source_pattern": "A model or analysis separates groups after outcomes are known and is described as predictive or generative.",
+      "required_gates": ["temporality", "strip_and_extract"],
+      "allowed_channels": ["descriptive_support", "method_support"],
+      "blocked_roles": ["prediction_weight", "direct_generative_grounding"]
+    },
+    {
+      "id": "cross-scale-language",
+      "source_pattern": "A molecular, cellular, imaging, or animal measurement is translated to an organism-level behavioral mechanism through shared terminology rather than a demonstrated dependency path.",
+      "required_gates": ["scale_translation", "proxy_promotion"],
+      "allowed_channels": ["source_scale_only", "proxy_only", "route_partial"],
+      "blocked_roles": ["target_scale_grounding", "direct_behavioral_mechanism"]
+    },
+    {
+      "id": "correlated-volume",
+      "source_pattern": "Many papers repeat an association using shared cohorts, datasets, pipelines, labs, or model lineages.",
+      "required_gates": ["independence"],
+      "allowed_channels": ["descriptive_support"],
+      "blocked_roles": ["grounding_by_count", "independence_by_publication_count"]
+    }
+  ]
+}
