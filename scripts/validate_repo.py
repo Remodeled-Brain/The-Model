@@ -9,7 +9,8 @@ import subprocess
 import sys
 from collections.abc import Iterable
 
-ROOT = pathlib.Path(__file__).resolve().parents[1]
+VALIDATOR = pathlib.Path(__file__).resolve()
+ROOT = VALIDATOR.parents[1]
 MODEL = ROOT / "model"
 BUILDER = ROOT / "scripts" / "build_master_prompt.py"
 DEFAULT_SELECTOR = MODEL / "manifest.json"
@@ -33,20 +34,7 @@ LEGACY_PATHS = [
     MODEL / "record_schema_v1.yaml",
 ]
 
-STALE_REFERENCES = [
-    "model/00_readme_for_llms.md",
-    "model/01_version_goals_and_non_goals.md",
-    "model/02_runtime_behavior_contract.md",
-    "model/03_ingest_architecture.yaml",
-    "model/04_candidate_rule_adoption_gate.yaml",
-    "model/05_failure_semantics_and_weight_caps.yaml",
-    "model/06_candidate_ingest_rules_reference.yaml",
-    "model/07_fixtures_and_regression_tests.md",
-    "model/08_prompt_harness.md",
-    "model/09_changelog_candidate.md",
-    "model/10_single_file_master_prompt.txt",
-    "model/record_schema_v1.yaml",
-]
+STALE_REFERENCES = [path.relative_to(ROOT).as_posix() for path in LEGACY_PATHS]
 
 ACTIVE_REFERENCE_ROOTS = [
     ROOT / "README.md",
@@ -196,20 +184,19 @@ def validate_ingest_fixtures() -> None:
         require(fixture_id not in ids, f"duplicate ingest fixture id: {fixture_id}")
         ids.add(fixture_id)
         for field in ("source_pattern", "required_gates", "allowed_channels", "blocked_roles"):
-            value = fixture.get(field)
-            require(value not in (None, "", []), f"{fixture_id}: {field} missing")
+            require(fixture.get(field) not in (None, "", []), f"{fixture_id}: {field} missing")
 
 
 def iter_active_reference_files() -> Iterable[pathlib.Path]:
     tracked = set(tracked_files())
     for root in ACTIVE_REFERENCE_ROOTS:
         if root.is_file():
-            if root in tracked:
+            if root in tracked and root.resolve() != VALIDATOR:
                 yield root
             continue
         if root.is_dir():
             for path in root.rglob("*"):
-                if path.is_file() and path in tracked:
+                if path.is_file() and path in tracked and path.resolve() != VALIDATOR:
                     yield path
 
 
@@ -217,7 +204,8 @@ def validate_cleanup() -> None:
     for path in LEGACY_PATHS:
         require(not path.exists(), f"legacy active file still exists: {path.relative_to(ROOT)}")
 
-    tracked_dist = [path for path in tracked_files() if path.is_relative_to(MODEL / "dist")]
+    tracked = tracked_files()
+    tracked_dist = [path for path in tracked if path.is_relative_to(MODEL / "dist")]
     require(not tracked_dist, "generated model/dist artifacts must not be tracked")
 
     failures: list[str] = []
@@ -250,8 +238,8 @@ def validate_trailing_newlines() -> None:
         MODEL / "cartridges",
         MODEL / "manifest.json",
         MODEL / "manifests",
-        ROOT / "scripts" / "build_master_prompt.py",
-        pathlib.Path(__file__),
+        BUILDER,
+        VALIDATOR,
     ]
 
     tracked = set(tracked_files())
@@ -260,8 +248,8 @@ def validate_trailing_newlines() -> None:
         for path in paths:
             if path not in tracked:
                 continue
+            content = path.read_bytes()
             try:
-                content = path.read_bytes()
                 content.decode("utf-8")
             except UnicodeDecodeError:
                 continue
