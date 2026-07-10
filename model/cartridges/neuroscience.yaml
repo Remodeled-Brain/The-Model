@@ -1,39 +1,65 @@
-# model/cartridges/neuroscience.yaml — CANDIDATE (v0.05 v5 partition)
+# Neuroscience domain cartridge
+# Status: CANDIDATE
 #
-# First domain cartridge for The Model. The CORE (model/06) defines content-indifferent handle
-# CATEGORIES — the shapes of what gets stripped. This cartridge supplies the neuroscience-specific
-# INSTANCES that fill those shapes (which terms are folklore here). Loaded as an OPTIONAL MODULE by
-# connected/capable models (see the bootstrap footer). A model without it strips by category only —
-# valid but generic. To retarget the same core to another field, swap this file; touch nothing in core.
+# The generic runtime and ingest contracts define handle categories. This cartridge supplies
+# neuroscience-specific instances and translation vocabulary. It is embedded by both manifests.
 neuroscience_cartridge:
   status: candidate
-  fills: model/06 handle_types + terminology_guard
-  domain: neuroscience (systems / motor / developmental)
+  domain: neuroscience (systems, motor, developmental, behavioral)
+  fills:
+    - model/runtime/question_compiler.yaml handle_categories
+    - model/ingest/rules.yaml strip_and_extract.handle_categories
 
-  # Instances per content-indifferent category defined in the core.
   handle_instances:
-    region_label:                      # core category: a location/structure named as the cause
+    region_or_structure_as_agent:
       - brainstem
       - cortex
       - cerebellum
       - basal ganglia
       - superior colliculus
       - hippocampus
-    conservation_label:                # core category: antiquity/prestige offered as explanation
-      - "highly conserved"
-      - "evolutionarily ancient / old"
-      - "phylogenetically primitive"
-    diagnostic_label:                  # core category: a category-name used as a causal object
+      - prefrontal cortex
+    conservation_or_age_as_explanation:
+      - highly conserved
+      - evolutionarily ancient
+      - phylogenetically primitive
+    diagnostic_or_taxonomic_label:
       - autism / ASD
       - intellectual disability
+      - ADHD
       - spectrum diagnoses
-    biomarker_status:                  # core category: a measured correlate called the mechanism
-      - blood or cellular marker named as the mechanism of a syndrome
-    controller_command_language:       # core category: agent / decision language
-      - "region X controls / commands / decides Y"
-      - "winner-take-all decision"
-    spectrum_label:                    # core category: a continuum collapsed to one causal point
+    faculty_or_cognitive_noun_as_operator:
+      - attention
+      - memory
+      - executive function
+      - intelligence
+      - decision
+      - salience
+    biomarker_or_proxy_as_mechanism:
+      - blood marker named as the mechanism of a syndrome
+      - cellular marker named as the mechanism of a syndrome
+      - imaging signal named as the cognitive operation
+    controller_command_or_decision_language:
+      - region X controls Y
+      - region X commands Y
+      - region X decides Y
+      - winner-take-all decision
+    spectrum_or_continuum_label:
       - autism spectrum treated as one explanatory object
+
+  translation_patterns:
+    region_language:
+      preserve: measured activity, perturbation leverage, timing, dependency position, and route
+      remove: source status supplied by the region name
+    faculty_language:
+      preserve: measured behavior, task relation, state transition, persistence, weighting, interruption, or release
+      remove: faculty noun acting as an internal operator
+    diagnostic_language:
+      preserve: measured traits, support needs, developmental timing, and route heterogeneity
+      remove: diagnosis acting as one generated biological object
+    biomarker_language:
+      preserve: measured substrate, variable, magnitude, timing, and assay conditions
+      remove: biomarker status acting as mechanism
 
   terminology_guard:
     avoid_promoting:
@@ -41,7 +67,8 @@ neuroscience_cartridge:
       - cortex-first
       - basal-ganglia controller
       - cerebellum module
-    prefer:
+      - attention system as an unexplained operator
+    descriptive_handles:
       - conserved maintenance substrate
       - conserved dependency node
       - routed maintenance implementation
@@ -49,13 +76,5 @@ neuroscience_cartridge:
       - downstream gating surface
       - stabilization route
     caution: >
-      Preferred terms are descriptive handles, not causal objects — same reification discipline as
-      the core. They live here because they are neuroscience-specific vocabulary, not core grammar.
-
-  global_shift_instances:
-    from:
-      - brainstem-first as default interpretive route
-      - anatomical region treated as causal origin
-    to:
-      - conserved dependency first
-      - maintenance-route first
+      These are interface handles for measured relations. They cannot become seats, controllers,
+      essences, or causal objects without the physical route they summarize.
