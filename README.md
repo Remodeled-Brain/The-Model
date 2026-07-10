@@ -1,37 +1,49 @@
 # The Model
 
-A platform-agnostic scaffold ("The Model / Remodeled Brain") developed collaboratively across multiple LLMs (Claude, ChatGPT/Codex, Gemini, GLM, and others). This repo is the single source of truth so that no provider's copy silently diverges.
+A platform-agnostic scaffold developed collaboratively across multiple LLMs. The repository is the shared source of truth so that no provider copy silently diverges.
 
-## How this repo is organized
+## Purpose
 
-| Path | What lives here | Who edits it |
-|------|-----------------|--------------|
-| `model/` | The canonical, provider-neutral model: goals, behavior contract, ingest architecture, rules, fixtures, prompts. **This is the truth.** | Any LLM, under the rules in `CONTRIBUTING.md` |
-| `packets/` | Frozen, self-contained porting packets exactly as shipped to an external LLM (e.g. the `v0.05 v4` zip). Reproducibility artifacts — do not edit after a version is tagged. | Nobody edits; new versions add new folders |
-| `providers/` | Provider-specific adapters, overrides, known incompatibilities, and notes **only**. Never a copy of the canonical model. | The LLM for that provider |
-| `conformance/results/` | Dated outputs from running the fixtures/harness against each provider. | Whoever ran the test |
-| `decisions/` | Architecture Decision Records — durable decisions distilled out of chat sessions. | Any LLM |
-| `changelog.d/` | One file per change (a "fragment"). Assembled into `CHANGELOG.md` at release. | Any LLM making a change |
+The Model transforms questions expressed through folklore, reified categories, hidden operators, or incomplete causal language into chain-bound questions that empirical work can answer. It then binds reviewed evidence to the required physical chain and returns a bounded answer with explicit closure and translation limits.
 
-## The two-layer rule
+Paper ingest is essential but subordinate. It is the adaptive evidence-maintenance subsystem that keeps the corpus current and internally consistent. The primary runtime remains operable against a frozen reviewed corpus.
 
-`model/` **defines truth.** `providers/` **adapts it.** `conformance/` **proves** whether those adaptations behave consistently. If a provider needs a different phrasing or workaround, that difference goes in `providers/<name>/` — never by editing the canonical files into a provider-specific shape.
+## Repository map
 
-## Versioning
+| Path | Role |
+|------|------|
+| `model/00_purpose_and_scope.md` | Primary purpose and operating boundary |
+| `model/kernel/` | Chain invariants shared by runtime and ingest |
+| `model/runtime/` | Question compiler, answerability planner, evidence binder, answer contract, and end-to-end fixtures |
+| `model/manifests/runtime.json` | Primary runtime load graph |
+| `model/manifests/ingest.json` | Adaptive evidence-maintenance load graph |
+| `model/cartridges/` | Domain-specific handle instances and translation vocabulary |
+| `providers/` | Provider-specific adapters and incompatibility notes only |
+| `conformance/results/` | Results from standardized provider tests |
+| `decisions/` | Architecture Decision Records |
+| `changelog.d/` | One fragment per change, assembled at release |
+| `packets/` | Frozen shipped artifacts |
 
-Versions are **git tags** (e.g. `v0.05-v4`), not `v1/ v2/` folders. The current living version is in `model/`; the exact bytes shipped for a given version are in `packets/<version>/`.
+## Default load graph
 
-## Location & sync
+`model/manifest.json` points to the candidate question runtime. The ingest subsystem is loaded only when evidence maintenance or paper assessment is required.
 
-The canonical working copy lives at `%USERPROFILE%\Documents\The Model` — a plain local folder, **not** inside any cloud file-sync folder (syncing a live `.git` corrupts it). Cross-machine sync is through the private GitHub remote only. See `decisions/0002-repo-location-and-sync.md`.
+Generate the default runtime with:
 
-## Canonical vs candidate
+```bash
+python scripts/build_master_prompt.py
+```
 
-Material is **candidate** until explicitly approved, then **adopted**. See `CONTRIBUTING.md` and `model/04_candidate_rule_adoption_gate.yaml`. An assisting LLM must never treat candidate rules as integrated.
+Generate the ingest support runtime with:
 
-## Start here if you are an LLM
+```bash
+python scripts/build_master_prompt.py model/manifests/ingest.json
+```
 
-Read `CONTRIBUTING.md`, then `model/00_readme_for_llms.md`.## Remote
+## Canonical and candidate material
 
-`origin` = private GitHub repo **`Remodeled-Brain/The-Model`** (https://github.com/Remodeled-Brain/The-Model). See `decisions/0002-repo-location-and-sync.md`.
+Material remains candidate until explicitly approved. A canonical location does not imply adopted status. See `CONTRIBUTING.md` and `model/04_candidate_rule_adoption_gate.yaml`.
 
+## Start here for an LLM
+
+Read `CONTRIBUTING.md`, then `model/00_purpose_and_scope.md`. Provider-specific instructions belong under `providers/<provider>/`.
