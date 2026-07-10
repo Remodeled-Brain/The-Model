@@ -9,7 +9,7 @@
     "runtime/answerability_planner.yaml",
     "runtime/evidence_binding_contract.yaml",
     "runtime/answer_contract.yaml",
-    "runtime/end_to_end_fixtures.md"
+    "runtime/fixtures.json"
   ],
   "domain_modules": [
     "cartridges/neuroscience.yaml"
@@ -19,5 +19,8 @@
   ],
   "generated": [
     "dist/the_model_runtime.txt"
-  ]
+  ],
+  "build": {
+    "dist/the_model_runtime.txt": "scripts/build_master_prompt.py"
+  }
 }
