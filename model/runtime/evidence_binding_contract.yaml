@@ -2,64 +2,96 @@ evidence_binding_contract:
   status: candidate
   layer: primary_runtime
   purpose: >
-    Bind corpus records to the chain segments required by an answerability plan without allowing
-    paper framing, recency, volume, or model agreement to substitute for causal closure.
+    Bind reviewed corpus records to the exact chain segments required by an answerability plan without
+    allowing paper framing, recency, volume, model agreement, or shared vocabulary to substitute for closure.
 
   corpus_modes:
     frozen:
-      rule: runtime remains fully operable against a fixed reviewed corpus
+      rule: The runtime remains operable against a fixed reviewed corpus.
     adaptive:
-      rule: ingest may add, supersede, attenuate, or disconfirm support records
+      rule: Ingest may add, supersede, attenuate, or disconfirm support records.
 
   retrieval_keys:
-    - measured_substrate
+    - source_substrate
     - measured_variable
+    - operation
     - dependency_relation
     - timing_relation
     - perturbation
+    - source_scale
+    - target_scale
     - state_transition
     - constraint
     - missing_route_slot
     - disconfirmation_target
 
   binding_unit:
-    definition: one evidence record bound to one or more explicit chain segments
+    definition: One reviewed evidence record bound to one or more named chain segments.
     required_fields:
       - provenance
       - supported_segment
       - support_role
+      - measured_scale
       - translation_limit
       - closure_state
       - recency_status
       - independence_status
+      - applicable_conditions
+
+  binding_rules:
+    - Support attaches only to the segment and conditions actually measured.
+    - Proxy evidence requires translation closure before binding to mechanism.
+    - Implementation-site evidence requires timing and dependency closure before binding to source.
+    - Scale crossing requires an explicit carried variable and intermediate dependency path.
+    - A route-closing intervention may bind more strongly than a descriptive association only for the segment it tests.
+    - Disconfirming evidence binds to the exact segment or join it breaks.
+    - Unresolved evidence remains visible without granting closure.
+    - Correlated reports remain grouped and cannot create independent weight by count.
 
   recency_policy:
     rule: >
-      Recent evidence receives search and supersession priority because the corpus is adaptive.
-      Recency does not supply causal weight. Older evidence remains load-bearing when later work
-      does not replace its measurement, route, or dependency result.
+      Recent evidence receives retrieval and supersession-review priority. Older evidence remains
+      load-bearing when later work does not retest the same variable, dependency, conditions, or scale translation.
     required_checks:
-      - does_new_work_measure_the_same_variable
-      - does_new_work_close_or_reopen_the_same_route
-      - is_the_new_result_independent
-      - does_it_change_only_language_or_actual_empirical_support
+      - same_variable
+      - same_segment_or_join
+      - compatible_conditions
+      - stronger_or_disconfirming_design
+      - independence
+      - actual_empirical_change_rather_than_new_language
+    recency_supplies_causal_weight: false
 
-  intersection_rules:
-    - support attaches to the segment actually measured
-    - proxy evidence cannot bind directly to mechanism without translation closure
-    - implementation-site evidence cannot bind to source without timing and dependency closure
-    - repeated correlated reports cannot create grounding by count
-    - disconfirming evidence binds to the exact segment it breaks
-    - unresolved evidence remains visible without granting closure
+  supersession:
+    candidate_if:
+      - a newer record measures the same segment under compatible conditions
+      - the newer design closes a route left open by the older record
+      - the newer result disconfirms the older segment with stronger controls
+    not_superseded_if:
+      - only terminology changed
+      - the measured scale or variable differs
+      - the newer work inherits the same cohort, pipeline, or unresolved proxy
+      - the apparent conflict disappears after condition or scope separation
+    result: preserve both records until a reviewed supersession decision is made
+
+  conflict_handling:
+    actions:
+      - verify_segment_identity
+      - separate_condition_or_scale_differences
+      - check_independence_and_shared_pipeline
+      - inspect_measurement_and_translation_limits
+      - mark_segment_as_contested_when_conflict_survives
+    majority_vote_closes_conflict: false
 
   output_schema:
     bindings: list
-    segment_closure: map
+    per_segment_closure: map
+    chain_join_status: map
     conflicts: list
     supersession_candidates: list
+    disconfirmed_segments: list
     unresolved_evidence: list
     corpus_mode: [frozen, adaptive]
 
   ingest_boundary: >
-    Ingest produces reviewed support records for this binder. It does not define the source
-    question, compile the question, or decide the answer shape.
+    Ingest produces reviewed support records for this binder. It does not define the source question,
+    compile the question, alter the chain kernel, or decide the final answer shape.
