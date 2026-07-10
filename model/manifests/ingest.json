@@ -3,17 +3,14 @@
   "status": "candidate",
   "role": "adaptive evidence maintenance",
   "source_files": [
-    "00_readme_for_llms.md",
-    "01_version_goals_and_non_goals.md",
-    "02_runtime_behavior_contract.md",
-    "03_ingest_architecture.yaml",
-    "04_candidate_rule_adoption_gate.yaml",
-    "05_failure_semantics_and_weight_caps.yaml",
-    "06_candidate_ingest_rules_reference.yaml",
-    "07_fixtures_and_regression_tests.md",
-    "08_prompt_harness.md",
-    "09_changelog_candidate.md",
-    "record_schema_v1.yaml"
+    "00_purpose_and_scope.md",
+    "kernel/chain_contract.yaml",
+    "ingest/purpose.md",
+    "ingest/architecture.yaml",
+    "ingest/rules.yaml",
+    "ingest/failure_routing.yaml",
+    "ingest/record_schema.yaml",
+    "ingest/fixtures.json"
   ],
   "domain_modules": [
     "cartridges/neuroscience.yaml"
@@ -32,5 +29,5 @@
   "build": {
     "dist/ingest_support_runtime.txt": "scripts/build_master_prompt.py model/manifests/ingest.json"
   },
-  "note": "Preserves the v0.05 ingest work as the evidence-maintenance subsystem. It is not the primary question runtime."
+  "note": "Adaptive evidence maintenance for the primary question runtime."
 }
