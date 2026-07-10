@@ -1,0 +1,143 @@
+ingest_rules:
+  status: candidate
+  layer: evidence_maintenance
+
+  strip_and_extract:
+    phase: admissibility
+    trigger: every_source
+    purpose: Remove causal work assigned to author handles while preserving measured observations.
+    required_questions:
+      - What substrate was measured?
+      - What variable changed?
+      - What grouped or selected the samples?
+      - What physical or descriptive claim remains after handles are removed?
+      - Which parts of the claim still depend on a removed handle?
+    outputs:
+      - measured_substrate
+      - measured_variable
+      - grouping_variable
+      - post_strip_claim
+      - handle_dependencies
+      - handle_flags
+    handle_categories:
+      diagnostic_label:
+        allowed_role: grouping
+        blocked_role: causal_object
+      spectrum_label:
+        allowed_role: cohort_description
+        blocked_role: unified_causal_route
+      controller_or_decision_language:
+        rewrite_to: measured interaction, dependency, route, balance, gating, release, or stabilization
+      biomarker_status:
+        allowed_role: measured_variable_or_proxy
+        blocked_role: mechanism
+      region_label:
+        allowed_role: implementation_site
+        blocked_role: causal_origin_without_route
+      conservation_label:
+        allowed_role: search_priority_handle
+        blocked_role: causal_weight_or_origin
+      clinical_promise_language:
+        allowed_role: stated_application
+        blocked_role: biological_or_clinical_weight
+    admissible_if: a sound physical or descriptive post_strip_claim survives
+    inadmissible_if: no claim survives handle removal
+
+  validation_gates:
+    controlled_sameness_missing_differentiator:
+      trigger:
+        - nominally_same_input_with_divergent_output
+        - matched_or_controlled_conditions_with_divergent_output
+      rule: >
+        Divergent outputs under claimed sameness identify an incomplete input set. The missing
+        differentiating variable or route must be opened rather than absorbed into a label.
+      outputs:
+        - missing_differentiator_slot
+        - incomplete_causal_frame
+        - intensified_route_burden
+
+    region_source_closure:
+      rule: >
+        Activity, perturbability, or localization identifies an implementation site unless timing,
+        dependency position, causal direction, and upstream controls establish source status.
+      required_for_source:
+        - temporal_precedence
+        - dependency_position
+        - causal_direction
+        - competing_route_control
+      failure_cap: implementation_site_observation
+
+    conservation_dependency:
+      rule: >
+        Conservation raises retrieval priority only when tied to a conserved operation, dependency,
+        or maintenance route. Anatomical age does not establish origin or weight.
+      causal_weight_from_conservation: false
+      source_status_from_conservation: false
+
+    proxy_promotion:
+      rule: >
+        A proxy, biomarker, assay output, or correlate cannot bind to mechanism without a demonstrated
+        translation route from measured substrate and variable to the requested outcome.
+      required_for_translation:
+        - measured_substrate
+        - measured_variable
+        - direction
+        - timing
+        - intermediate_dependency
+        - outcome_relation
+      failure_cap: proxy_only
+
+    scale_translation:
+      rule: >
+        Evidence crosses scales only through an explicit physical dependency that carries the measured
+        change from the source scale to the requested scale. Shared vocabulary does not close translation.
+      outputs:
+        - source_scale
+        - target_scale
+        - translation_steps
+        - translation_limit
+      failure_cap: source_scale_only
+
+    temporality:
+      rule: >
+        Concurrent or postdictive separation cannot supply predictive or generative weight. Temporal
+        order must match the claimed dependency.
+      states:
+        - predictive
+        - prospective
+        - concurrent
+        - retrospective
+        - postdictive
+      postdictive_caps:
+        - no_prediction_weight
+        - no_direct_generative_grounding
+
+    practical_significance:
+      rule: >
+        Analytical separability does not establish biological, behavioral, or clinical importance.
+      required_when_practical_weight_is_claimed:
+        - effect_magnitude
+        - variance_envelope
+        - noise_floor
+        - biological_range
+        - functional_threshold
+        - replication
+      failure_cap: assay_or_measurement_level_only
+
+    independence:
+      rule: >
+        Shared cohorts, pipelines, labs, model families, or inherited datasets do not count as independent
+        route closure. Correlated records remain visible but cannot accumulate weight as independent support.
+      outputs:
+        - independence_status
+        - shared_pipeline_id
+        - shared_cohort_id
+        - shared_dataset_id
+
+  common_invariants:
+    handles_never_generate: true
+    descriptive_claims_are_positive_support: true
+    failed_mechanism_gate_does_not_discard_source: true
+    each_gate_caps_only_the_role_it_tests: true
+    recency_never_supplies_causal_weight: true
+    framework_fit_never_supplies_weight: true
