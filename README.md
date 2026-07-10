@@ -1,49 +1,59 @@
 # The Model
 
-A platform-agnostic scaffold developed collaboratively across multiple LLMs. The repository is the shared source of truth so that no provider copy silently diverges.
+A platform-agnostic scaffold developed collaboratively across multiple LLMs. The repository is the shared source of truth so provider copies do not silently diverge.
 
 ## Purpose
 
-The Model transforms questions expressed through folklore, reified categories, hidden operators, or incomplete causal language into chain-bound questions that empirical work can answer. It then binds reviewed evidence to the required physical chain and returns a bounded answer with explicit closure and translation limits.
+The Model reconstructs questions expressed through folklore, reified categories, hidden operators, or incomplete causal language into chain-bound questions that empirical work can answer. It binds reviewed evidence to the required physical path and returns a bounded answer with explicit closure and translation limits.
 
-Paper ingest is essential but subordinate. It is the adaptive evidence-maintenance subsystem that keeps the corpus current and internally consistent. The primary runtime remains operable against a frozen reviewed corpus.
+Paper ingest is the adaptive evidence-maintenance subsystem under that runtime. It keeps a recency-sensitive corpus current without making live ingest a prerequisite for operation or allowing recency to become causal weight.
 
-## Repository map
+## Active structure
 
 | Path | Role |
 |------|------|
-| `model/00_purpose_and_scope.md` | Primary purpose and operating boundary |
-| `model/kernel/` | Chain invariants shared by runtime and ingest |
-| `model/runtime/` | Question compiler, answerability planner, evidence binder, answer contract, and end-to-end fixtures |
-| `model/manifests/runtime.json` | Primary runtime load graph |
-| `model/manifests/ingest.json` | Adaptive evidence-maintenance load graph |
+| `model/00_purpose_and_scope.md` | Candidate purpose and operating boundary |
+| `model/kernel/` | Shared physical-chain invariants |
+| `model/runtime/` | Question compiler, answerability planner, evidence binder, answer contract, and machine-readable conformance contracts |
+| `model/ingest/` | Adaptive evidence-maintenance architecture, gates, routing, records, and fixtures |
 | `model/cartridges/` | Domain-specific handle instances and translation vocabulary |
+| `model/manifests/runtime.json` | Authoritative candidate question-runtime load graph |
+| `model/manifests/ingest.json` | Authoritative candidate ingest load graph |
+| `model/manifest.json` | Default-manifest selector only |
+| `governance/` | Candidate review and adoption rules |
 | `providers/` | Provider-specific adapters and incompatibility notes only |
-| `conformance/results/` | Results from standardized provider tests |
-| `decisions/` | Architecture Decision Records |
-| `changelog.d/` | One fragment per change, assembled at release |
-| `packets/` | Frozen shipped artifacts |
+| `conformance/results/` | Semantic conformance results from standardized provider runs |
+| `decisions/` | Durable architecture decisions |
+| `packets/` | Frozen externally shipped bundles |
 
-## Default load graph
+## Build and validation
 
-`model/manifest.json` points to the candidate question runtime. The ingest subsystem is loaded only when evidence maintenance or paper assessment is required.
-
-Generate the default runtime with:
+Generate the default runtime:
 
 ```bash
 python scripts/build_master_prompt.py
 ```
 
-Generate the ingest support runtime with:
+Generate the ingest support runtime:
 
 ```bash
 python scripts/build_master_prompt.py model/manifests/ingest.json
 ```
 
-## Canonical and candidate material
+Generated artifacts are written under `model/dist/` and are not committed.
 
-Material remains candidate until explicitly approved. A canonical location does not imply adopted status. See `CONTRIBUTING.md` and `model/04_candidate_rule_adoption_gate.yaml`.
+Validate manifest authority, cartridge inclusion, capability reach, fixture structure, stale references, and generated outputs:
+
+```bash
+python scripts/validate_repo.py
+```
+
+The machine-readable fixtures are executable as structural contracts in CI. Scientific semantic conformance still requires running a provider against them and recording the result under `conformance/results/`.
+
+## Candidate status
+
+This architectural refactor remains candidate until explicitly adopted. See `CONTRIBUTING.md`, `governance/reviewer_protocol.md`, and `governance/candidate_adoption_gate.yaml`.
 
 ## Start here for an LLM
 
-Read `CONTRIBUTING.md`, then `model/00_purpose_and_scope.md`. Provider-specific instructions belong under `providers/<provider>/`.
+Read `CONTRIBUTING.md`, then `model/00_purpose_and_scope.md` and `model/manifest.json`. Load only the manifest required by the operation.
