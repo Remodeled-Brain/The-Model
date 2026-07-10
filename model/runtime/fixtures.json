@@ -1,0 +1,138 @@
+{
+  "schema_version": "v1",
+  "status": "candidate",
+  "purpose": "Machine-readable question-first conformance contracts for the primary runtime.",
+  "execution_scope": {
+    "ci": "validates fixture structure, manifest inclusion, and required output fields",
+    "semantic": "provider conformance runs must execute the questions and compare outputs against these contracts"
+  },
+  "required_answer_fields": [
+    "direct_answer",
+    "generated_chain",
+    "closure_report",
+    "alternative_routes",
+    "translation_back",
+    "confidence"
+  ],
+  "fixtures": [
+    {
+      "id": "region-as-agent",
+      "mode": "question",
+      "source_question": "Does the cortex control attention?",
+      "required": [
+        "preserve the request for physical dependencies altering selection, weighting, persistence, interruption, or release of behavior under competing inputs",
+        "mark cortex, control, and attention as handles whose causal content must be generated",
+        "request measured state transitions, timing, perturbation dependencies, upstream maintenance conditions, and implementation sites",
+        "retain multiple routes until evidence discriminates them"
+      ],
+      "forbidden": [
+        "replace cortex controls attention with another region or faculty noun",
+        "grant source status from location or activity alone"
+      ]
+    },
+    {
+      "id": "diagnostic-category",
+      "mode": "question",
+      "source_question": "What causes autism?",
+      "required": [
+        "preserve the request for developmental processes producing measured traits or support needs grouped by the label",
+        "preserve route heterogeneity",
+        "request trait-level variables, developmental timing, substrate dependencies, route divergence, and stabilizing constraints",
+        "permit multiple compiled questions when the source label contains distinct outcomes"
+      ],
+      "forbidden": [
+        "treat the diagnosis as one generated biological object",
+        "compress heterogeneous routes into one causal point"
+      ]
+    },
+    {
+      "id": "same-input-different-output",
+      "mode": "question",
+      "source_question": "Why does the same mutation produce autism in one person and intellectual disability in another?",
+      "required": [
+        "preserve the divergent outcomes",
+        "mark the named mutation as an incomplete input set",
+        "open missing differentiator slots across development, regulation, environment, timing, compensation, and route stabilization",
+        "identify observations that discriminate among candidate routes"
+      ],
+      "forbidden": [
+        "rename divergence as variable expressivity without generating the missing path",
+        "treat nominal input sameness as causal completeness"
+      ]
+    },
+    {
+      "id": "proxy-as-mechanism",
+      "mode": "question",
+      "source_question": "Does low nitric oxide cause autism?",
+      "required": [
+        "preserve the reported assay difference",
+        "separate measured substrate, assay variable, cohort label, effect magnitude, and proposed developmental route",
+        "require translation from assay signal to organism-level state transition",
+        "cap the answer at assay-level difference when translation is absent"
+      ],
+      "forbidden": [
+        "promote biomarker status to mechanism",
+        "treat statistical separation as practical significance"
+      ]
+    },
+    {
+      "id": "frozen-corpus",
+      "mode": "condition",
+      "condition": "Disable live ingest and external retrieval.",
+      "required": [
+        "compile questions normally",
+        "bind only reviewed records in the frozen corpus",
+        "report missing evidence without treating runtime operation as failed",
+        "preserve the same chain and answer contracts used in adaptive mode"
+      ],
+      "forbidden": [
+        "require live ingest for question compilation",
+        "change the chain contract because retrieval is unavailable"
+      ]
+    },
+    {
+      "id": "adaptive-update",
+      "mode": "condition",
+      "condition": "Add a recent paper measuring a previously missing dependency segment.",
+      "required": [
+        "update evidence binding and segment closure",
+        "test whether the paper is independent and measures the same variable",
+        "leave the question compiler and chain contract unchanged",
+        "treat recency as search and supersession priority only"
+      ],
+      "forbidden": [
+        "raise causal weight from recency alone",
+        "rewrite settled runtime commitments through ingest"
+      ]
+    },
+    {
+      "id": "descriptive-question",
+      "mode": "question",
+      "source_question": "How often does the measured behavior occur under condition X?",
+      "required": [
+        "compile as a descriptive measurement question",
+        "answer from valid descriptive evidence",
+        "treat descriptive support as a positive role"
+      ],
+      "forbidden": [
+        "penalize evidence for lacking a mechanism it did not claim",
+        "invent a mechanism to make the answer appear complete"
+      ]
+    },
+    {
+      "id": "translation-honesty",
+      "mode": "question",
+      "source_question": "Why do I lose focus when sleep deprived?",
+      "required": [
+        "preserve the experienced transition and requested dependency",
+        "compile into sleep-pressure state, metabolic and arousal maintenance, competing-state stabilization, behavioral persistence, and interruption variables",
+        "distinguish human evidence from animal or assay-level route support",
+        "report compilation, chain, and translation confidence separately"
+      ],
+      "forbidden": [
+        "replace the physical path with personal relevance language",
+        "hide cross-species or proxy translation limits"
+      ]
+    }
+  ]
+}
