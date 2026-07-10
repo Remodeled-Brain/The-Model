@@ -1,24 +1,26 @@
 {
-  "packet": "v0_05_v4_porting_packet",
+  "name": "the-model-question-runtime",
   "status": "candidate",
-  "created": "2026-07-05",
+  "role": "primary question reconstruction and answering runtime",
   "source_files": [
-    "00_readme_for_llms.md",
-    "01_version_goals_and_non_goals.md",
-    "02_runtime_behavior_contract.md",
-    "03_ingest_architecture.yaml",
-    "04_candidate_rule_adoption_gate.yaml",
-    "05_failure_semantics_and_weight_caps.yaml",
-    "06_candidate_ingest_rules_reference.yaml",
-    "07_fixtures_and_regression_tests.md",
-    "08_prompt_harness.md",
-    "09_changelog_candidate.md",
-    "record_schema_v1.yaml"
+    "00_purpose_and_scope.md",
+    "kernel/chain_contract.yaml",
+    "runtime/question_compiler.yaml",
+    "runtime/answerability_planner.yaml",
+    "runtime/evidence_binding_contract.yaml",
+    "runtime/answer_contract.yaml",
+    "runtime/end_to_end_fixtures.md"
+  ],
+  "domain_modules": [
+    "cartridges/neuroscience.yaml"
+  ],
+  "support_manifests": [
+    "manifests/ingest.json"
   ],
   "generated": [
-    "10_single_file_master_prompt.txt"
+    "dist/the_model_runtime.txt"
   ],
   "build": {
-    "10_single_file_master_prompt.txt": "scripts/build_master_prompt.py"
+    "dist/the_model_runtime.txt": "scripts/build_master_prompt.py"
   }
 }
