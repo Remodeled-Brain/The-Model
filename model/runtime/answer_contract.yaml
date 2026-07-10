@@ -2,61 +2,91 @@ answer_contract:
   status: candidate
   layer: primary_runtime
   purpose: >
-    Produce an answer that is responsive to the source question while preserving chain closure,
-    uncertainty, and translation limits.
+    Produce a responsive answer that follows the chain path required by the question, preserves
+    unresolved alternatives, and keeps confidence attached to the operation that generated it.
 
   required_inputs:
     - source_question
-    - compiled_question
+    - question_type
+    - answer_target
+    - compiled_questions
     - answerability_status
     - evidence_bindings
-    - segment_closure
+    - per_segment_closure
+    - chain_join_status
     - unresolved_chain_slots
+    - narrower_answerable_targets
 
   answer_sequence:
-    - state_the_best_supported_chain_bound_answer
-    - show_the_generating_path_at_the_needed_resolution
-    - identify_closed_partial_and_missing_segments
-    - distinguish_observation_from_mechanism
-    - translate_back_to_source_language
-    - state_confidence_by_operation
+    - state_the_best_supported_answer_at_the_requested_or_narrower_valid_scope
+    - generate_the_required_physical_path
+    - identify_the_operations_and_state_transition
+    - report_closed_partial_contested_and_missing_segments
+    - preserve_alternative_routes_until_discriminated
+    - distinguish_observation_readout_implementation_route_and_source
+    - translate_back_to_source_language_without_restoring_handles_as_mechanism
+    - state_confidence_for_each_claimed_conclusion
+
+  conclusion_record:
+    required_fields:
+      - conclusion
+      - required_chain_path
+      - supporting_bindings
+      - closure_state
+      - translation_steps
+      - unresolved_limits
+      - confidence
 
   confidence_dimensions:
-    compilation_confidence:
-      basis: source_to_physical_mapping
-    chain_confidence:
-      basis: closure_of_required_segments
-    translation_confidence:
-      basis: distance_from_measured_chain_to_source_wording
+    compilation:
+      basis: security_of_source_to_physical_mapping
+    segment_closure:
+      basis: evidence_for_each_required_segment_and_join
+    scale_translation:
+      basis: demonstrated_dependency_across_required_scales
+    answer_translation:
+      basis: distance_from_the_closed_chain_to_the_source_wording
+
+  confidence_rule: >
+    Confidence is conclusion-specific. A conclusion cannot exceed the weakest segment or translation
+    step on its required path. Open segments outside that path do not cap a narrower conclusion.
 
   rules:
-    - Never collapse the confidence dimensions into one score.
-    - Confidence cannot exceed the weakest required translation step.
-    - A responsive answer may use the user's label as an interface handle after its causal role is removed.
-    - Missing evidence must be named as a missing route, dependency, measurement, or translation step.
-    - Multiple surviving routes remain explicit until discriminating evidence closes them.
+    - Never collapse confidence into one score.
+    - A responsive answer may reuse the user's label as an interface handle after removing its causal role.
+    - Missing evidence must be named as a missing segment, join, dependency, measurement, discriminator, or translation step.
+    - Multiple surviving routes remain explicit until evidence distinguishes their generated consequences.
     - A descriptive answer is complete when the question is descriptive and the measurements support it.
-    - Do not pad an unresolved answer with conventional scientific folklore.
+    - A partial answer states the narrower answer target it actually closes.
+    - Conflicting evidence marks the affected segment as contested rather than averaging the conflict away.
+    - Conventional terminology cannot fill an unresolved route.
 
   output_schema:
     direct_answer: string
+    answer_scope: string
     generated_chain: list
+    operations: list
+    state_transition: string
     closure_report:
       closed: list
       partial: list
+      contested: list
       missing: list
       contradicted: list
     alternative_routes: list
     translation_back: string
+    conclusions: list
     confidence:
       compilation: map
-      chain: map
-      translation: map
+      segment_closure: map
+      scale_translation: map
+      answer_translation: map
 
   forbidden_patterns:
-    - is_is_not_comparator_as_primary_explanation
+    - definition_sorting_as_primary_explanation
     - label_reintroduced_as_operator
     - citation_volume_as_confidence
     - recency_as_causal_weight
     - hidden_single_score
-    - certainty_beyond_chain_closure
+    - certainty_beyond_required_path_closure
+    - unresolved_full_scope_presented_as_a_closed_answer
