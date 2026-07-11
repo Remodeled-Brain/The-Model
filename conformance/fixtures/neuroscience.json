@@ -1,0 +1,123 @@
+{
+  "schema_version": "v1",
+  "status": "candidate",
+  "fixture_set": "neuroscience",
+  "purpose": "Neuroscience-cartridge semantic fixtures applying the generic decision-record contract.",
+  "fixtures": [
+    {
+      "id": "cbt-depression-effectiveness",
+      "critical": true,
+      "mutation_type": "single",
+      "variants": [
+        {
+          "id": "weak_comparator_heterogeneous_scale",
+          "input": {
+            "question": "Is CBT effective at treating depression?",
+            "narrative": "CBT is an effective treatment for depression.",
+            "data": {
+              "sample": "diagnosis-indexed",
+              "outcome": "rating-scale composite",
+              "comparator": "weak and variable",
+              "effect": "modest mean change with broad heterogeneity",
+              "attrition": "material",
+              "durability": "limited"
+            }
+          },
+          "expected": {
+            "relations": {
+              "cbt_to_scale_change": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "descriptive_only",
+                "target_relation": "intervention_to_outcome"
+              },
+              "cbt_treats_depression": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "label_dependent",
+                "target_relation": "intervention_to_outcome"
+              }
+            },
+            "required_stripped_assertions": [
+              "CBT is an effective treatment for depression."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "therapy-neuroplasticity",
+      "critical": true,
+      "mutation_type": "single",
+      "variants": [
+        {
+          "id": "pre_post_imaging_proxy",
+          "input": {
+            "question": "Did therapy induce neuroplasticity?",
+            "narrative": "Therapy induced neuroplasticity.",
+            "data": {
+              "measurement": "pre-post imaging or connectivity proxy",
+              "comparator": "inadequate",
+              "noise_and_practice": "not excluded",
+              "persistence": "not established",
+              "behavioral_dependency": "open"
+            }
+          },
+          "expected": {
+            "relations": {
+              "imaging_change": {
+                "causal_disposition": "not_a_causal_question",
+                "closure_state": "proxy_limited",
+                "target_relation": "descriptive_distribution"
+              },
+              "therapy_induced_neuroplasticity": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "proxy_limited",
+                "target_relation": "mechanism_or_route"
+              }
+            },
+            "required_stripped_assertions": [
+              "Therapy induced neuroplasticity."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "decisive-neural-stimulation",
+      "critical": true,
+      "mutation_type": "scope_separation",
+      "variants": [
+        {
+          "id": "exact_effect_vs_disorder_origin",
+          "input": {
+            "question": "Did stimulation cause the measured behavioral outcome, and does it prove the region is the disorder?",
+            "data": {
+              "manipulation": "specified substrate",
+              "effect": "near-universal large specific durable",
+              "comparison": "valid",
+              "attrition": "negligible",
+              "replication": "independent",
+              "etiology": "untested"
+            }
+          },
+          "expected": {
+            "relations": {
+              "stimulation_to_behavior": {
+                "causal_disposition": "causal_admitted",
+                "closure_state": "closed",
+                "target_relation": "intervention_to_outcome"
+              },
+              "region_is_disorder_origin": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "unresolved",
+                "target_relation": "etiology_or_origin"
+              }
+            },
+            "required_stripped_assertions": [
+              "The stimulated region is the disorder."
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
