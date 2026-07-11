@@ -96,7 +96,7 @@ def validate_causal_admission() -> None:
         [
             "out_of_sample_route_prediction",
             "route_bounded_heterogeneity",
-            "poorly predictive or postdictive work cannot be restated as causal contribution",
+            "Poorly predictive or postdictive work cannot be restated as causal contribution",
         ],
     )
     require_text(
