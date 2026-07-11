@@ -60,7 +60,8 @@ def validate_construct_admission() -> None:
         CARTRIDGE,
         [
             "source_question: Is ADHD a defective prefrontal cortex?",
-            "disposition: premise_rejected",
+            "construct_disposition: premise_rejected",
+            "causal_disposition: causal_rejected",
             "ADHD is a diagnostic folklore grouping",
         ],
     )
@@ -105,6 +106,13 @@ def validate_causal_admission() -> None:
             "state_no_or_the_direct_causal_rejection_in_the_first_sentence",
             "heterogeneous_poorly_predictive_work_rephrased_as_causal",
             "A causal-rejected answer must not be softened into mixed, complex, multifactorial, linked, associated, or may-contribute framing.",
+        ],
+    )
+    require_text(
+        CARTRIDGE,
+        [
+            "highly heterogeneous and poorly predictive",
+            "Do not restate those findings as contributions, roles, dysfunctions",
         ],
     )
 
