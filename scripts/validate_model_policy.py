@@ -16,7 +16,9 @@ COMPILER = MODEL / "runtime" / "question_compiler.yaml"
 PLANNER = MODEL / "runtime" / "answerability_planner.yaml"
 BINDER = MODEL / "runtime" / "evidence_binding_contract.yaml"
 ANSWER = MODEL / "runtime" / "answer_contract.yaml"
+INGEST_ARCHITECTURE = MODEL / "ingest" / "architecture.yaml"
 INGEST_RULES = MODEL / "ingest" / "rules.yaml"
+FAILURE_ROUTING = MODEL / "ingest" / "failure_routing.yaml"
 RECORD_SCHEMA = MODEL / "ingest" / "record_schema.yaml"
 RUNTIME_FIXTURES = MODEL / "runtime" / "fixtures.json"
 INGEST_FIXTURES = MODEL / "ingest" / "fixtures.json"
@@ -166,7 +168,7 @@ def validate_evidence_admission() -> None:
         [
             "reviewed_does_not_mean_admitted: true",
             "Bind the observation or closed bridge, never the paper's prose conclusion.",
-            "A meta-analysis inherits construct, measurement, direction, task, and bridge failures from its inputs.",
+            "A meta-analysis inherits construct, measurement, direction, task, proxy, treatment-response, and bridge failures from its inputs.",
         ],
     )
     require_text(
@@ -196,6 +198,67 @@ def validate_evidence_admission() -> None:
     }
     missing = expected_fixtures - fixture_ids(EVIDENCE_FIXTURES)
     vr.require(not missing, f"missing evidence admission fixtures: {sorted(missing)}")
+
+
+def validate_restrictive_presumptions() -> None:
+    require_text(
+        EVIDENCE_ADMISSION,
+        [
+            "construct_indexed:",
+            "presumed_closure_state: label_dependent",
+            "proxy_record:",
+            "presumed_closure_state: proxy_limited",
+            "treatment_response:",
+            "Treatment response identifies an intervention-outcome relation under the tested conditions.",
+            "local_guard_pass_as_global_upgrade",
+        ],
+    )
+    require_text(
+        BINDER,
+        [
+            "classify_record_before_local_checks",
+            "Construct-indexed records begin label_dependent, not neutral.",
+            "Proxy records begin proxy_limited and cannot bind to causal or mechanistic segments.",
+            "Treatment-response records can bind intervention-outcome relations but never etiology",
+            "local_passes_remove_presumption: false",
+        ],
+    )
+    require_text(
+        INGEST_ARCHITECTURE,
+        [
+            "phase_0_presumption:",
+            "Construct-indexed work begins label_dependent rather than neutral.",
+            "Proxy work begins proxy_limited and cannot bind to causal or mechanistic segments.",
+            "Treatment-response work may bind intervention-outcome relations but cannot bind etiology or endogenous mechanism.",
+        ],
+    )
+    require_text(
+        FAILURE_ROUTING,
+        [
+            "initial_channel: label_dependent_observation",
+            "initial_channel: proxy_only",
+            "count_can_escape_presumption: false",
+            "presumption_survives_local_passes: true",
+        ],
+    )
+    require_text(
+        RECORD_SCHEMA,
+        [
+            "restrictive_presumption_assigned_before_local_checks: true",
+            "construct_indexed_defaults_to_label_dependent: true",
+            "proxy_defaults_to_proxy_limited: true",
+            "proxy_never_binds_causal_segment: true",
+            "treatment_response_never_binds_etiology_or_endogenous_mechanism: true",
+        ],
+    )
+
+    expected = {
+        "construct-indexed-defaults-label-dependent",
+        "proxy-cannot-bind-causal-segment",
+        "treatment-response-cannot-bind-etiology",
+    }
+    missing = expected - fixture_ids(EVIDENCE_FIXTURES)
+    vr.require(not missing, f"missing restrictive-presumption fixtures: {sorted(missing)}")
 
 
 def validate_evidence_weighting() -> None:
@@ -276,6 +339,7 @@ if __name__ == "__main__":
         validate_construct_admission()
         validate_causal_admission()
         validate_evidence_admission()
+        validate_restrictive_presumptions()
         validate_evidence_weighting()
         validate_regressions()
     except (vr.ValidationError, OSError) as exc:
