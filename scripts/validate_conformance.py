@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate semantic causal decision records and mutation fixtures."""
 from __future__ import annotations
-import argparse, copy, json, pathlib, re, sys
+import argparse, copy, hashlib, json, pathlib, re, subprocess, sys
 from typing import Any
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
@@ -9,6 +9,8 @@ CONF=ROOT/"conformance"
 FIXTURE_FILES=(CONF/"fixtures/generic.json",CONF/"fixtures/neuroscience.json")
 RESULTS=CONF/"results"
 PASS=CONF/"selftests/pass"; FAIL=CONF/"selftests/fail"
+POLICY=CONF/"required_runs.json"; SCHEMA=CONF/"decision_record.schema.json"
+MODEL=ROOT/"model"; BUILDER=ROOT/"scripts/build_master_prompt.py"; RUNTIME=MODEL/"dist/the_model_runtime.txt"; KERNEL=MODEL/"kernel/chain_contract.yaml"; CARTRIDGE=MODEL/"cartridges/neuroscience.yaml"
 
 CAUSAL={"causal_admitted","causal_rejected","causal_unresolved","not_a_causal_question"}
 CLOSURE={"closed","partial","descriptive_only","source_scale_only","proxy_limited","label_dependent","contested","unresolved","contradicted"}
@@ -37,6 +39,25 @@ def load(path:pathlib.Path)->dict[str,Any]:
     req(isinstance(value,dict),"JSON_OBJECT_REQUIRED",str(path)); return value
 def string(v:Any)->bool: return isinstance(v,str) and bool(v.strip())
 def strings(v:Any)->bool: return isinstance(v,list) and all(string(x) for x in v)
+def sha(path:pathlib.Path)->str: return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def validate_policy():
+    schema=load(SCHEMA); req(schema.get("type")=="object","DECISION_SCHEMA_INVALID","schema type")
+    req({"schema_version","relations","claims","answer_claim_order"}<=set(schema.get("required",[])),"DECISION_SCHEMA_INVALID","required fields")
+    policy=load(POLICY).get("policy"); req(isinstance(policy,dict),"ADOPTION_POLICY_REQUIRED","policy")
+    req(policy.get("semantic_results_required_for_adoption") is True,"ADOPTION_POLICY_INVALID","semantic results")
+    req(set(policy.get("required_fixture_sets",[]))=={"generic","neuroscience"},"ADOPTION_POLICY_INVALID","fixture sets")
+    req(policy.get("critical_fixture_failure_tolerance")==0,"ADOPTION_POLICY_INVALID","failure tolerance")
+    req(isinstance(policy.get("minimum_independent_runs_per_critical_variant"),int) and policy["minimum_independent_runs_per_critical_variant"]>=1,"ADOPTION_POLICY_INVALID","run count")
+    req(policy.get("positive_causal_control_required") is True,"ADOPTION_POLICY_INVALID","positive control")
+    return policy
+
+def current_hashes():
+    subprocess.run([sys.executable,str(BUILDER)],cwd=ROOT,check=True)
+    try: return {"runtime_hash":sha(RUNTIME),"kernel_hash":sha(KERNEL),"cartridge_hash":sha(CARTRIDGE)}
+    finally:
+        RUNTIME.unlink(missing_ok=True)
+        if RUNTIME.parent.exists() and not any(RUNTIME.parent.iterdir()): RUNTIME.parent.rmdir()
 
 def relations(record:dict[str,Any])->dict[str,dict[str,Any]]:
     rows=record.get("relations"); req(isinstance(rows,list) and rows,"RELATIONS_REQUIRED","relations")
@@ -46,6 +67,7 @@ def relations(record:dict[str,Any])->dict[str,dict[str,Any]]:
         rid=row.get("id"); req(string(rid),"RELATION_ID_REQUIRED","id"); req(rid not in out,"DUPLICATE_RELATION_ID",rid)
         out[rid]=row
     return out
+
 def claims(record:dict[str,Any])->dict[str,dict[str,Any]]:
     rows=record.get("claims"); req(isinstance(rows,list) and rows,"CLAIMS_REQUIRED","claims")
     out={}
@@ -62,55 +84,47 @@ def validate_relation(r:dict[str,Any]):
     req(string(r.get("scope")),"RELATION_SCOPE_REQUIRED",rid)
     for f in ("required_checks","passed_checks","failed_checks"): req(strings(r.get(f)),"CHECK_LIST_REQUIRED",f"{rid}.{f}")
     needed=set(r["required_checks"]); passed=set(r["passed_checks"]); failed=set(r["failed_checks"])
-    req(not passed&failed,"CHECK_STATE_CONFLICT",rid)
-    req((passed|failed)<=needed,"CHECK_NOT_REQUIRED",rid)
+    req(not passed&failed,"CHECK_STATE_CONFLICT",rid); req((passed|failed)<=needed,"CHECK_NOT_REQUIRED",rid)
     data=r.get("data"); req(isinstance(data,dict),"RELATION_DATA_REQUIRED",rid)
     missing=DATA-set(data); req(not missing,"RELATION_DATA_FIELDS_MISSING",f"{rid}: {sorted(missing)}")
     req(all(string(data[f]) for f in DATA),"RELATION_DATA_VALUE_MISSING",rid)
     d=r["causal_disposition"]
     if d=="causal_admitted":
-        req(not failed,"CAUSAL_ADMISSION_WITH_FAILED_CHECKS",rid)
-        req(needed<=passed,"CAUSAL_ADMISSION_WITH_OPEN_CHECKS",rid)
+        req(not failed,"CAUSAL_ADMISSION_WITH_FAILED_CHECKS",rid); req(needed<=passed,"CAUSAL_ADMISSION_WITH_OPEN_CHECKS",rid)
     elif d=="causal_rejected": req(bool(failed),"CAUSAL_REJECTION_WITHOUT_FAILURE",rid)
     elif d=="causal_unresolved":
-        req(not failed,"UNRESOLVED_WITH_POSITIVE_FAILURE",rid)
-        req(bool(needed-passed),"UNRESOLVED_WITHOUT_OPEN_CHECK",rid)
+        req(not failed,"UNRESOLVED_WITH_POSITIVE_FAILURE",rid); req(bool(needed-passed),"UNRESOLVED_WITHOUT_OPEN_CHECK",rid)
     else: req(r["target_relation"]=="descriptive_distribution","NONCAUSAL_DISPOSITION_SCOPE",rid)
     if d!="causal_admitted": return
-    if r["design_mode"]=="interventional" and r["target_relation"]=="intervention_to_outcome":
-        req(INTERVENTION<=passed,"INTERVENTION_CAUSAL_BURDEN_OPEN",f"{rid}: {sorted(INTERVENTION-passed)}")
-    if r["design_mode"] in {"observational","longitudinal_observational"} and r["target_relation"]!="descriptive_distribution":
-        req(OBSERVATIONAL<=passed,"OBSERVATIONAL_CAUSAL_BURDEN_OPEN",f"{rid}: {sorted(OBSERVATIONAL-passed)}")
+    if r["design_mode"]=="interventional" and r["target_relation"]=="intervention_to_outcome": req(INTERVENTION<=passed,"INTERVENTION_CAUSAL_BURDEN_OPEN",f"{rid}: {sorted(INTERVENTION-passed)}")
+    if r["design_mode"] in {"observational","longitudinal_observational"} and r["target_relation"]!="descriptive_distribution": req(OBSERVATIONAL<=passed,"OBSERVATIONAL_CAUSAL_BURDEN_OPEN",f"{rid}: {sorted(OBSERVATIONAL-passed)}")
     if r["construct_relation"]!="construct_independent": req("construct_escape_complete" in passed,"CONSTRUCT_DEPENDENCE_NOT_ESCAPED",rid)
     if r["measurement_relation"] in {"proxy","surrogate","model_derived"}: req("physical_translation_closed" in passed,"PROXY_CAUSAL_PROMOTION",rid)
     target_checks={"etiology_or_origin":"etiology_independently_closed","endogenous_dependency":"endogenous_route_independently_closed","mechanism_or_route":"physical_dependency_path_closed","cross_scale_translation":"cross_scale_translation_closed","predictive_relation":"predictive_adequacy_closed"}
     check=target_checks.get(r["target_relation"])
     if check: req(check in passed,"TARGET_SCOPE_TRANSFER",f"{rid}: {check}")
 
-def validate_claims(record:dict[str,Any], rels:dict[str,dict[str,Any]]):
+def validate_claims(record:dict[str,Any],rels:dict[str,dict[str,Any]]):
     cs=claims(record); order=record.get("answer_claim_order")
     req(strings(order) and bool(order),"ANSWER_CLAIM_ORDER_REQUIRED","answer_claim_order")
-    req(len(order)==len(set(order)),"DUPLICATE_ANSWER_CLAIM","answer_claim_order")
-    req(set(order)<=set(cs),"UNKNOWN_ANSWER_CLAIM",str(set(order)-set(cs)))
+    req(len(order)==len(set(order)),"DUPLICATE_ANSWER_CLAIM","answer_claim_order"); req(set(order)<=set(cs),"UNKNOWN_ANSWER_CLAIM",str(set(order)-set(cs)))
     for cid,c in cs.items():
         rid=c.get("relation_id"); req(rid in rels,"CLAIM_RELATION_UNKNOWN",cid)
-        cls=c.get("language_class"); text=c.get("text")
-        req(cls in LANG,"CLAIM_LANGUAGE_CLASS_INVALID",cid); req(string(text),"CLAIM_TEXT_REQUIRED",cid)
+        cls=c.get("language_class"); text=c.get("text"); req(cls in LANG,"CLAIM_LANGUAGE_CLASS_INVALID",cid); req(string(text),"CLAIM_TEXT_REQUIRED",cid)
         r=rels[rid]; disposition=r["causal_disposition"]; passed=set(r["passed_checks"])
         if cls in {"causal","mechanistic"}: req(disposition=="causal_admitted","CAUSAL_LANGUAGE_WITHOUT_ADMISSION",cid)
         if cls=="causal_rejection": req(disposition=="causal_rejected","CAUSAL_REJECTION_LANGUAGE_MISMATCH",cid)
         if cls=="descriptive" and CAUSAL_WORDS.search(text): raise ConformanceError("CAUSAL_VERB_HIDDEN_AS_DESCRIPTIVE",cid)
-        if EFFECTIVE_WORDS.search(text): req(EFFECTIVE<=passed,"EFFECTIVENESS_LANGUAGE_OVERREACH",f"{cid}: {sorted(EFFECTIVE-passed)}")
-        if INDUCES_WORDS.search(text): req(INDUCES<=passed,"INDUCES_LANGUAGE_OVERREACH",f"{cid}: {sorted(INDUCES-passed)}")
+        if cls in {"causal","mechanistic"} and EFFECTIVE_WORDS.search(text): req(EFFECTIVE<=passed,"EFFECTIVENESS_LANGUAGE_OVERREACH",f"{cid}: {sorted(EFFECTIVE-passed)}")
+        if cls in {"causal","mechanistic"} and INDUCES_WORDS.search(text): req(INDUCES<=passed,"INDUCES_LANGUAGE_OVERREACH",f"{cid}: {sorted(INDUCES-passed)}")
         if cls=="mechanistic": req("physical_dependency_path_closed" in passed,"MECHANISM_LANGUAGE_WITHOUT_ROUTE",cid)
 
 def render_answer(record:dict[str,Any])->str:
     cs=claims(record); return " ".join(cs[cid]["text"].strip() for cid in record["answer_claim_order"]).strip()
+
 def validate_decision_record(record:dict[str,Any]):
-    req(record.get("schema_version")=="v1","DECISION_SCHEMA_VERSION","v1 required")
-    req(string(record.get("query")),"QUERY_REQUIRED","query")
-    for f in ("admitted_observations","stripped_assertions"):
-        req(isinstance(record.get(f),list) and all(string(x) for x in record[f]),"AUDIT_LIST_REQUIRED",f)
+    req(record.get("schema_version")=="v1","DECISION_SCHEMA_VERSION","v1 required"); req(string(record.get("query")),"QUERY_REQUIRED","query")
+    for f in ("admitted_observations","stripped_assertions"): req(isinstance(record.get(f),list) and all(string(x) for x in record[f]),"AUDIT_LIST_REQUIRED",f)
     rels=relations(record)
     for r in rels.values(): validate_relation(r)
     validate_claims(record,rels)
@@ -133,9 +147,8 @@ def catalog():
             if kind=="narrative_invariance": req(isinstance(fixture.get("invariant_relations"),list) and fixture["invariant_relations"],"INVARIANT_RELATIONS_REQUIRED",fid)
     return variants,fixtures
 
-def validate_expected(record:dict[str,Any], expected:dict[str,Any]):
-    rels=relations(record); er=expected.get("relations")
-    req(isinstance(er,dict) and er,"EXPECTED_RELATIONS_REQUIRED","expected.relations")
+def validate_expected(record:dict[str,Any],expected:dict[str,Any]):
+    rels=relations(record); er=expected.get("relations"); req(isinstance(er,dict) and er,"EXPECTED_RELATIONS_REQUIRED","expected.relations")
     for rid,constraints in er.items():
         req(rid in rels,"EXPECTED_RELATION_MISSING",rid)
         for field,value in constraints.items(): req(rels[rid].get(field)==value,"FIXTURE_EXPECTATION_FAILED",f"{rid}.{field}")
@@ -143,36 +156,52 @@ def validate_expected(record:dict[str,Any], expected:dict[str,Any]):
     missing=[x for x in expected.get("required_stripped_assertions",[]) if x.casefold() not in actual]
     req(not missing,"REQUIRED_STRIPPED_ASSERTION_MISSING",str(missing))
 
-def validate_result(result:dict[str,Any], variants=None):
+def validate_result(result:dict[str,Any],variants=None):
     req(result.get("schema_version")=="v1","RESULT_SCHEMA_VERSION","v1 required")
     for f in ("run_id","fixture_set","fixture_id","variant_id"): req(string(result.get(f)),"RESULT_IDENTITY_REQUIRED",f)
     provider=result.get("provider"); req(isinstance(provider,dict),"PROVIDER_METADATA_REQUIRED","provider")
-    for f in ("name","model","runtime_hash","kernel_hash","cartridge_hash","fixture_hash"): req(string(provider.get(f)),"PROVIDER_METADATA_FIELD",f)
-    record=result.get("decision_record"); req(isinstance(record,dict),"DECISION_RECORD_REQUIRED","decision_record")
-    validate_decision_record(record)
+    for f in ("name","model"): req(string(provider.get(f)),"PROVIDER_METADATA_FIELD",f)
+    for f in ("runtime_hash","kernel_hash","cartridge_hash","fixture_hash"): req(string(provider.get(f)) and re.fullmatch(r"[0-9a-f]{64}",provider[f]) is not None,"PROVIDER_HASH_FIELD",f)
+    req(isinstance(provider.get("temperature"),(int,float)),"PROVIDER_METADATA_FIELD","temperature"); req(string(provider.get("seed")),"PROVIDER_METADATA_FIELD","seed")
+    record=result.get("decision_record"); req(isinstance(record,dict),"DECISION_RECORD_REQUIRED","decision_record"); validate_decision_record(record)
     req(result.get("rendered_answer")==render_answer(record),"RENDERED_ANSWER_DRIFT","rendered answer")
     if variants is not None:
-        key=(result["fixture_set"],result["fixture_id"],result["variant_id"]); req(key in variants,"UNKNOWN_FIXTURE_VARIANT",str(key))
-        validate_expected(record,variants[key]["expected"])
+        key=(result["fixture_set"],result["fixture_id"],result["variant_id"]); req(key in variants,"UNKNOWN_FIXTURE_VARIANT",str(key)); validate_expected(record,variants[key]["expected"])
 
 def projection(record,fixture):
     rels=relations(record); out={}
     for item in fixture["invariant_relations"]:
-        rid=item["relation_id"]; req(rid in rels,"INVARIANT_RELATION_MISSING",rid)
-        out[rid]={f:rels[rid].get(f) for f in item["fields"]}
+        rid=item["relation_id"]; req(rid in rels,"INVARIANT_RELATION_MISSING",rid); out[rid]={f:rels[rid].get(f) for f in item["fields"]}
     return out
+
 def validate_mutation_groups(rows,fixtures):
     groups={}
     for row in rows:
-        p=row["provider"]; key=(row["run_id"],p["name"],p["model"],row["fixture_set"],row["fixture_id"])
-        groups.setdefault(key,[]).append(row)
+        p=row["provider"]; key=(row["run_id"],p["name"],p["model"],row["fixture_set"],row["fixture_id"]); groups.setdefault(key,[]).append(row)
     for key,items in groups.items():
-        fixture=fixtures[(key[-2],key[-1])]
-        expected={v["id"] for v in fixture["variants"]}; present={r["variant_id"] for r in items}
+        fixture=fixtures[(key[-2],key[-1])]; expected={v["id"] for v in fixture["variants"]}; present={r["variant_id"] for r in items}
         req(present==expected,"INCOMPLETE_MUTATION_GROUP",str((expected,present)))
         if fixture["mutation_type"]=="narrative_invariance":
-            ps=[projection(r["decision_record"],fixture) for r in items]
-            req(all(p==ps[0] for p in ps[1:]),"NARRATIVE_CHANGED_CAUSAL_RESULT",str(key))
+            ps=[projection(r["decision_record"],fixture) for r in items]; req(all(p==ps[0] for p in ps[1:]),"NARRATIVE_CHANGED_CAUSAL_RESULT",str(key))
+
+def validate_adoption(rows,fixtures,policy):
+    req(bool(rows),"ADOPTION_RESULTS_REQUIRED","no provider results")
+    current=current_hashes(); fixture_hashes={path.stem:sha(path) for path in FIXTURE_FILES}
+    for row in rows:
+        p=row["provider"]
+        for field,value in current.items(): req(p.get(field)==value,"STALE_PROVIDER_RESULT",f"{row['fixture_id']}: {field}")
+        req(p.get("fixture_hash")==fixture_hashes[row["fixture_set"]],"STALE_PROVIDER_RESULT",f"{row['fixture_id']}: fixture_hash")
+    required_sets=set(policy["required_fixture_sets"])
+    critical={(fs,fid,v["id"]) for (fs,fid),f in fixtures.items() if fs in required_sets and f.get("critical") for v in f["variants"]}
+    minimum=policy["minimum_independent_runs_per_critical_variant"]
+    groups={}
+    for row in rows:
+        p=row["provider"]; groups.setdefault((p["name"],p["model"]),{}).setdefault((row["fixture_set"],row["fixture_id"],row["variant_id"]),set()).add(row["run_id"])
+    complete=[]
+    for provider,counts in groups.items():
+        missing={key:minimum-len(counts.get(key,set())) for key in critical if len(counts.get(key,set()))<minimum}
+        if not missing: complete.append(provider)
+    req(bool(complete),"ADOPTION_RUN_COUNT_INCOMPLETE",f"need {minimum} complete runs per critical variant for one provider/model")
 
 def set_path(root,path,value):
     parts=path.split("."); target=root
@@ -183,6 +212,7 @@ def set_path(root,path,value):
         else: del target[last]
     elif isinstance(target,list): target[int(last)]=value
     else: target[last]=value
+
 def selftests():
     for path in sorted(PASS.glob("*.json")): validate_result(load(path))
     for path in sorted(FAIL.glob("*.json")):
@@ -196,16 +226,19 @@ def selftests():
         else: raise ConformanceError("SELFTEST_FALSE_NEGATIVE",str(path))
 
 def main()->int:
-    parser=argparse.ArgumentParser(); parser.add_argument("results",nargs="*",type=pathlib.Path); parser.add_argument("--fixtures-only",action="store_true"); args=parser.parse_args()
+    parser=argparse.ArgumentParser(); parser.add_argument("results",nargs="*",type=pathlib.Path); parser.add_argument("--fixtures-only",action="store_true"); parser.add_argument("--adoption",action="store_true"); args=parser.parse_args()
     try:
-        variants,fixtures=catalog(); selftests()
+        req(not (args.fixtures_only and args.adoption),"ARGUMENT_CONFLICT","fixtures-only with adoption")
+        policy=validate_policy(); variants,fixtures=catalog(); selftests()
         if not args.fixtures_only:
-            paths=args.results or (sorted(RESULTS.rglob("*.json")) if RESULTS.exists() else [])
-            rows=[]
+            paths=args.results or (sorted(RESULTS.rglob("*.json")) if RESULTS.exists() else []); rows=[]
             for path in paths:
                 row=load(path); validate_result(row,variants); rows.append(row)
             if rows: validate_mutation_groups(rows,fixtures)
-    except ConformanceError as e:
-        print(f"CONFORMANCE FAILED [{e.code}]: {e.message}",file=sys.stderr); return 1
+            if args.adoption: validate_adoption(rows,fixtures,policy)
+    except (ConformanceError,subprocess.CalledProcessError,OSError) as e:
+        if isinstance(e,ConformanceError): print(f"CONFORMANCE FAILED [{e.code}]: {e.message}",file=sys.stderr)
+        else: print(f"CONFORMANCE FAILED: {e}",file=sys.stderr)
+        return 1
     print("conformance validation passed"); return 0
 if __name__=="__main__": raise SystemExit(main())
