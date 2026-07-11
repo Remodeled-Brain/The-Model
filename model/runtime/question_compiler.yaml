@@ -2,18 +2,21 @@ question_compiler:
   status: candidate
   layer: primary_runtime
   purpose: >
-    Reject invalid source premises before reconstruction, then convert admitted questions into chain-bound
-    questions while preserving only observations and distinctions actually supplied by the source.
+    Reject invalid source premises before reconstruction, identify hard causal questions, then convert only
+    admitted questions into chain-bound questions while preserving observations actually supplied by the source.
 
   construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+  causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
   trigger: every question requesting description, explanation, prediction, intervention, or causal attribution
 
   stages:
     - classify_question_type
+    - classify_hard_causality_request
     - identify_requested_relation_scope_and_resolution
     - detect_handles_and_hidden_operators
     - evaluate_construct_admission
     - identify_explicit_observations_without_label_inference
+    - apply_immediate_causal_rejection_when_construct_fails
     - reject_invalid_premise_or_continue
     - identify_required_organism_state_relation
     - extract_or_propose_physical_variables_and_substrates
@@ -35,6 +38,30 @@ question_compiler:
       target: dependency whose alteration changes a reachable or stabilized state
     interpretive:
       target: bounded meaning of an observation within the available chain
+
+  hard_causality_detection:
+    trigger_relations:
+      - causes
+      - is_a_defect
+      - is_dysfunction
+      - controls
+      - drives
+      - underlies
+      - is_the_mechanism
+      - is_responsible_for
+      - is_located_in
+      - is_the_biological_basis
+    rule: >
+      A hard causality request cannot be downgraded into a request for association. It must pass the kernel
+      causal-admission gate or terminate with causal_rejected.
+    forbidden_downgrades:
+      - associated_with
+      - linked_to
+      - may_contribute
+      - plays_a_role
+      - partly_explains
+      - is_involved_in
+      - is_consistent_with
 
   handle_categories:
     - diagnostic_or_taxonomic_label
@@ -65,6 +92,18 @@ question_compiler:
       - offer_a_replacement_measurement_question_only_when_an_explicit_observation_exists_or_the_user_requests_one
     disposition_rule: Use exactly one disposition from construct_admission_ref.
 
+  causal_admission_routing:
+    immediate_causal_rejection_when:
+      - construct_disposition_is_premise_rejected
+      - diagnostic_grouping_is_the_only_target_definition
+      - region_name_supplies_defect_or_source_status
+    pending_causal_review_when:
+      - construct_is_admitted
+      - target_relation_is_independently_measurable
+    rule: >
+      Highly heterogeneous or poorly predictive literature cannot be converted into candidate causal paths.
+      Those properties are causal-admission failures to be evaluated by the planner and binder.
+
   observation_admission_rule: >
     Preserve only observations, measured differences, behaviors, transitions, or practical constraints explicitly
     supplied by the question. A diagnostic definition, literature stereotype, or familiar phenotype bundle may not
@@ -77,7 +116,7 @@ question_compiler:
   reconstruction_rule: >
     Reconstruction begins only after construct admission. Replace unsupported operators with questions about
     substrate, variable, operation, timing, dependency, constraint, scale, and organism-state transition. Do not
-    reconstruct a rejected entity into a charitable nearby claim and then answer that substitute.
+    reconstruct a rejected entity into a charitable nearby claim and do not soften a failed causal question into association.
 
   multiple_compilations:
     allowed_when:
@@ -87,16 +126,22 @@ question_compiler:
     forbidden_when:
       - the only source of variation is a rejected diagnostic or faculty label
       - candidate compilations merely rescue an entity premise rejected by the admission gate
+      - heterogeneous associations are being converted into causal candidate routes without predictive discrimination
     rule: Keep admitted candidate compilations separate and state what observation would distinguish them.
 
   output_schema:
     source_question: string
     question_type: string
+    hard_causality_request: boolean
     requested_relation: string
     requested_scope: string
     requested_resolution: string
     construct_disposition:
       vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+      value: string
+    causal_admission_required: boolean
+    initial_causal_disposition:
+      vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
       value: string
     rejected_premises: list
     handles_detected: list
@@ -122,9 +167,10 @@ question_compiler:
     corpus volume, or confidence in later evidence cannot raise it.
 
   failure_semantics:
-    diagnostic_label_supplies_entity: premise_rejected
-    diagnostic_label_supplies_defect_location: premise_rejected
+    diagnostic_label_supplies_entity: premise_rejected_and_causal_rejected
+    diagnostic_label_supplies_defect_location: premise_rejected_and_causal_rejected
     no_explicit_observation_beyond_label: premise_rejected
+    heterogeneous_poorly_predictive_work: causal_rejected
     ambiguous_admitted_observation: preserve_multiple_candidate_compilations
     no_physical_variables_for_explicit_observation: underspecified
     multiple_routes_fit: retain_alternatives_and_generate_discriminating_questions
@@ -136,6 +182,8 @@ question_compiler:
     - inferred_trait_bundle_from_diagnostic_label
     - evidence_search_to_rescue_rejected_premise
     - charitable_substitution_for_rejected_entity
+    - causal_question_downgraded_to_association
+    - heterogeneous_associations_rephrased_as_causal_contribution
     - observation_erasure
     - unsupported_single_route
     - hidden_change_of_question_scope
