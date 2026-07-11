@@ -1,6 +1,8 @@
 # The Model — Purpose and Scope
 
-**Status:** CANDIDATE architectural refactor.
+**Status:** ADOPTED — v0.05 v5, July 11, 2026.
+
+The structural and deterministic validation suite passed at adoption. Live-provider conformance remains an explicit validation debt and is not represented as completed.
 
 ## Primary purpose
 
