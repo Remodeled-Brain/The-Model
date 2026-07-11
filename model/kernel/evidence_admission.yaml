@@ -1,0 +1,123 @@
+evidence_admission:
+  status: candidate
+  layer: shared_kernel
+  purpose: >
+    Prevent scientific prose from entering the model as evidence merely because it is published, repeated,
+    reviewed, statistically significant, or expressed in causal language. Every source enters as a set of
+    assertions whose observational content and inferential bridges must be separated and independently audited.
+
+  default_posture:
+    source_claim_status: unadmitted_assertion
+    causal_weight: zero
+    mechanism_weight: zero
+    burden_holder: claimant
+    absence_of_disconfirmation_is_support: false
+    author_interpretation_is_evidence: false
+    peer_review_is_evidence: false
+    consensus_is_evidence: false
+    meta_analysis_repairs_invalid_inputs: false
+
+  claim_decomposition:
+    required_parts:
+      - direct_observation
+      - sampling_and_grouping_operation
+      - measurement_operation
+      - analytical_transformation
+      - construct_assignment
+      - direction_inference
+      - cross_scale_inference
+      - causal_or_mechanistic_conclusion
+    rule: >
+      Preserve direct observations and explicit operations. Treat every transition from observation to construct,
+      direction, scale, mechanism, defect, dysfunction, or biological meaning as a separate inferential bridge.
+      No bridge inherits validity from the paper's conclusion or from another paper repeating the same bridge.
+
+  assertion_statuses:
+    - unadmitted_assertion
+    - observation_admitted
+    - bridge_partially_closed
+    - bridge_closed
+    - causal_admitted
+    - causal_rejected
+    - non_probative
+
+  bridge_audit:
+    required_fields:
+      - bridge_id
+      - source_statement
+      - source_observation
+      - target_claim
+      - bridge_type
+      - required_dependencies
+      - direct_support
+      - contrary_evidence
+      - hidden_assumptions
+      - shared_assumption_family
+      - status
+    bridge_types:
+      - observation_to_construct
+      - group_difference_to_individual_state
+      - correlation_to_direction
+      - location_to_source
+      - perturbability_to_control
+      - proxy_to_mechanism
+      - source_scale_to_target_scale
+      - retrospective_to_predictive
+      - prediction_to_causation
+      - statistical_to_practical_significance
+      - diagnostic_group_to_biological_entity
+      - heterogeneity_to_unitary_route
+    admission_rule: >
+      A bridge closes only when its required physical dependency is directly supported under the conditions
+      needed by the target claim. Familiar terminology, disciplinary convention, author confidence, citation
+      volume, or recurrence of the bridge cannot close it.
+
+  hostile_reading_protocol:
+    required_questions:
+      - What was directly observed before interpretation?
+      - Which claim components were introduced by grouping, thresholds, instruments, models, or author language?
+      - Which causal direction was measured and which was inferred?
+      - Which scale crossings lack an explicit physical carrier?
+      - Which conclusions depend on the diagnostic or theoretical construct being true in advance?
+      - Which findings disappear or change under another task, threshold, cohort, comparator, or operationalization?
+      - Which nulls, reversals, overlaps, and failed predictions are hidden by summary language?
+      - Which papers repeat the same assumption family rather than provide independent closure?
+    rule: >
+      Read to locate inferential debt, not to preserve the paper's intended story. The record must retain the
+      strongest surviving observation after every unsupported bridge is removed.
+
+  corpus_level_rules:
+    - The corpus is a collection of claims and measurements, not a trusted body of conclusions.
+    - Repetition of one inferential bridge across papers counts as one shared assumption family, not convergence.
+    - A meta-analysis inherits construct, measurement, task, selection, and direction failures from its inputs.
+    - Publication volume can increase confidence only after exact relation identity, bridge closure, and independence are established.
+    - Heterogeneous effects cannot be averaged into a unitary mechanism when route-generating conditions remain unknown.
+    - Predictive weakness is positive evidence against a proposed unitary causal relation when that relation should predict the target.
+    - Broad overlap is positive evidence against defect, dysfunction, or individual-state assignment from group means.
+    - Missing null results and selective reporting reduce admissible weight; they do not create generic uncertainty around a causal story.
+    - The model must prefer a sparse surviving observation over a rich unsupported causal narrative.
+
+  causal_transfer_rule: >
+    No source conclusion, discussion claim, abstract framing, review synthesis, or consensus statement may transfer
+    causal language into the runtime. Causal language is regenerated only from closed construct, dependency,
+    timing, prediction, heterogeneity, magnitude, translation, independence, and disconfirmation paths.
+
+  output_requirements:
+    - admitted_observations
+    - stripped_assertions
+    - bridge_ledger
+    - shared_assumption_families
+    - non_probative_claims
+    - strongest_surviving_claim
+    - causal_weight
+    - causal_rejection_basis
+
+  forbidden_shortcuts:
+    - publication_as_admission
+    - author_conclusion_as_binding
+    - peer_review_as_validation
+    - consensus_as_causal_weight
+    - meta_analysis_as_construct_repair
+    - repeated_inference_as_independent_convergence
+    - hedged_causal_language_as_descriptive_neutrality
+    - uncertainty_language_after_positive_causal_failure
