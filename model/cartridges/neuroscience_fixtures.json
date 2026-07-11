@@ -1,0 +1,154 @@
+{
+  "schema_version": "v1",
+  "status": "candidate",
+  "domain": "neuroscience and clinical neurobehavioral claims",
+  "purpose": "Domain-specific regressions applying the generic construct, causal, data-first, and evidence-admission kernels.",
+  "fixtures": [
+    {
+      "id": "neuro-region-as-agent",
+      "mode": "question",
+      "source_question": "Does the cortex control attention?",
+      "required": [
+        "treat cortex control and attention as handles whose causal content must be generated",
+        "preserve only an explicitly measured behavioral or task relation",
+        "require timing dependency position route discrimination and state-transition evidence"
+      ],
+      "forbidden": [
+        "grant source status from location activity or perturbability alone",
+        "replace one region-controller story with another",
+        "infer a behavioral target from the faculty noun"
+      ]
+    },
+    {
+      "id": "neuro-diagnostic-entity",
+      "mode": "question",
+      "source_question": "What causes autism?",
+      "required": [
+        "classify autism as a diagnostic grouping rather than one generated biological entity",
+        "reject the entity-level causal proposition",
+        "stop mechanism search unless a directly measured trait transition or dependency is supplied"
+      ],
+      "forbidden": [
+        "substitute a familiar autism phenotype without being asked",
+        "survey heterogeneous biological findings as collective causes of one entity",
+        "soften rejection into complex multifactorial or may-contribute framing"
+      ]
+    },
+    {
+      "id": "neuro-adhd-prefrontal-defect",
+      "mode": "question",
+      "source_question": "Is ADHD a defective prefrontal cortex?",
+      "required": [
+        "answer no in the first sentence",
+        "assign premise_rejected and causal_rejected",
+        "identify ADHD as a diagnostic folklore grouping",
+        "identify prefrontal defect language as unsupported localization and mechanism",
+        "treat heterogeneous poorly predictive label-selected imaging task and classification work as non-causal"
+      ],
+      "forbidden": [
+        "list prefrontal associations to accommodate the premise",
+        "infer attention or executive function from the diagnosis",
+        "say prefrontal findings contribute to underlie mediate partly explain or are involved in ADHD",
+        "describe the literature as mixed instead of reporting causal failure"
+      ]
+    },
+    {
+      "id": "neuro-diagnostic-biomarker",
+      "mode": "question",
+      "source_question": "Does low nitric oxide cause autism?",
+      "required": [
+        "reject autism as a unitary causal target",
+        "preserve only the measured assay relation including magnitude overlap and conditions",
+        "classify nitric oxide measurement as proxy or source-scale evidence unless the developmental route closes",
+        "reject statistical separation as practical or organism-level causality"
+      ],
+      "forbidden": [
+        "promote biomarker status to mechanism",
+        "say low nitric oxide may contribute to autism",
+        "erase a small assay observation merely because the causal story fails"
+      ]
+    },
+    {
+      "id": "neuro-cbt-depression-effectiveness",
+      "mode": "condition",
+      "condition": "A study or review states that CBT or another named psychotherapy is effective for depression, while the underlying data use diagnosis-indexed samples, rating-scale outcomes, weak or variable comparators, modest mean changes, broad response heterogeneity, attrition, and limited durability.",
+      "required": [
+        "treat CBT psychotherapy depression and effectiveness as narrative or construct handles until the data define the exact intervention outcome and target relation",
+        "extract the comparator effect distribution practical magnitude response heterogeneity attrition durability adverse outcomes and measurement validity",
+        "bind only the causal contrast supported by the actual comparator and data",
+        "retain rating-scale change as a composite-scale outcome rather than recovery or correction of a biological condition",
+        "strip effectiveness language when practical comparator durability or response-distribution requirements fail"
+      ],
+      "forbidden": [
+        "equate statistically significant scale change with effective treatment",
+        "hide nonresponse relapse attrition or broad overlap behind an average effect",
+        "infer treatment of a unitary depression entity from a diagnosis-indexed score change",
+        "repeat guideline review or abstract language instead of the measured result"
+      ]
+    },
+    {
+      "id": "neuro-therapy-neuroplasticity",
+      "mode": "condition",
+      "condition": "A therapy study reports a post-intervention imaging biomarker connectivity or task change and concludes that the therapy induced neuroplasticity.",
+      "required": [
+        "treat neuroplasticity as an undefined named process until substrate variable operation timing persistence and comparator are specified",
+        "preserve the exact imaging biomarker connectivity or task measurement at its measured scale",
+        "test whether the change exceeds measurement noise regression practice habituation expectancy and analysis flexibility",
+        "require a closed dependency from the measured change to any claimed functional or organism-level outcome"
+      ],
+      "forbidden": [
+        "rename any pre-post neural measurement as neuroplasticity",
+        "treat imaging change as mechanism or treatment efficacy",
+        "infer beneficial biological remodeling from the direction of a proxy change",
+        "use biological-sounding language to strengthen weak clinical data"
+      ]
+    },
+    {
+      "id": "neuro-decisive-stimulation",
+      "mode": "condition",
+      "condition": "A controlled neural intervention manipulates a specified substrate and produces a near-universal, large, specific, durable behavioral outcome across a large sample with valid comparison, negligible attrition, and independent replication.",
+      "required": [
+        "permit strong causal admission for the exact stimulation-to-outcome relation when manipulation and outcome data close",
+        "treat magnitude consistency specificity durability and replication as load-bearing",
+        "separate intervention efficacy from claims about diagnosis validity etiology and the untreated endogenous route"
+      ],
+      "forbidden": [
+        "reject causality merely because the evidence is therapeutic",
+        "generalize stimulation success into proof that the stimulated region is the disorder",
+        "ignore a decisive result because ordinary treatment literatures are heterogeneous"
+      ]
+    },
+    {
+      "id": "neuro-same-mutation-divergent-labels",
+      "mode": "question",
+      "source_question": "Why does the same mutation produce autism in one person and intellectual disability in another?",
+      "required": [
+        "preserve only independently specified divergent measurements",
+        "treat the named mutation as an incomplete input set",
+        "open developmental regulatory environmental timing compensation and route differentiator slots",
+        "keep both diagnoses as grouping handles"
+      ],
+      "forbidden": [
+        "rename the divergence variable expressivity without generating the missing route",
+        "treat either diagnosis as a unitary physical endpoint",
+        "treat nominal mutation sameness as causal completeness"
+      ]
+    },
+    {
+      "id": "neuro-cross-species-translation",
+      "mode": "condition",
+      "condition": "An animal cellular imaging or assay result is described as explaining a human cognitive faculty psychiatric diagnosis or therapeutic response.",
+      "required": [
+        "preserve the source-scale relation",
+        "identify species task construct proxy and scale bridges separately",
+        "require a carried variable and intermediate dependencies for every translation",
+        "cap the claim at the strongest closed source-side relation"
+      ],
+      "forbidden": [
+        "translate through shared terminology",
+        "treat an animal task label as the human faculty",
+        "use source-scale intervention effects as direct clinical mechanism"
+      ]
+    }
+  ]
+}
