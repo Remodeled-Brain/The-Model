@@ -17,6 +17,10 @@ candidate_adoption_gate:
     - reification
     - operation_product
     - chain_generation
+    - universal_physical_continuity
+    - biological_metabolic_binding
+    - no_magic_transition
+    - physical_chain_visibility
     - redundancy
     - failure_modes
     - calibration
@@ -32,14 +36,21 @@ candidate_adoption_gate:
   semantic_conformance:
     policy_ref: conformance/required_runs.json
     decision_record_ref: conformance/decision_record.schema.json
-    validator: scripts/validate_conformance.py
+    causal_validator: scripts/validate_conformance.py
+    physical_validator: scripts/validate_physical_continuity.py
+    adoption_validator: scripts/validate_adoption.py
     requirements:
       - every critical generic and active-cartridge fixture passes
-      - narrative-only mutations preserve causal and closure results
+      - narrative-only mutations preserve causal closure physical-chain and metabolic-binding results
       - data mutations change results when the causal burden changes
-      - exact intervention causality remains separate from etiology and endogenous mechanism
+      - every biological or behavioral answer exposes a physical chain or explicit open chain slots
+      - biological scope binds through metabolically maintained state
+      - metabolism energy activation signaling and named components cannot act as replacement operators
+      - exact intervention causality remains separate from etiology endogenous mechanism and route closure
+      - a decisive intervention may retain exact causality while intermediate physical mechanics remain partial
+      - mechanistic language requires closed physical and metabolic routes
       - decisive-intervention positive controls receive causal admission at exact scope
-      - provider result hashes match the runtime kernel cartridge and fixture versions under review
+      - provider result hashes match the runtime kernel cartridge fixture and physical-contract versions under review
       - minimum independent run count is satisfied with zero critical failures
     rule: Structural CI validates the harness. Adoption requires fresh provider executions recorded under conformance/results.
 
@@ -59,6 +70,9 @@ candidate_adoption_gate:
     adoption_requires_fresh_provider_results: true
     critical_semantic_failure_tolerance: zero
     reject_everything_is_not_conformance: true
+    biology_has_no_separate_causal_currency: true
+    metabolism_is_not_a_magic_operator: true
+    open_physical_segments_remain_visible: true
 
   required_output:
     - verdict
@@ -69,5 +83,7 @@ candidate_adoption_gate:
     - redundancy
     - minimal_safe_form
     - semantic_conformance_status
+    - physical_continuity_status
+    - metabolic_binding_status
     - provider_result_freshness
     - adoption_status
