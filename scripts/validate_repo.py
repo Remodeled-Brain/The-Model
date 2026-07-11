@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate active repository structure, load graphs, builds, and contract fixtures."""
+"""Validate active repository structure, shared vocabularies, builds, and fixtures."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import pathlib
 import subprocess
 import sys
 from collections.abc import Iterable
+from typing import Any
 
 VALIDATOR = pathlib.Path(__file__).resolve()
 ROOT = VALIDATOR.parents[1]
@@ -16,8 +17,15 @@ BUILDER = ROOT / "scripts" / "build_master_prompt.py"
 DEFAULT_SELECTOR = MODEL / "manifest.json"
 RUNTIME_MANIFEST = MODEL / "manifests" / "runtime.json"
 INGEST_MANIFEST = MODEL / "manifests" / "ingest.json"
+KERNEL = MODEL / "kernel" / "chain_contract.yaml"
+ANSWER_CONTRACT = MODEL / "runtime" / "answer_contract.yaml"
+EVIDENCE_BINDER = MODEL / "runtime" / "evidence_binding_contract.yaml"
+FAILURE_ROUTING = MODEL / "ingest" / "failure_routing.yaml"
 RUNTIME_FIXTURES = MODEL / "runtime" / "fixtures.json"
 INGEST_FIXTURES = MODEL / "ingest" / "fixtures.json"
+CLOSURE_REF = "model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states"
+CROSSWALK_REF = "model/ingest/failure_routing.yaml#ingest_failure_routing.closure_state_crosswalk"
+REPOSITORY = "github.com/Remodeled-Brain/The-Model"
 
 LEGACY_PATHS = [
     MODEL / "00_readme_for_llms.md",
@@ -33,9 +41,7 @@ LEGACY_PATHS = [
     MODEL / "10_single_file_master_prompt.txt",
     MODEL / "record_schema_v1.yaml",
 ]
-
 STALE_REFERENCES = [path.relative_to(ROOT).as_posix() for path in LEGACY_PATHS]
-
 ACTIVE_REFERENCE_ROOTS = [
     ROOT / "README.md",
     ROOT / "CONTRIBUTING.md",
@@ -60,7 +66,7 @@ def require(condition: bool, message: str) -> None:
         raise ValidationError(message)
 
 
-def load_json(path: pathlib.Path) -> dict:
+def load_json(path: pathlib.Path) -> dict[str, Any]:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
@@ -71,12 +77,74 @@ def load_json(path: pathlib.Path) -> dict:
 
 def tracked_files() -> list[pathlib.Path]:
     result = subprocess.run(
-        ["git", "ls-files", "-z"],
-        cwd=ROOT,
-        check=True,
-        capture_output=True,
+        ["git", "ls-files", "-z"], cwd=ROOT, check=True, capture_output=True
     )
     return [ROOT / value.decode("utf-8") for value in result.stdout.split(b"\0") if value]
+
+
+def yaml_lines(path: pathlib.Path) -> list[str]:
+    return path.read_text(encoding="utf-8").splitlines()
+
+
+def indentation(line: str) -> int:
+    return len(line) - len(line.lstrip(" "))
+
+
+def find_yaml_key(lines: list[str], key: str) -> tuple[int, int]:
+    target = f"{key}:"
+    for index, line in enumerate(lines):
+        if line.strip() == target:
+            return index, indentation(line)
+    raise ValidationError(f"YAML key {key!r} not found")
+
+
+def yaml_list(path: pathlib.Path, key: str) -> list[str]:
+    lines = yaml_lines(path)
+    index, parent_indent = find_yaml_key(lines, key)
+    values: list[str] = []
+    for line in lines[index + 1 :]:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        level = indentation(line)
+        if level <= parent_indent:
+            break
+        if level == parent_indent + 2 and stripped.startswith("- "):
+            values.append(stripped[2:].strip().strip('"\''))
+    require(values, f"{path.relative_to(ROOT)}:{key} must contain a list")
+    return values
+
+
+def yaml_mapping(path: pathlib.Path, key: str) -> dict[str, str]:
+    lines = yaml_lines(path)
+    index, parent_indent = find_yaml_key(lines, key)
+    values: dict[str, str] = {}
+    for line in lines[index + 1 :]:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        level = indentation(line)
+        if level <= parent_indent:
+            break
+        if level != parent_indent + 2 or ":" not in stripped:
+            continue
+        name, raw = stripped.split(":", 1)
+        value = raw.strip().strip('"\'')
+        if value and value not in {">", "|"}:
+            values[name.strip()] = value
+    require(values, f"{path.relative_to(ROOT)}:{key} must contain a mapping")
+    return values
+
+
+def yaml_scalar(path: pathlib.Path, key: str) -> str:
+    target = f"{key}:"
+    for line in yaml_lines(path):
+        stripped = line.strip()
+        if stripped.startswith(target):
+            value = stripped[len(target) :].strip().strip('"\'')
+            if value:
+                return value
+    raise ValidationError(f"YAML scalar {key!r} not found in {path.relative_to(ROOT)}")
 
 
 def validate_selector() -> None:
@@ -89,7 +157,7 @@ def validate_selector() -> None:
     require("generated" not in selector, "default selector must not duplicate build outputs")
 
 
-def validate_manifest(path: pathlib.Path) -> dict:
+def validate_manifest(path: pathlib.Path) -> dict[str, Any]:
     manifest = load_json(path)
     source_files = manifest.get("source_files")
     domain_modules = manifest.get("domain_modules", [])
@@ -110,17 +178,48 @@ def validate_manifest(path: pathlib.Path) -> dict:
     for relative in inputs:
         require(isinstance(relative, str) and relative, f"{path.name}: invalid input path")
         require((MODEL / relative).is_file(), f"{path.name}: missing model/{relative}")
-
     for relative in support_manifests:
         require((MODEL / relative).is_file(), f"{path.name}: missing support manifest model/{relative}")
-
     for record in reachable_modules:
         require(isinstance(record, dict), f"{path.name}: reachable module must be an object")
         relative = record.get("path")
         require(isinstance(relative, str) and relative, f"{path.name}: reachable module path missing")
         require((MODEL / relative).resolve().is_file(), f"{path.name}: missing reachable module {relative}")
-
     return manifest
+
+
+def validate_closure_vocabulary() -> None:
+    states = yaml_list(KERNEL, "states")
+    require(len(states) == len(set(states)), "kernel closure vocabulary contains duplicate states")
+    require("contested" in states, "kernel closure vocabulary must own contested")
+    require("unresolved" in states, "kernel closure vocabulary must own unresolved")
+
+    answer_text = ANSWER_CONTRACT.read_text(encoding="utf-8")
+    binder_text = EVIDENCE_BINDER.read_text(encoding="utf-8")
+    routing_text = FAILURE_ROUTING.read_text(encoding="utf-8")
+    require(CLOSURE_REF in answer_text, "answer contract does not reference kernel closure vocabulary")
+    require(CLOSURE_REF in binder_text, "evidence binder does not reference kernel closure vocabulary")
+    require(CLOSURE_REF in routing_text, "ingest routing does not reference kernel closure vocabulary")
+    require(CROSSWALK_REF in binder_text, "evidence binder does not reference ingest closure crosswalk")
+
+    channels = yaml_list(FAILURE_ROUTING, "support_channels")
+    crosswalk = yaml_mapping(FAILURE_ROUTING, "channels")
+    require(set(crosswalk) == set(channels), "ingest closure crosswalk must cover every support channel exactly once")
+    unknown = sorted(set(crosswalk.values()) - set(states))
+    require(not unknown, f"ingest closure crosswalk targets unknown kernel states: {unknown}")
+
+    conflict_state = yaml_scalar(EVIDENCE_BINDER, "surviving_conflict_state")
+    require(conflict_state == "contested", "surviving evidence conflict must use contested")
+    require(conflict_state in states, "binder conflict state is absent from kernel vocabulary")
+
+    for path in tracked_files():
+        if path == KERNEL or not path.is_file():
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        require("closure_states:" not in text, f"closure enum redefined outside kernel: {path.relative_to(ROOT)}")
 
 
 def run_build(manifest_path: pathlib.Path | None) -> pathlib.Path:
@@ -128,24 +227,52 @@ def run_build(manifest_path: pathlib.Path | None) -> pathlib.Path:
     if manifest_path is not None:
         command.append(str(manifest_path))
     subprocess.run(command, cwd=ROOT, check=True)
-
     manifest = load_json(RUNTIME_MANIFEST if manifest_path is None else manifest_path)
     output = MODEL / manifest["generated"][0]
     require(output.is_file(), f"build did not create {output.relative_to(ROOT)}")
     return output
 
 
-def validate_output(output: pathlib.Path, manifest: dict, expect_support: bool) -> None:
+def parse_markers(text: str) -> dict[str, Any]:
+    markers: dict[str, Any] = {}
+    prefix = "# @model."
+    for line in text.splitlines():
+        if not line.startswith(prefix) or "=" not in line:
+            continue
+        name, raw = line[len(prefix) :].split("=", 1)
+        try:
+            markers[name] = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise ValidationError(f"invalid generated metadata marker {name}: {exc}") from exc
+    return markers
+
+
+def expected_reachable_paths(manifest: dict[str, Any]) -> list[str]:
+    paths: list[str] = []
+    for record in manifest.get("reachable_modules", []):
+        path = (MODEL / record["path"]).resolve()
+        paths.append(path.relative_to(ROOT).as_posix())
+    return paths
+
+
+def validate_output(output: pathlib.Path, manifest_path: pathlib.Path, manifest: dict[str, Any]) -> None:
     text = output.read_text(encoding="utf-8")
+    markers = parse_markers(text)
     require(text.endswith("\n"), f"{output.relative_to(ROOT)} lacks trailing newline")
-    require("cartridges/neuroscience.yaml" in text, f"{output.relative_to(ROOT)} omits cartridge path")
-    require("neuroscience_cartridge:" in text, f"{output.relative_to(ROOT)} omits cartridge content")
-    require("Live specification: github.com/Remodeled-Brain/The-Model" in text, "provenance/reach footer missing")
-    require("Load only modules named by this manifest" in text, "module reach guard missing")
-    if expect_support:
-        require("model/manifests/ingest.json" in text, "question runtime omits reachable ingest manifest")
-    if manifest.get("reachable_modules"):
-        require("decisions/0003-concurrent-ingest.md" in text, "ingest runtime omits distributed-ingest reach")
+    require(markers.get("repository") == REPOSITORY, "generated runtime repository metadata is wrong")
+    require(markers.get("named_modules_only") is True, "generated runtime named-module guard is absent")
+    require(
+        markers.get("authoritative_manifest") == manifest_path.relative_to(ROOT).as_posix(),
+        "generated runtime authoritative-manifest metadata is wrong",
+    )
+    require(markers.get("domain_modules") == manifest.get("domain_modules", []), "generated runtime domain metadata drifted")
+    require(markers.get("support_manifests") == manifest.get("support_manifests", []), "generated runtime support metadata drifted")
+    require(markers.get("reachable_modules") == expected_reachable_paths(manifest), "generated runtime reachable-module metadata drifted")
+
+    for name in manifest["source_files"]:
+        require(f"===== SOURCE: {name} =====" in text, f"generated runtime omits source {name}")
+    for name in manifest.get("domain_modules", []):
+        require(f"===== DOMAIN MODULE: {name} =====" in text, f"generated runtime omits domain module {name}")
 
 
 def validate_runtime_fixtures() -> None:
@@ -154,7 +281,6 @@ def validate_runtime_fixtures() -> None:
     fixtures = data.get("fixtures")
     require(isinstance(required_answer_fields, list) and required_answer_fields, "runtime answer schema missing")
     require(isinstance(fixtures, list) and fixtures, "runtime fixtures missing")
-
     ids: set[str] = set()
     for fixture in fixtures:
         require(isinstance(fixture, dict), "runtime fixture must be an object")
@@ -175,8 +301,8 @@ def validate_ingest_fixtures() -> None:
     fixtures = data.get("fixtures")
     require(isinstance(sections, list) and sections, "ingest record sections missing")
     require(isinstance(fixtures, list) and fixtures, "ingest fixtures missing")
-
     ids: set[str] = set()
+    valid_channels = set(yaml_list(FAILURE_ROUTING, "support_channels"))
     for fixture in fixtures:
         require(isinstance(fixture, dict), "ingest fixture must be an object")
         fixture_id = fixture.get("id")
@@ -185,6 +311,8 @@ def validate_ingest_fixtures() -> None:
         ids.add(fixture_id)
         for field in ("source_pattern", "required_gates", "allowed_channels", "blocked_roles"):
             require(fixture.get(field) not in (None, "", []), f"{fixture_id}: {field} missing")
+        unknown = sorted(set(fixture["allowed_channels"]) - valid_channels)
+        require(not unknown, f"{fixture_id}: unknown ingest support channels: {unknown}")
 
 
 def iter_active_reference_files() -> Iterable[pathlib.Path]:
@@ -203,11 +331,9 @@ def iter_active_reference_files() -> Iterable[pathlib.Path]:
 def validate_cleanup() -> None:
     for path in LEGACY_PATHS:
         require(not path.exists(), f"legacy active file still exists: {path.relative_to(ROOT)}")
-
     tracked = tracked_files()
     tracked_dist = [path for path in tracked if path.is_relative_to(MODEL / "dist")]
     require(not tracked_dist, "generated model/dist artifacts must not be tracked")
-
     failures: list[str] = []
     for path in iter_active_reference_files():
         try:
@@ -221,7 +347,7 @@ def validate_cleanup() -> None:
 
 
 def validate_trailing_newlines() -> None:
-    active_text_roots = [
+    roots = [
         ROOT / "README.md",
         ROOT / "CONTRIBUTING.md",
         ROOT / "AGENTS.md",
@@ -241,9 +367,8 @@ def validate_trailing_newlines() -> None:
         BUILDER,
         VALIDATOR,
     ]
-
     tracked = set(tracked_files())
-    for root in active_text_roots:
+    for root in roots:
         paths = [root] if root.is_file() else [path for path in root.rglob("*") if path.is_file()]
         for path in paths:
             if path not in tracked:
@@ -262,6 +387,7 @@ def main() -> int:
         validate_selector()
         runtime = validate_manifest(RUNTIME_MANIFEST)
         ingest = validate_manifest(INGEST_MANIFEST)
+        validate_closure_vocabulary()
         validate_runtime_fixtures()
         validate_ingest_fixtures()
         validate_cleanup()
@@ -269,11 +395,11 @@ def main() -> int:
 
         runtime_output = run_build(None)
         generated.append(runtime_output)
-        validate_output(runtime_output, runtime, expect_support=True)
+        validate_output(runtime_output, RUNTIME_MANIFEST, runtime)
 
         ingest_output = run_build(INGEST_MANIFEST)
         generated.append(ingest_output)
-        validate_output(ingest_output, ingest, expect_support=False)
+        validate_output(ingest_output, INGEST_MANIFEST, ingest)
     except (ValidationError, subprocess.CalledProcessError, OSError) as exc:
         print(f"VALIDATION FAILED: {exc}", file=sys.stderr)
         return 1
