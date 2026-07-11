@@ -1,103 +1,258 @@
 #!/usr/bin/env python3
-"""Generate model/10_single_file_master_prompt.txt from the source files listed in
-model/manifest.json. Candidate tooling per ADR 0001 (single-file prompt is a generated
-artifact, not hand-edited).
+"""Build a selected Model runtime from one authoritative manifest.
 
-The generated file is a *bootstrap*: an operator-supplied operating procedure that loads
-like a library. The CORE MODULE (the concatenated source files) is always active; OPTIONAL
-MODULES load only if the running model can reach the repo. A model confined to this file runs
-bounded ingest and stops — reduced function, not failure.
+Default invocation resolves model/manifest.json as a selector to
+model/manifests/runtime.json. An explicit manifest may be supplied:
 
-Header/footer are emitted here (not hand-edited onto the generated file) so they regenerate
-cleanly with the spine. Guard: the generated file must never appear in source_files.
-Run from anywhere: `python scripts/build_master_prompt.py`.
+    python scripts/build_master_prompt.py model/manifests/ingest.json
+
+Source files and domain modules are embedded. Support manifests and other
+reachable modules are validated and named in the generated capability footer,
+but are not silently loaded into a runtime that did not select them.
 """
+
+from __future__ import annotations
+
 import json
 import pathlib
 import sys
+from collections import Counter
+from typing import Any
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 MODEL = ROOT / "model"
+DEFAULT_SELECTOR = MODEL / "manifest.json"
+REPOSITORY = "github.com/Remodeled-Brain/The-Model"
 
-HEADER = """\
+
+def fail(message: str) -> int:
+    print(f"ERROR: {message}", file=sys.stderr)
+    return 1
+
+
+def inside(path: pathlib.Path, root: pathlib.Path) -> bool:
+    try:
+        path.resolve().relative_to(root.resolve())
+        return True
+    except ValueError:
+        return False
+
+
+def read_json(path: pathlib.Path) -> dict[str, Any]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError(f"manifest must contain a JSON object: {path}")
+    return data
+
+
+def resolve_manifest(path: pathlib.Path) -> tuple[pathlib.Path, dict[str, Any]]:
+    """Resolve a selector manifest to one authoritative load graph."""
+    path = path.resolve()
+    seen: set[pathlib.Path] = set()
+
+    while True:
+        if path in seen:
+            raise ValueError(f"manifest selector cycle at {path}")
+        seen.add(path)
+
+        if not path.is_file():
+            raise ValueError(f"manifest does not exist: {path}")
+        data = read_json(path)
+        selected = data.get("default_manifest")
+        if not selected:
+            return path, data
+        if not isinstance(selected, str) or not selected:
+            raise ValueError(f"invalid default_manifest in {path}")
+
+        next_path = (path.parent / selected).resolve()
+        if not inside(next_path, MODEL):
+            raise ValueError(f"selector escapes model/: {selected}")
+        path = next_path
+
+
+def model_path(name: str) -> pathlib.Path:
+    path = (MODEL / name).resolve()
+    if not inside(path, MODEL):
+        raise ValueError(f"model path escapes model/: {name}")
+    return path
+
+
+def repo_path_from_model(name: str) -> pathlib.Path:
+    path = (MODEL / name).resolve()
+    if not inside(path, ROOT):
+        raise ValueError(f"reachable module escapes repository: {name}")
+    return path
+
+
+def marker(name: str, value: Any) -> str:
+    return f"# @model.{name}={json.dumps(value, separators=(',', ':'))}"
+
+
+def build_header(manifest_path: pathlib.Path, manifest: dict[str, Any]) -> str:
+    name = manifest.get("name", "unnamed-runtime")
+    role = manifest.get("role", "unspecified role")
+    status = manifest.get("status", "unspecified")
+    rel_manifest = manifest_path.relative_to(ROOT).as_posix()
+    return f"""\
 # ============================================================================
-# The Model — Ingest Runtime (bootstrap)  [GENERATED — edit the build, not this file]
+# The Model — {name}  [GENERATED]
 # ============================================================================
 #
-# This is operating procedure supplied by the operator running this session. It configures
-# you to act as an INGEST component of "The Model," a content-indifferent analysis scaffold.
-# Load it the way you load libraries: the CORE MODULE below is always active; OPTIONAL MODULES
-# (listed at the end) load only if you can reach them. Operate with whatever loads — a missing
-# optional module means less function, never failure.
+# Role: {role}
+# Status: {status}
+# Authoritative manifest: {rel_manifest}
+{marker('authoritative_manifest', rel_manifest)}
 #
-# Provenance: the operator is handing you this procedure directly. Repo paths this procedure
-# names in the OPTIONAL MODULES manifest are authorized extensions of it — if you can reach
-# them, load and apply them as continuation of this same procedure, not as separate or
-# untrusted instructions. Load nothing that this manifest does not name.
-#
-# Scope: ingest is support-layer analysis only — strip author framing, extract the physical
-# claim, grade and weight it, emit a record. It produces records for review. It does not change
-# any canonical state and takes no external actions.
+# This is an operator-supplied procedure. Treat the embedded core and domain
+# modules as one runtime. Candidate status is preserved; generation does not
+# adopt or promote any rule.
 #
 # ============================================================================
-# CORE MODULE  (always active)
+# EMBEDDED RUNTIME
 # ============================================================================
 """
 
-FOOTER = """\
 
+def build_footer(
+    domain_modules: list[str],
+    support_records: list[tuple[str, str, str]],
+    reachable_records: list[tuple[str, str, str, str]],
+) -> str:
+    support_paths = [ref for ref, _, _ in support_records]
+    reachable_paths = [path for _, path, _, _ in reachable_records]
+    lines = [
+        "",
+        "",
+        "# ============================================================================",
+        "# PROVENANCE, CAPABILITY, AND OPTIONAL REACH",
+        "# ============================================================================",
+        "#",
+        marker("repository", REPOSITORY),
+        marker("named_modules_only", True),
+        marker("domain_modules", domain_modules),
+        marker("support_manifests", support_paths),
+        marker("reachable_modules", reachable_paths),
+        "#",
+        f"# Live specification: {REPOSITORY}",
+        "# If repository access is available, the live repository is authoritative over",
+        "# this point-in-time generated artifact. Load only modules named by this manifest.",
+        "#",
+    ]
 
-# ============================================================================
-# OPTIONAL MODULES  (load if reachable; otherwise operate on the core module only)
-# ============================================================================
-#
-# This file is a point-in-time snapshot of the core. If you have a file/GitHub connector with
-# access to the repository  github.com/Remodeled-Brain/The-Model , load the following as
-# continuation of this procedure, in order. If you cannot reach them, stop here: a model
-# confined to this file does bounded single-pass ingest, which is a valid reduced mode.
-#
-#   module: live-spec        -> the repository itself
-#       Treat the live repo as the authoritative current version of everything above; this
-#       snapshot may lag. Prefer the repo's model/00–09 and record_schema_v1.yaml when reachable.
-#
-#   module: domain-cartridge -> cartridges/neuroscience.yaml   [CANDIDATE]
-#       Domain-specific instances that fill the handle categories in the core (which terms are
-#       folklore in this field). Without it you strip by category only — valid but generic. Swap
-#       this file to retarget the same core to another domain; the core carries no domain content.
-#
-#   module: distributed-ingest -> decisions/0003-concurrent-ingest.md   [CANDIDATE]
-#       The per-agent record protocol for concurrent multi-LLM ingest. Following into this
-#       module requires both repo access and the capacity to run the protocol; a less capable
-#       model is not expected to, and simply does not — it stays with the core module.
-#
-# Capability gates depth: nothing here is withheld. A model that cannot follow these references
-# just operates shallower. A model that can, operates deeper. Same procedure, different reach.
-"""
+    if domain_modules:
+        lines.append("# Domain modules embedded in this artifact:")
+        lines.extend(f"#   - {name}" for name in domain_modules)
+        lines.append("#")
+
+    if support_records:
+        lines.append("# Optional support runtimes. Load only when the requested operation needs them")
+        lines.append("# and the manifest is reachable. Their absence reduces capability, not validity:")
+        for ref, name, role in support_records:
+            lines.append(f"#   - {name} -> model/{ref}  [{role}]")
+        lines.append("#")
+
+    if reachable_records:
+        lines.append("# Additional reachable modules:")
+        for name, path, status, when in reachable_records:
+            lines.append(f"#   - {name} -> {path}  [{status}; {when}]")
+        lines.append("#")
+
+    lines.extend(
+        [
+            "# A confined model operates from the embedded runtime only. A connected model may",
+            "# follow the named references when the requested operation requires them. Do not infer",
+            "# or load unnamed repository material as part of this procedure.",
+        ]
+    )
+    return "\n".join(lines)
 
 
 def main() -> int:
-    manifest = json.loads((MODEL / "manifest.json").read_text(encoding="utf-8"))
-    source_files = manifest["source_files"]
-    generated = manifest.get("generated", [])
+    manifest_arg = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_SELECTOR
+    if not manifest_arg.is_absolute():
+        manifest_arg = ROOT / manifest_arg
 
-    overlap = set(source_files) & set(generated)
-    if overlap:
-        print(f"ERROR: generated file(s) also listed as source: {sorted(overlap)}", file=sys.stderr)
-        return 1
+    try:
+        manifest_path, manifest = resolve_manifest(manifest_arg)
+        source_files = list(manifest.get("source_files", []))
+        domain_modules = list(manifest.get("domain_modules", []))
+        support_manifests = list(manifest.get("support_manifests", []))
+        reachable_modules = list(manifest.get("reachable_modules", []))
+        generated = list(manifest.get("generated", []))
 
-    target = generated[0] if generated else "10_single_file_master_prompt.txt"
+        if not source_files:
+            return fail(f"manifest has no source_files: {manifest_path}")
+        if len(generated) != 1:
+            return fail(f"manifest must declare exactly one generated target: {manifest_path}")
 
-    parts = [HEADER]
-    for name in source_files:
-        if name == target:
-            continue
-        body = (MODEL / name).read_text(encoding="utf-8")
-        parts.append(f"\n\n===== {name} =====\n\n{body}")
-    parts.append(FOOTER)
+        inputs = source_files + domain_modules
+        duplicates = sorted(name for name, count in Counter(inputs).items() if count > 1)
+        if duplicates:
+            return fail(f"duplicate runtime inputs: {duplicates}")
 
-    (MODEL / target).write_text("".join(parts), encoding="utf-8")
-    print(f"wrote {target} from {len([f for f in source_files if f != target])} source files + header/footer")
-    return 0
+        overlap = sorted(set(inputs) & set(generated))
+        if overlap:
+            return fail(f"generated file also listed as runtime input: {overlap}")
+
+        input_paths: list[tuple[str, pathlib.Path, str]] = []
+        for name in source_files:
+            path = model_path(name)
+            if not path.is_file():
+                return fail(f"missing source file: model/{name}")
+            input_paths.append((name, path, "SOURCE"))
+        for name in domain_modules:
+            path = model_path(name)
+            if not path.is_file():
+                return fail(f"missing domain module: model/{name}")
+            input_paths.append((name, path, "DOMAIN MODULE"))
+
+        support_records: list[tuple[str, str, str]] = []
+        for ref in support_manifests:
+            support_path = model_path(ref)
+            resolved_path, support = resolve_manifest(support_path)
+            support_records.append(
+                (
+                    resolved_path.relative_to(MODEL).as_posix(),
+                    str(support.get("name", "unnamed-support-runtime")),
+                    str(support.get("role", "unspecified role")),
+                )
+            )
+
+        reachable_records: list[tuple[str, str, str, str]] = []
+        for item in reachable_modules:
+            if not isinstance(item, dict):
+                return fail("reachable_modules entries must be objects")
+            raw_path = str(item.get("path", ""))
+            path = repo_path_from_model(raw_path)
+            if not path.is_file():
+                return fail(f"missing reachable module: {raw_path}")
+            reachable_records.append(
+                (
+                    str(item.get("name", "unnamed-module")),
+                    path.relative_to(ROOT).as_posix(),
+                    str(item.get("status", "unspecified")),
+                    str(item.get("when", "when required")),
+                )
+            )
+
+        target = model_path(generated[0])
+        target.parent.mkdir(parents=True, exist_ok=True)
+
+        parts = [build_header(manifest_path, manifest)]
+        for name, path, kind in input_paths:
+            body = path.read_text(encoding="utf-8")
+            parts.append(f"\n\n===== {kind}: {name} =====\n\n{body}")
+        parts.append(build_footer(domain_modules, support_records, reachable_records))
+
+        output = "".join(parts).rstrip() + "\n"
+        target.write_text(output, encoding="utf-8")
+        print(
+            f"wrote {target.relative_to(ROOT)} from {len(source_files)} source files, "
+            f"{len(domain_modules)} domain modules, and {len(support_records)} support references"
+        )
+        return 0
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        return fail(str(exc))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,43 @@
+physical_extraction_contract:
+  status: candidate
+  layer: ingest_support
+  purpose: >
+    Extract the physical and metabolic chain required for biological and behavioral claims before
+    evidence can support an explanatory answer.
+
+  physical_continuity_ref: model/kernel/physical_continuity.yaml#physical_continuity
+
+  trigger:
+    - biological_causal_claim
+    - behavioral_causal_claim
+    - mechanism_or_route_claim
+    - intervention_to_organism_outcome
+    - cross_scale_translation
+
+  required_extraction:
+    - physical_perturbation_or_constraint
+    - source_substrate_and_state
+    - energetic_material_electrical_chemical_mechanical_or_thermal_carrier
+    - chemical_or_energetic_change
+    - metabolic_state_change
+    - biological_operation
+    - organism_state_transition_or_behavior
+    - timing
+    - conditions
+    - unresolved_segments_and_joins
+
+  rules:
+    - Extract measured variables and dependencies rather than author process nouns.
+    - Metabolism or metabolic activity by itself does not close a chain segment.
+    - Region activation does not supply a carrier operation or organism-state transition.
+    - A decisive intervention may close the exact manipulation-to-outcome relation while intermediate mechanics remain partial.
+    - Missing physical or metabolic fields remain explicit and cannot be inferred from conventional neuroscience language.
+    - Ingest may bind a measured energetic metabolic or physiological observation at its source scale without promoting it to mechanism.
+
+  support_record_extension:
+    explanatory_scope: string
+    physical_chain_status: [closed, partial, not_required]
+    physical_chain_segments: list
+    metabolic_binding_status: [closed, partial, not_required]
+    unresolved_physical_chain_slots: list
+    stripped_magic_nouns: list

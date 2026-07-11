@@ -1,0 +1,177 @@
+ingest_failure_routing:
+  status: candidate
+  layer: evidence_maintenance
+  purpose: Preserve useful observations while preventing unsupported causal scope from entering chain closure.
+
+  closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+  evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission
+
+  default:
+    source_record: keep
+    provenance: keep
+    observations: keep_if_valid
+    source_narrative: strip_if_stronger_than_data
+    direct_grounding: deny
+    causal_weight: zero
+    promotion: deny_until_relation_specific_burden_closes
+
+  support_channels:
+    - mechanistic_grounded
+    - route_partial
+    - source_scale_only
+    - proxy_only
+    - descriptive_support
+    - label_dependent_observation
+    - method_support
+    - disconfirmation
+    - provenance_only
+
+  channel_meanings:
+    mechanistic_grounded: Required route and translation segments close for the exact target relation and conditions.
+    route_partial: A physical route survives but one or more required segments remain open.
+    source_scale_only: The measurement is valid at its measured scale while translation remains open.
+    proxy_only: The measured variable is a proxy surrogate classifier composite or downstream readout whose physical translation remains open.
+    descriptive_support: A valid measured distribution association or intervention-outcome observation without full causal closure.
+    label_dependent_observation: The observation remains dependent on construct-selected groups instruments or thresholds.
+    method_support: The source constrains measurement intervention assay or analysis behavior without closing the target relation.
+    disconfirmation: The source breaks an asserted construct counterfactual bridge segment prediction or route.
+    provenance_only: The source remains visible without a support role.
+
+  closure_state_crosswalk:
+    vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+    channels:
+      mechanistic_grounded: closed
+      route_partial: partial
+      source_scale_only: source_scale_only
+      proxy_only: proxy_limited
+      descriptive_support: descriptive_only
+      label_dependent_observation: label_dependent
+      method_support: unresolved
+      disconfirmation: contradicted
+      provenance_only: unresolved
+    rule: >
+      Support channels describe retained evidentiary scope. Stronger closure applies only to the exact relation whose
+      data counterfactual bridges and segments close. Contested is assigned after cross-record review.
+
+  initial_routing:
+    construct_indexed:
+      initial_channel: label_dependent_observation
+      initial_closure_state: label_dependent
+    proxy_or_surrogate:
+      initial_channel: proxy_only
+      initial_closure_state: proxy_limited
+    observational_record:
+      initial_channel: descriptive_support
+      initial_closure_state: descriptive_only
+      causal_binding: denied_until_full_observational_burden_closes
+    intervention_record:
+      initial_channel: provenance_only
+      initial_closure_state: unresolved
+      eligible_causal_target: intervention_to_outcome
+      upgrade_requires:
+        - manipulation_integrity
+        - valid_comparator_or_counterfactual
+        - temporal_precedence
+        - valid_outcome_measurement
+        - practically_large_effect_distribution
+        - bounded_or_generated_heterogeneity
+        - specificity
+        - durability_matching_claim
+        - bounded_attrition_missingness_and_crossover
+        - survival_of_disconfirmation
+      broader_target_rule: >
+        Etiology endogenous mechanism construct validity and cross-scale explanation remain separate targets and
+        require separate closed bridges.
+    direct_construct_independent:
+      initial_channel: provenance_only
+      initial_closure_state: unresolved
+
+  gate_intersection:
+    notes: union
+    permissions: intersection_by_target_relation
+    rule: >
+      Every applicable gate contributes a limit to a named relation. One pass cannot upgrade the whole record.
+      Missing or failed requirements preserve the restrictive state only for the affected claim.
+
+  aggregation:
+    rule: >
+      Correlated records and records sharing a construct design cohort intervention comparator outcome measure proxy
+      pipeline instrument task or bridge count as one family for weighting.
+    count_can_raise_visibility: true
+    count_can_create_grounding: false
+    count_can_escape_presumption: false
+    independence_required_for_accumulation: true
+
+  hard_zero_scope:
+    rule: Hard zero applies to a claimed role or target relation, never automatically to the whole source.
+    narrative_exceeds_data:
+      zeroes:
+        - unsupported_effectiveness_language
+        - unsupported_mechanism_language
+        - unsupported_named_process_language
+      preserves:
+        - admitted_observations
+        - data_supported_scope
+        - provenance
+    observational_without_causal_closure:
+      zeroes:
+        - causal_binding_for_named_relation
+        - mechanism_binding_for_named_relation
+      preserves:
+        - descriptive_support
+        - method_support
+        - provenance
+    intervention_with_failed_counterfactual_or_effect_burden:
+      zeroes:
+        - intervention_to_outcome_causal_binding
+      preserves:
+        - measured_pre_post_or_group_relation
+        - adverse_effect_relation
+        - dose_timing_response_distribution
+        - provenance
+    intervention_scope_transfer:
+      zeroes:
+        - etiology_from_intervention_target
+        - endogenous_mechanism_from_intervention_target
+        - construct_validity_from_response
+      preserves:
+        - admitted_intervention_to_outcome_relation
+        - provenance
+    construct_indexed_without_escape:
+      zeroes:
+        - causal_binding_beyond_construct_scope
+        - mechanism_binding_beyond_construct_scope
+      preserves:
+        - label_dependent_observation
+        - descriptive_support
+        - provenance
+    proxy_without_translation:
+      zeroes:
+        - direct_mechanism_binding
+        - cross_scale_causal_binding
+      preserves:
+        - proxy_only
+        - measured_proxy_relation
+        - translation_limit
+    postdictive_claim:
+      zeroes:
+        - prediction_weight
+        - direct_generative_grounding
+      preserves:
+        - descriptive_support
+        - provenance
+        - method_support
+
+  output_required:
+    - evidence_axes
+    - target_relation
+    - presumptive_class
+    - presumed_closure_state
+    - data_supported_scope
+    - stripped_assertions
+    - support_channels
+    - closure_state
+    - blocked_roles
+    - translation_limits
+    - unresolved_slots
+    - preserved_observations

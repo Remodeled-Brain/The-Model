@@ -1,0 +1,201 @@
+target_identity:
+  status: candidate
+  layer: shared_kernel
+  purpose: >
+    Require every named target to expose a recoverable identity generator before evidence can bind to the name.
+    Names may compress generated identities. They may not generate identities by compression.
+
+  applies_before:
+    - evidence_retrieval_for_causal_weight
+    - design_admission
+    - causal_weighting
+    - mechanism_search
+    - effectiveness_language
+    - cross_scale_translation
+
+  governing_question: >
+    What independently measurable relation remains after the target name is removed, and what generator makes
+    the surviving observations instances of the same target rather than merely members of one verbal category?
+
+  identity_sources:
+    speaker_intent:
+      role: identify_the_relation_scope_and_distinction_the_asker_cares_about
+      cannot_supply:
+        - construct_unity
+        - causal_closure
+        - physical_identity
+        - corpus_wide_operational_equivalence
+    corpus_operations:
+      role: expose_how_sources_select_construct_measure_aggregate_and_transport_the_target
+      cannot_supply_by_agreement_alone:
+        - identity_from_repeated_terminology
+        - unity_from_shared_scale_or_threshold
+        - validity_from_citation_volume
+        - causal_identity_from_intervention_response
+
+  identity_dispositions:
+    generated_identity_closed:
+      construct_disposition: admitted
+      rule: >
+        A recoverable generator, variables, realization or reconstruction procedure, conditions, uncertainty,
+        and reproduction path establish the target at the claimed scope.
+    generated_identity_conditional:
+      construct_disposition: admitted
+      rule: >
+        The identity is generated only within an explicit model, scale, regime, apparatus, task, population,
+        or construction. Evidence binds only within those stated conditions.
+    constructed_measurement_identity:
+      construct_disposition: admitted
+      rule: >
+        An algorithm, score, threshold, classifier, or aggregation rule reproducibly creates the target.
+        Evidence binds to that construction and does not automatically bind to a broader natural kind.
+    grouping_handle_only:
+      construct_disposition: grouping_handle_only
+      rule: >
+        Multiple non-equivalent relations are grouped without a demonstrated common generator. Preserve the
+        name only as a conversational, administrative, historical, or indexing handle.
+    identity_unresolved:
+      construct_disposition: underspecified
+      rule: >
+        The available speaker and corpus records do not establish what the target denotes or whether the
+        operationalizations share identity.
+    premise_rejected:
+      construct_disposition: premise_rejected
+      rule: >
+        The name supplies the entire object and no independent observation or construction survives removal.
+
+  recoverable_generator_requirements:
+    fields:
+      - generator_type
+      - generator_definition_or_pointer
+      - variables_or_inputs
+      - realization_reconstruction_or_measurement_procedure
+      - aggregation_threshold_or_classification_rule
+      - boundary_conditions_and_regime
+      - uncertainty_and_error_model
+      - reproducibility_or_recovery_path
+      - sensitivity_to_plausible_alternate_constructions
+      - transport_scope
+    generator_types:
+      - physical_invariant_or_stable_interaction_structure
+      - equation_or_model_defined_state
+      - algorithmic_reconstruction
+      - measurement_or_realization_standard
+      - demonstrated_organism_state_relation
+      - explicit_conditional_construction
+    shortcut_rule: >
+      A source may use an identity shortcut without restating the complete generator when the pointer is
+      recoverable and the current use remains within the generator's demonstrated conditions.
+
+  speaker_interrogation:
+    objective: resolve_requested_relation_without_asking_the_speaker_to_prove_construct_validity
+    required_record:
+      - source_wording
+      - intended_referent_candidates
+      - requested_scope
+      - requested_time_horizon
+      - distinctions_that_change_the_answer
+      - selected_or_inferred_referent
+      - unresolved_material_ambiguity
+    interaction_rule: >
+      Reconstruct silently when all plausible interpretations produce the same bounded answer. When different
+      interpretations produce materially different answers, present the smallest useful fork using observable
+      relations rather than asking for another verbal definition.
+    control_rule: >
+      The asker controls the intended question and practical scope. The asker does not supply target unity,
+      physical identity, operational equivalence, or causal closure.
+
+  corpus_interrogation:
+    per_source_required_record:
+      - source_label
+      - sample_selection_and_grouping
+      - exact_observations
+      - measurement_operations
+      - task_apparatus_and_environmental_conditions
+      - timing_and_state_conditions
+      - aggregation_threshold_or_classification_rule
+      - discarded_or_unobserved_cases
+      - inferred_target_after_measurement
+      - claimed_transport_scope
+      - imported_identity_pointer
+    cross_source_tests:
+      - same_label_same_operationalization
+      - same_label_different_operationalization
+      - different_label_same_operationalization
+      - cross_measure_prediction
+      - intervention_transfer_across_operationalizations
+      - sign_magnitude_and_distribution_stability
+      - measurement_invariance
+      - alternate_construction_sensitivity
+      - condition_and_population_transport
+      - identity_breaking_counterexamples
+    search_trees:
+      definition_tree:
+        - original_and_revised_definitions
+        - competing_definitions
+        - standards_and_instrument_manuals
+        - inclusion_exclusion_and_threshold_changes
+      operationalization_tree:
+        - tasks
+        - scales_and_questionnaires
+        - behavioral_events
+        - assays_and_biomarkers
+        - coding_and_reconstruction_procedures
+        - latent_variable_and_aggregation_models
+      failure_tree:
+        - measurement_noninvariance
+        - low_cross_task_or_cross_instrument_relation
+        - subgroup_instability
+        - sign_reversal
+        - poor_out_of_sample_prediction
+        - intervention_nontransfer
+        - inconsistent_factor_or_component_structure
+        - same_label_divergent_outputs
+        - different_labels_same_outputs
+
+  heterogeneity_rule: >
+    Heterogeneity preserves a common identity only when an exposed generator accounts for the variation and
+    predicts how conditions produce the different observations. Complexity, multidimensionality, heterogeneous
+    presentation, task impurity, individual variation, and context dependence are unresolved demands unless
+    their differentiating variables and routes are generated.
+
+  relation_separation:
+    required_relations:
+      - speaker_intended_target
+      - source_defined_target
+      - exact_measured_relation
+      - constructed_or_aggregated_measure
+      - claimed_broader_target
+      - claimed_transport_relation
+    evidence_binding_rule: >
+      Evidence binds first to the exact measured or constructed relation. It may bind to a shared named target
+      only after operational equivalence, generator identity, and transport close at the claimed scope.
+    randomization_rule: >
+      Randomization applies to the object actually assigned and the outcome actually recorded. It cannot create
+      target identity, isolate an unmeasured active component, or validate a broader construct by response.
+    magnitude_rule: Effect magnitude cannot repair target identity, operational equivalence, or transport.
+
+  failure_conditions:
+    - name_supplies_target_identity
+    - definition_is_only_a_synonym_or_adjacent_label
+    - non_equivalent_relations_are_compressed_as_one_target
+    - score_threshold_or_classifier_is_treated_as_direct_access_to_a_broader_entity
+    - condition_task_or_measurement_operations_disappear_in_translation
+    - protocol_bound_change_is_renamed_as_general_trait_or_real_world_change
+    - heterogeneity_is_used_to_protect_identity_without_a_generator
+    - repeated_corpus_agreement_is_used_as_identity_evidence
+    - intervention_response_is_used_as_construct_validation
+
+  preservation_rule: >
+    Identity failure does not erase observations. Preserve every exact measured event, distribution, transition,
+    construction, and protocol-bound relation at its own scope, then route broader failed claims to the appropriate
+    label-dependent, constructed-measurement, descriptive, proxy, disconfirmation, method, or provenance channel.
+
+  invariants:
+    target_identity_is_generated_not_inherited: true
+    names_may_compress_but_may_not_create_identity: true
+    speaker_intent_and_corpus_identity_remain_separate: true
+    evidence_binds_to_exact_relation_before_shared_name: true
+    heterogeneity_must_be_generated: true
+    design_strength_does_not_repair_identity: true
+    identity_shortcuts_require_recoverable_generators: true

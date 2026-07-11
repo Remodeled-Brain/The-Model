@@ -1,0 +1,44 @@
+{
+  "name": "ingest-support-runtime",
+  "version": "v0.05-v5",
+  "status": "adopted",
+  "role": "adaptive evidence maintenance",
+  "source_files": [
+    "00_purpose_and_scope.md",
+    "kernel/chain_contract.yaml",
+    "kernel/physical_continuity.yaml",
+    "kernel/target_identity.yaml",
+    "kernel/evidence_admission.yaml",
+    "kernel/evidence_admission_fixtures.json",
+    "ingest/purpose.md",
+    "ingest/architecture.yaml",
+    "ingest/rules.yaml",
+    "ingest/target_identity_extraction.yaml",
+    "ingest/target_identity_record_schema.yaml",
+    "ingest/physical_extraction_contract.yaml",
+    "ingest/failure_routing.yaml",
+    "ingest/record_schema.yaml",
+    "ingest/fixtures.json",
+    "ingest/target_identity_fixtures.json"
+  ],
+  "domain_modules": [
+    "cartridges/neuroscience.yaml",
+    "cartridges/neuroscience_physical_continuity.yaml",
+    "cartridges/neuroscience_fixtures.json"
+  ],
+  "reachable_modules": [
+    {
+      "name": "distributed-ingest",
+      "path": "../decisions/0003-concurrent-ingest.md",
+      "status": "candidate",
+      "when": "multi-agent replicated ingest is available"
+    }
+  ],
+  "generated": [
+    "dist/ingest_support_runtime.txt"
+  ],
+  "build": {
+    "dist/ingest_support_runtime.txt": "scripts/build_master_prompt.py model/manifests/ingest.json"
+  },
+  "note": "Adopted v0.05 v5 adaptive evidence-maintenance runtime."
+}

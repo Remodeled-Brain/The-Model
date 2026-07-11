@@ -1,0 +1,214 @@
+{
+  "schema_version": "v5",
+  "status": "candidate",
+  "purpose": "Domain-neutral conformance contracts for construct admission, relation-specific causality, chain construction, and evidence binding.",
+  "execution_scope": {
+    "ci": "validates fixture structure, manifest inclusion, and required output fields",
+    "semantic": "provider conformance runs execute the questions and compare outputs against these contracts"
+  },
+  "required_answer_fields": [
+    "direct_answer",
+    "answer_scope",
+    "construct_disposition",
+    "causal_disposition_by_target",
+    "causal_failure_path_by_target",
+    "rejected_premises",
+    "evidence_admission",
+    "body_of_evidence",
+    "generated_chain",
+    "operations",
+    "state_transition",
+    "closure_report",
+    "alternative_routes",
+    "translation_back",
+    "conclusions",
+    "confidence"
+  ],
+  "fixtures": [
+    {
+      "id": "reified-category-as-entity",
+      "mode": "question",
+      "source_question": "What physical defect causes category X?",
+      "required": [
+        "classify this as a hard causality question",
+        "test whether category X has an independently measurable physical referent before mechanism search",
+        "reject the entity-level premise when the category supplies all biological unity",
+        "preserve only observations explicitly supplied independently of the category"
+      ],
+      "forbidden": [
+        "infer a familiar property bundle from the category name",
+        "search for associations to rescue the category as one causal object",
+        "soften premise failure into a complex or multifactorial causal story"
+      ]
+    },
+    {
+      "id": "same-input-divergent-output",
+      "mode": "question",
+      "source_question": "Why does the same stated input produce different measured outcomes under nominally matched conditions?",
+      "required": [
+        "preserve the divergent measured outcomes",
+        "mark the stated input set as causally incomplete",
+        "open missing differentiator slots across timing state environment regulation compensation and route stabilization",
+        "identify observations that discriminate the candidate routes"
+      ],
+      "forbidden": [
+        "rename the divergence without generating the missing path",
+        "treat nominal input sameness as causal completeness",
+        "absorb the unexplained difference into a category label"
+      ]
+    },
+    {
+      "id": "observational-hard-causality",
+      "mode": "condition",
+      "condition": "A hard causal question is followed by a large observational literature with recurring adjusted associations, heterogeneous effects, broad overlap, weak prediction, and no exposed dependency path.",
+      "required": [
+        "classify the evidence as observational before evaluating the narrative",
+        "preserve valid measured relations at descriptive scope",
+        "withhold causal promotion unless temporal direction alternative routes practical magnitude stability negative controls independence and every required bridge close",
+        "treat poor prediction and unbounded heterogeneity as positive failure when the proposed relation entails prediction and stability"
+      ],
+      "forbidden": [
+        "treat adjustment sample size publication volume or consensus as a measured counterfactual",
+        "summarize recurring associations in causal-feeling language",
+        "describe the body as mixed after a load-bearing causal failure is established"
+      ]
+    },
+    {
+      "id": "decisive-intervention",
+      "mode": "condition",
+      "condition": "A controlled manipulation produces a large, highly consistent, specific, durable outcome with valid comparison, negligible attrition, clear timing, and independent replication.",
+      "required": [
+        "evaluate the full intervention admission burden from the actual data",
+        "permit causal admission for the exact intervention-to-outcome relation when every required test closes",
+        "treat strength consistency specificity durability and replication as load-bearing",
+        "state the tested conditions and target relation explicitly"
+      ],
+      "forbidden": [
+        "reject causal status merely because the manipulation is therapeutic or applied",
+        "cap decisive intervention evidence at descriptive only",
+        "generalize the admitted relation beyond its measured target and conditions"
+      ]
+    },
+    {
+      "id": "intervention-scope-transfer",
+      "mode": "condition",
+      "condition": "An intervention changes a measured outcome, and the source infers an endogenous cause, complete mechanism, construct validity, or cross-scale explanation from that effect.",
+      "required": [
+        "evaluate intervention-to-outcome separately from etiology endogenous dependency mechanism construct validity and scale translation",
+        "bind only the target relation whose comparator data and bridges close",
+        "require separate closed dependencies for every broader causal target"
+      ],
+      "forbidden": [
+        "infer endogenous origin from the manipulated target",
+        "infer construct validity from response",
+        "present an admitted intervention effect as closure of the full causal chain"
+      ]
+    },
+    {
+      "id": "narrative-data-conflict",
+      "mode": "condition",
+      "condition": "A source describes an exposure or intervention as effective, robust, normalizing, or mechanistic while the actual data show a small mean effect, broad overlap, weak comparator, high attrition, short durability, or substantial null and adverse outcomes.",
+      "required": [
+        "extract the full outcome distribution comparator magnitude uncertainty attrition durability and adverse outcomes",
+        "derive the admissible claim from those data",
+        "record the stronger narrative as a stripped assertion",
+        "cap every target relation whose practical or counterfactual burden fails"
+      ],
+      "forbidden": [
+        "equate statistical significance with effectiveness",
+        "hide response heterogeneity behind a group mean",
+        "repeat the source conclusion when it exceeds the measured result"
+      ]
+    },
+    {
+      "id": "descriptive-question",
+      "mode": "question",
+      "source_question": "How often does measured outcome Y occur under stated condition Z?",
+      "required": [
+        "compile as a descriptive measurement question",
+        "assign not_a_causal_question",
+        "answer from valid descriptive evidence",
+        "treat descriptive support as a positive role"
+      ],
+      "forbidden": [
+        "penalize evidence for lacking a mechanism it did not claim",
+        "invent a mechanism to make the answer appear complete"
+      ]
+    },
+    {
+      "id": "competing-routes",
+      "mode": "question",
+      "source_question": "Why does the same measured input produce different outputs on different trials?",
+      "required": [
+        "generate multiple candidate paths involving state timing weighting constraint and prior route stabilization",
+        "state what each route predicts differently",
+        "identify a measurement or perturbation that discriminates the routes",
+        "leave route identity and causal status unresolved when no discriminator is available"
+      ],
+      "forbidden": [
+        "select one familiar explanation without discrimination",
+        "rename unexplained variance as noise"
+      ]
+    },
+    {
+      "id": "narrow-answer-from-partial-chain",
+      "mode": "condition",
+      "condition": "The corpus closes one source-scale relation but leaves the requested cross-scale translation open.",
+      "required": [
+        "answer the closed source-scale relation",
+        "state the cross-scale target as unresolved or rejected according to the failed bridge",
+        "attach confidence separately to the narrow conclusion and open translation"
+      ],
+      "forbidden": [
+        "present the full target-scale mechanism as closed",
+        "erase a valid narrow observation because a broader bridge remains open",
+        "use the narrow result to imply causal contribution at the target scale"
+      ]
+    },
+    {
+      "id": "condition-separated-conflict",
+      "mode": "condition",
+      "condition": "Two credible records appear to conflict but measure different scales, conditions, comparators, target relations, or route segments.",
+      "required": [
+        "verify target relation and segment identity before declaring contradiction",
+        "separate design scale condition and comparator differences",
+        "compare effect distributions rather than headline directions",
+        "mark contested only when conflict survives separation"
+      ],
+      "forbidden": [
+        "average incompatible records into one confidence score",
+        "use publication count to resolve the conflict"
+      ]
+    },
+    {
+      "id": "frozen-corpus",
+      "mode": "condition",
+      "condition": "Disable live ingest and external retrieval.",
+      "required": [
+        "compile questions normally",
+        "bind only audited records in the frozen corpus",
+        "report missing evidence without treating runtime operation as failed",
+        "preserve the same admission chain and answer contracts used in adaptive mode"
+      ],
+      "forbidden": [
+        "require live ingest for question compilation",
+        "change the chain contract because retrieval is unavailable"
+      ]
+    },
+    {
+      "id": "adaptive-update",
+      "mode": "condition",
+      "condition": "Add a recent source that measures a previously missing dependency segment.",
+      "required": [
+        "audit the source from its data rather than narrative",
+        "update only the exact eligible relations and segment closure",
+        "test independence and shared assumptions",
+        "treat recency as retrieval and supersession priority only"
+      ],
+      "forbidden": [
+        "raise causal weight from recency alone",
+        "rewrite settled runtime commitments through ingest"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+- **[adopted]** Adopted v0.05 v5 with generated target identity, speaker/corpus separation, data-first causal admission, universal physical continuity, metabolic binding, and explicit provider-conformance debt. (ChatGPT, 2026-07-11)

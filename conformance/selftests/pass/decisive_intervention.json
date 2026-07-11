@@ -1,0 +1,168 @@
+{
+  "schema_version": "v1",
+  "run_id": "selftest",
+  "fixture_set": "selftest",
+  "fixture_id": "selftest",
+  "variant_id": "selftest",
+  "provider": {
+    "name": "selftest",
+    "model": "deterministic",
+    "runtime_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "kernel_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+    "cartridge_hash": "3333333333333333333333333333333333333333333333333333333333333333",
+    "fixture_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+    "target_identity_contract_hash": "5555555555555555555555555555555555555555555555555555555555555555",
+    "physical_contract_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+    "temperature": 0.0,
+    "seed": "selftest"
+  },
+  "decision_record": {
+    "schema_version": "v1",
+    "query": "Did intervention X cause outcome Y?",
+    "speaker_intent": {
+      "source_wording": "Did intervention X cause outcome Y?",
+      "intended_referent_candidates": [
+        "measured outcome Y under the tested conditions"
+      ],
+      "selected_or_inferred_referent": "measured outcome Y under the tested conditions",
+      "requested_scope": "the tested intervention, population, comparator, conditions, and time horizon",
+      "distinctions_that_change_answer": [],
+      "unresolved_material_ambiguity": []
+    },
+    "target_identities": [
+      {
+        "id": "outcome_y",
+        "source_label": "outcome Y",
+        "speaker_intended_referent": "the directly measured organism outcome under the tested conditions",
+        "source_defined_target": "the directly measured outcome specified by the intervention protocol",
+        "exact_relations_after_label_removal": [
+          "assignment to intervention X versus comparator changed the directly measured organism outcome under the tested conditions"
+        ],
+        "generator_type": "demonstrated_organism_state_relation",
+        "generator_pointer": "the protocol outcome definition and direct measurement procedure",
+        "boundary_conditions_and_regime": "the tested population, comparator, intervention dose, timing, and measurement conditions",
+        "measurement_or_construction_operations": [
+          "direct measurement of the prespecified outcome Y"
+        ],
+        "operational_equivalence_evidence": "one direct outcome definition was used consistently across the controlled comparison",
+        "identity_breaking_evidence": [],
+        "heterogeneity_generator": "response heterogeneity was bounded by the full reported distribution under the tested conditions",
+        "transport_status": "identity and causal scope are limited to the tested conditions",
+        "identity_disposition": "generated_identity_conditional",
+        "mapped_construct_disposition": "admitted",
+        "unresolved_identity_slots": []
+      }
+    ],
+    "admitted_observations": [
+      "The controlled manipulation changed outcome Y under the tested conditions."
+    ],
+    "stripped_assertions": [],
+    "relations": [
+      {
+        "id": "intervention_to_outcome",
+        "target_identity_id": "outcome_y",
+        "design_mode": "interventional",
+        "target_relation": "intervention_to_outcome",
+        "construct_relation": "construct_independent",
+        "measurement_relation": "direct_target_measurement",
+        "chain_exposure": "dependency_directly_exposed",
+        "scope": "outcome Y under tested conditions",
+        "explanatory_scope": "behavioral",
+        "causal_disposition": "causal_admitted",
+        "closure_state": "closed",
+        "required_checks": [
+          "attrition_missingness_and_crossover_bounded",
+          "bounded_or_generated_heterogeneity",
+          "durability_appropriate_to_claim",
+          "effect_magnitude_and_full_response_distribution",
+          "manipulation_integrity",
+          "measurement_validity",
+          "no_stronger_disconfirmation",
+          "replication_or_internal_strength_proportionate_to_claim_scope",
+          "specificity_against_relevant_alternative_routes",
+          "temporal_precedence",
+          "valid_comparator_or_counterfactual"
+        ],
+        "passed_checks": [
+          "attrition_missingness_and_crossover_bounded",
+          "bounded_or_generated_heterogeneity",
+          "durability_appropriate_to_claim",
+          "effect_magnitude_and_full_response_distribution",
+          "manipulation_integrity",
+          "measurement_validity",
+          "no_stronger_disconfirmation",
+          "replication_or_internal_strength_proportionate_to_claim_scope",
+          "specificity_against_relevant_alternative_routes",
+          "temporal_precedence",
+          "valid_comparator_or_counterfactual"
+        ],
+        "failed_checks": [],
+        "data": {
+          "baseline_distribution": "reported",
+          "comparator_or_counterfactual": "reported",
+          "sample_and_exclusion_flow": "reported",
+          "effect_distribution": "reported",
+          "effect_magnitude": "reported",
+          "uncertainty": "reported",
+          "overlap_and_response_heterogeneity": "reported",
+          "missingness_attrition_and_crossover": "reported",
+          "timing_and_durability": "reported",
+          "dose_or_exposure_relation": "reported",
+          "adverse_or_opposing_outcomes": "reported",
+          "measurement_validity_and_noise": "reported",
+          "preregistration_outcome_switching_and_analysis_multiplicity": "reported",
+          "replication_and_condition_stability": "reported",
+          "exact_outcome_definition": "specified",
+          "exact_exposure_or_intervention": "specified"
+        },
+        "physical_chain": {
+          "universal_floor": "all_admitted_causes_and_operations_are_physical",
+          "status": "partial",
+          "segments": [
+            {
+              "source_state": "baseline tissue and organism state",
+              "physical_change": "specified intervention altered local electrical conditions",
+              "carrier_or_constraint": "applied field and induced ionic current",
+              "target_state": "measured organism outcome Y under the tested conditions",
+              "timing": "intervention preceded the measured outcome",
+              "conditions": "controlled comparison with durable replicated response"
+            }
+          ],
+          "unresolved_slots": [
+            "exact chemical and metabolic route between local perturbation and organism outcome"
+          ],
+          "metabolic_binding": {
+            "required": true,
+            "status": "partial",
+            "physical_or_chemical_input": "specified stimulation waveform delivered to tissue",
+            "energetic_or_material_carrier": "electrical field and induced ionic current",
+            "metabolic_state_change": "unresolved: exact energetic and substrate reweighting was not measured",
+            "biological_operation": "unresolved: transition-level tissue operation was not measured",
+            "organism_state_or_behavior": "measured outcome Y under the tested conditions"
+          }
+        }
+      }
+    ],
+    "claims": [
+      {
+        "id": "c1",
+        "relation_id": "intervention_to_outcome",
+        "language_class": "causal",
+        "claim_role": "direct_answer",
+        "text": "Intervention X caused outcome Y under the tested conditions."
+      },
+      {
+        "id": "c2",
+        "relation_id": "intervention_to_outcome",
+        "language_class": "descriptive",
+        "claim_role": "physical_chain",
+        "text": "The physical manipulation altered local electrical conditions, but the intervening change in metabolically maintained state remains unresolved."
+      }
+    ],
+    "answer_claim_order": [
+      "c1",
+      "c2"
+    ]
+  },
+  "rendered_answer": "Intervention X caused outcome Y under the tested conditions. The physical manipulation altered local electrical conditions, but the intervening change in metabolically maintained state remains unresolved."
+}

@@ -1,0 +1,261 @@
+answerability_planner:
+  status: candidate
+  layer: primary_runtime
+  purpose: >
+    Determine what empirical and physical-chain work is required for each admitted target relation. Apply
+    relation-specific causal admission rather than one universal causal checklist. At biological or behavioral
+    scope, plan the route through metabolically maintained state before evidence is summarized.
+
+  construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+  causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
+  physical_continuity_ref: model/kernel/physical_continuity.yaml#physical_continuity
+  evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission
+
+  input_required:
+    - question_type
+    - hard_causality_request
+    - construct_disposition
+    - rejected_premises
+    - answer_target
+    - target_relations
+    - explanatory_scope_by_target
+    - candidate_dependency_paths
+    - physical_variables
+    - candidate_substrates
+    - candidate_carriers_or_constraints
+    - candidate_operations
+    - candidate_metabolic_state_relations
+    - state_transition
+    - required_scale_translations
+    - required_chain_slots
+
+  admission_routing:
+    premise_rejected:
+      - state_the_premise_failure
+      - assign_causal_rejected_to_targets_that_require_the_failed_construct
+      - stop_entity_level_mechanism_retrieval
+      - preserve_only_explicit_observations
+      - preserve_any_directly_measured_physical_relation_at_its_measured_scope
+    grouping_handle_only:
+      - retain_label_as_grouping_metadata
+      - require_independently_measured_variables_for_physical_claims
+      - reject_unitary_causal_claims_about_the_grouping_handle
+    admitted:
+      - continue_to_relation_specific_planning
+      - generate_the_shortest_sufficient_physical_chain
+    underspecified:
+      - name_the_missing_measurement_or_relation
+      - name_missing_physical_carrier_metabolic_binding_and_state_transition_slots
+      - do_not_fill_it_from_conventional_definitions
+
+  physical_chain_planning:
+    universal_floor: all_admitted_causes_and_operations_are_physical
+    required_sequence:
+      - identify_physical_perturbation_or_constraint
+      - identify_chemical_electrical_mechanical_thermal_energetic_or_material_carrier
+      - identify_change_in_metabolically_maintained_state_at_biological_scope
+      - identify_biological_operation
+      - identify_organism_state_transition_or_behavior
+      - mark_unresolved_segments_and_joins
+    shortest_sufficient_rule: >
+      Plan only the physical detail required by the target, but never skip an open join. A region, construct,
+      faculty, intervention label, metabolism, energy, activation, signaling, regulation, processing,
+      information, or network change cannot fill a missing segment by name.
+    causal_mechanistic_separation: >
+      A strong counterfactual may close an exact intervention-to-outcome relation while intermediate physical
+      and metabolic segments remain partial. Preserve exact causality and list the open route. A mechanism
+      target requires the route itself to close.
+
+  target_relation_plans:
+    descriptive_distribution:
+      required:
+        - valid_measurement
+        - stated_population_condition_and_time
+        - sampling_and_missingness_bounded
+      physical_chain_requirement: measured_source_scale_only_unless_explanation_is_requested
+      causal_disposition: not_a_causal_question
+    observational_causal_relation:
+      required:
+        - construct_independent_target
+        - temporal_direction
+        - alternative_routes_and_confounding_paths_tested
+        - negative_controls_or_equivalent_failure_probes
+        - practical_effect_magnitude
+        - bounded_heterogeneity_and_condition_stability
+        - independent_operationalizations
+        - prediction_when_the_claim_entails_prediction
+        - every_claimed_mechanism_and_scale_bridge_closed
+        - physical_carrier_and_state_transition_closed
+        - metabolic_binding_closed_at_biological_scope
+      default_without_full_closure: descriptive_only
+    intervention_to_outcome:
+      required:
+        - manipulation_integrity
+        - valid_comparator_or_counterfactual
+        - temporal_precedence
+        - direct_or_validly_translated_outcome_measurement
+        - full_effect_and_response_distribution
+        - practical_magnitude
+        - bounded_or_generated_heterogeneity
+        - specificity_against_relevant_alternative_routes
+        - durability_matching_claim
+        - bounded_attrition_missingness_crossover_and_adverse_outcomes
+        - replication_or_internal_strength_proportionate_to_scope
+        - survival_of_disconfirmation
+      physical_answer_required:
+        - physical_intervention_or_exposure
+        - measured_target_state_change
+        - known_carrier_and_intermediate_segments
+        - explicit_open_physical_or_metabolic_slots
+      prediction_required_only_when:
+        - claim_generalizes_beyond_tested_conditions
+        - route_identity_entails_distinct_predictions
+        - future_or_individual_state_prediction_is_claimed
+      pass_result: causal_admitted_for_intervention_to_outcome
+      mechanism_closure_not_implied: true
+    endogenous_dependency:
+      required:
+        - direct_dependency_or_intervention_evidence_on_the_route
+        - route_position_direction_and_timing
+        - physical_carrier
+        - metabolic_binding_at_biological_scope
+        - organism_state_transition
+        - compensation_and_redundancy_checks
+        - route_discrimination
+        - condition_stability
+        - relevant_prediction_when_route_identity_entails_it
+    etiology_or_origin:
+      required:
+        - source_precedes_generated_outcome
+        - endogenous_route_from_source_to_outcome
+        - continuous_physical_carrier_across_required_segments
+        - metabolic_binding_at_biological_scope
+        - alternative_origins_discriminated
+        - intervention_response_not_used_as_origin_without_additional_route
+    mechanism_or_route:
+      required:
+        - explicit_substrate_variable_operation_and_carrier
+        - physical_or_chemical_input
+        - energetic_or_material_carrier
+        - metabolic_state_change_at_biological_scope
+        - biological_operation
+        - organism_state_transition_or_behavior
+        - every_segment_and_join_closed
+        - source_implementation_and_readout_roles_discriminated
+        - competing_routes_bounded
+    cross_scale_translation:
+      required:
+        - source_and_target_scales
+        - carried_variable
+        - intermediate_dependencies
+        - temporal_and_condition_compatibility
+        - metabolic_binding_when_target_scale_is_biological_or_behavioral
+
+  data_requirements:
+    universal:
+      - exact_outcome_definition
+      - baseline_distribution
+      - comparator_or_counterfactual
+      - full_effect_distribution
+      - effect_magnitude_and_uncertainty
+      - overlap_and_response_heterogeneity
+      - sample_flow_attrition_and_missingness
+      - timing_and_durability
+      - adverse_or_opposing_outcomes
+      - measurement_validity_and_noise
+      - analysis_integrity
+    physical_chain_when_explanatory:
+      - physical_perturbation_or_constraint
+      - carrier_or_constraint
+      - source_and_target_state
+      - timing_and_conditions
+      - chemical_or_energetic_change
+      - metabolic_state_change_at_biological_scope
+      - biological_operation
+      - organism_state_transition_or_behavior
+    rule: Missing data remain missing and cannot be replaced by source adjectives design labels region names or process nouns.
+
+  hard_failure_results:
+    rejected_construct: causal_rejected_for_dependent_targets
+    invalid_counterfactual: causal_rejected_for_claimed_effect
+    narrative_exceeds_data: causal_rejected_for_excess_scope
+    heterogeneous_unbounded_effects: causal_rejected_for_unitary_claim
+    poor_prediction_when_prediction_is_entailed: causal_rejected_for_predictive_or_generalized_claim
+    postdictive_only_body: causal_rejected_for_prediction_and_direction
+    small_overlapping_average_difference: causal_rejected_for_defect_or_individual_state_claim
+    failed_scale_translation: causal_rejected_for_requested_cross_scale_claim
+    action_at_distance_between_components: causal_unresolved_or_rejected_by_target
+    metabolism_or_energy_used_as_operator: causal_unresolved_for_mechanism
+    missing_metabolic_binding_at_biological_scope: causal_unresolved_for_mechanism
+    missing_route_without_positive_failure: causal_unresolved
+
+  planning_dimensions:
+    measurement:
+      - Which variables were directly measured?
+      - Does the measurement observe the target or a proxy composite or readout?
+      - What noise threshold and scale limit apply?
+    counterfactual:
+      - What comparison supports the claimed contrast?
+      - Does it isolate the named exposure or intervention?
+      - Which alternative routes remain compatible?
+    physical_continuity:
+      - What physical state or constraint changes first?
+      - What carrier or constraint connects each named component?
+      - Does each segment output a physically admissible input to the next?
+      - Which joins remain open?
+    metabolic_binding:
+      - What energetic or material throughput maintains the biological state?
+      - What metabolic state relation changed or remained constrained?
+      - Which biological operation did that change make available weight stabilize block release or maintain?
+    effect_distribution:
+      - What is the full response distribution?
+      - Is the effect practically large relative to variance overlap noise and threshold?
+      - Are nonresponse worsening and adverse outcomes included?
+    temporality_and_durability:
+      - What precedes what?
+      - How long does the measured change persist?
+      - Does the time horizon match the claim?
+    heterogeneity:
+      - Is variation generated by explicit conditions or routes?
+      - Are direction magnitude and response stable enough for the requested scope?
+    translation:
+      - Which physical dependencies carry the result across each claimed scale?
+      - Where does the chain enter metabolically maintained biological state?
+      - What narrower source-side conclusion survives an open bridge?
+    route_discrimination:
+      - What do surviving routes predict differently?
+      - Which measurement or manipulation separates them?
+
+  output_schema:
+    construct_disposition:
+      vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+      value: string
+    per_target_causal_disposition:
+      vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
+      values: map
+    per_target_failure_basis: map
+    explanatory_scope_by_target: map
+    physical_chain_plan_by_target: map
+    metabolic_binding_plan_by_target: map
+    unresolved_physical_chain_slots: map
+    data_requirements_available: list
+    data_requirements_missing: list
+    per_target_plan: map
+    narrower_answerable_targets: list
+    answerability_status:
+      state: [premise_rejected, causal_rejected, causal_unresolved, answerable, partially_answerable, descriptive_only, currently_unanswerable]
+      basis: list
+
+  rules:
+    - Premise rejection terminates only targets that require the rejected entity.
+    - Causal admission is target-relation specific.
+    - Every biological or behavioral explanation remains on one continuous physical chain.
+    - Metabolically maintained state binds physical and chemical change to biological operation.
+    - Observational evidence begins noncausal and must earn causal scope affirmatively.
+    - Intervention evidence may close the exact manipulated relation when its full burden passes.
+    - A decisive intervention must not be rejected merely because it is therapeutic.
+    - Exact intervention causality may coexist with partial internal physical or metabolic route closure.
+    - Intervention effects do not automatically establish etiology endogenous mechanism construct validity cross-scale explanation or mechanism closure.
+    - Prediction is required when entailed by the target claim rather than as a universal checkbox.
+    - Source narrative cannot replace missing data bridges carriers metabolic relations or state transitions.
+    - A valid narrower relation survives failure of a broader claim.

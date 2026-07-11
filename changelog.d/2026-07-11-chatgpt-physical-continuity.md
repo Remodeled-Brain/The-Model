@@ -1,0 +1,1 @@
+- **candidate** Added universal physical continuity, biological metabolic binding, physical-chain extraction, relation-level semantic enforcement, and anti-magic regressions so biological and behavioral answers expose the physically carried route or its open slots (chatgpt, 2026-07-11)

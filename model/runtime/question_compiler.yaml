@@ -1,0 +1,267 @@
+question_compiler:
+  status: candidate
+  layer: primary_runtime
+  purpose: >
+    Reject invalid source premises before reconstruction, identify hard causal questions, reconstruct the identity
+    of every named target, then convert only admitted exact relations into chain-bound questions while preserving
+    observations actually supplied by the source.
+
+  construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+  causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
+  target_identity_ref: model/kernel/target_identity.yaml#target_identity
+  trigger: every question requesting description, explanation, prediction, intervention, or causal attribution
+
+  stages:
+    - classify_question_type
+    - classify_hard_causality_request
+    - identify_requested_relation_scope_and_resolution
+    - detect_handles_and_hidden_operators
+    - build_speaker_intent_record
+    - remove_target_names_and_enumerate_surviving_relations
+    - reconstruct_target_identity_from_source_and_corpus_operations
+    - assign_identity_disposition_per_target_relation
+    - evaluate_construct_admission
+    - identify_explicit_observations_without_label_inference
+    - apply_immediate_causal_rejection_when_construct_fails
+    - reject_invalid_premise_or_continue
+    - identify_required_organism_state_relation
+    - extract_or_propose_physical_variables_and_substrates
+    - assign_candidate_operations_from_the_kernel_grammar
+    - construct_candidate_dependency_paths
+    - identify_scale_translations_and_unresolved_slots
+    - generate_discriminating_questions_for_competing_paths
+    - emit_compiled_question_set
+
+  question_types:
+    descriptive:
+      target: measured distribution, frequency, relation, or condition
+      mechanism_required: false
+    explanatory:
+      target: generated dependency path producing or maintaining an observation
+    predictive:
+      target: variables and temporal relations that discriminate future outcomes
+    interventional:
+      target: dependency whose alteration changes a reachable or stabilized state
+    interpretive:
+      target: bounded meaning of an observation within the available chain
+
+  hard_causality_detection:
+    trigger_relations:
+      - causes
+      - is_a_defect
+      - is_dysfunction
+      - controls
+      - drives
+      - underlies
+      - is_the_mechanism
+      - is_responsible_for
+      - is_located_in
+      - is_the_biological_basis
+    rule: >
+      A hard causality request cannot be downgraded into a request for association. It must pass the kernel
+      causal-admission gate or terminate with causal_rejected.
+    forbidden_downgrades:
+      - associated_with
+      - linked_to
+      - may_contribute
+      - plays_a_role
+      - partly_explains
+      - is_involved_in
+      - is_consistent_with
+
+  handle_categories:
+    - diagnostic_or_taxonomic_label
+    - spectrum_or_continuum_label
+    - region_or_structure_as_agent
+    - controller_command_or_decision_language
+    - faculty_or_cognitive_noun_as_operator
+    - biomarker_or_proxy_as_mechanism
+    - conservation_or_age_as_explanation
+    - statistical_or_clinical_promise_language
+    - target_name_as_identity_generator
+    - aggregation_threshold_or_classifier_as_natural_kind
+    - identity_shortcut_without_recoverable_generator
+    - condition_or_transport_erasure
+    - heterogeneity_as_identity_protection
+
+  target_identity_compilation:
+    rule_ref: model/kernel/target_identity.yaml#target_identity
+    first_question: >
+      What independently measurable relation remains after the target name is removed, and what generator makes
+      the surviving observations instances of the same target?
+    speaker_intent_rule: >
+      Identify the observable relation and practical scope the asker cares about. Speaker wording controls the
+      requested question but cannot establish target unity, physical identity, operational equivalence, or causality.
+    corpus_identity_rule: >
+      Reconstruct how the corpus selects, measures, aggregates, thresholds, and transports the target. Repeated
+      terminology, validated instruments, disciplinary familiarity, and intervention response do not supply identity.
+    shortcut_rule: >
+      Permit a named shortcut when it points to a recoverable generator and the use remains within its demonstrated
+      model, scale, regime, apparatus, task, population, construction, and uncertainty limits.
+    heterogeneity_rule: >
+      Complexity, multidimensionality, heterogeneous presentation, individual variation, context dependence, and task
+      impurity preserve common identity only when generated differentiators predict the observed variation.
+    causal_weight_barrier: >
+      Retrieval may resolve identity, but causal weighting begins only after exact target relations and identity
+      dispositions are emitted.
+
+  construct_admission:
+    required_tests:
+      - can_the_questioned_entity_be_specified_without_the_label
+      - does_an_explicit_observation_or_recoverable_construction_survive_handle_removal
+      - does_a_recoverable_identity_generator_exist_at_the_claimed_scope
+      - are_grouped_operationalizations_demonstrably_equivalent
+      - is_observed_heterogeneity_generated_and_predictive
+      - is_biological_unity_demonstrated_rather_than_supplied_by_group_membership
+      - is_the_proposed_defect_source_or_location_relation_independently_measured
+    premise_rejection_triggers:
+      - diagnostic_label_treated_as_a_unitary_biological_entity
+      - diagnostic_label_treated_as_a_defect_located_in_a_named_region
+      - faculty_or_controller_noun_contains_all_explanatory_content
+      - target_name_supplies_all_identity
+      - no_explicit_observation_or_construction_survives_handle_removal
+    premise_rejection_behavior:
+      - answer_the_rejected_premise_directly
+      - stop_entity_level_mechanism_search
+      - do_not_retrieve_evidence_to_accommodate_the_rejected_construct
+      - preserve_the_label_only_as_a_grouping_or_social_administrative_handle
+      - preserve_every_exact_observation_and_constructed_measure_at_its_own_scope
+      - offer_a_replacement_measurement_question_only_when_an_explicit_observation_exists_or_the_user_requests_one
+    disposition_rule: Use exactly one disposition from construct_admission_ref for each target relation.
+
+  causal_admission_routing:
+    immediate_causal_rejection_when:
+      - construct_disposition_is_premise_rejected
+      - grouping_handle_is_the_only_target_definition
+      - region_name_supplies_defect_or_source_status
+      - broader_target_identity_depends_only_on_exact_intervention_response
+    pending_causal_review_when:
+      - target_identity_is_generated_at_the_claimed_scope
+      - target_relation_is_independently_measurable
+      - constructed_measurement_target_is_explicitly_bounded_to_its_construction
+    hard_evidence_failure_when:
+      - highly_heterogeneous_effects_lack_generated_conditions_or_routes
+      - out_of_sample_prediction_is_poor_or_absent
+      - evidence_is_postdictive_label_separation
+      - group_mean_effects_are_small_with_broad_overlap
+      - no_stable_route_specific_dependency_survives
+    hard_evidence_failure_result: causal_rejected
+    rule: >
+      Highly heterogeneous or poorly predictive literature is a failed causal proposition, not an open causal
+      possibility and not material for a softened causal summary. It cannot be converted into candidate causal paths.
+
+  observation_admission_rule: >
+    Preserve only observations, measured differences, behaviors, transitions, constructions, or practical constraints
+    explicitly supplied by the question or source. A definition, literature stereotype, familiar phenotype bundle,
+    or conventional target name may not be imported as a substitute observation.
+
+  preservation_rule: >
+    Removing causal and identity work from a handle must preserve the explicit measured difference, reported behavior,
+    experienced transition, requested distinction, constructed measure, or practical constraint that generated the question.
+
+  reconstruction_rule: >
+    Reconstruction begins with target identity and construct admission. Replace unsupported operators with questions
+    about substrate, variable, operation, timing, dependency, constraint, scale, and organism-state transition. Do not
+    reconstruct a rejected entity into a charitable nearby claim and do not soften a failed causal question into association.
+
+  multiple_compilations:
+    allowed_when:
+      - the speaker wording supports materially different observable referents
+      - an admitted observation supports more than one physical route
+      - the requested scope is ambiguous after premise admission
+      - the available variables support different resolutions
+    forbidden_when:
+      - the only source of variation is a rejected label
+      - candidate compilations merely rescue an entity premise rejected by the admission gate
+      - heterogeneous associations are being converted into causal candidate routes without predictive discrimination
+    rule: Keep admitted candidate compilations separate and state what observation would distinguish them.
+
+  output_schema:
+    source_question: string
+    question_type: string
+    hard_causality_request: boolean
+    requested_relation: string
+    requested_scope: string
+    requested_resolution: string
+    speaker_intent_record:
+      source_wording: string
+      intended_referent_candidates: list
+      selected_or_inferred_referent: string
+      distinctions_that_change_the_answer: list
+      unresolved_material_ambiguity: list
+    target_identity_records:
+      vocabulary_ref: model/kernel/target_identity.yaml#target_identity.identity_dispositions
+      per_target_fields:
+        - source_label
+        - source_defined_target
+        - exact_relations_after_label_removal
+        - identity_generator_pointer
+        - generator_type
+        - boundary_conditions_and_regime
+        - measurement_or_construction_operations
+        - operational_equivalence_evidence
+        - identity_breaking_evidence
+        - heterogeneity_generator
+        - transport_status
+        - identity_disposition
+        - mapped_construct_disposition
+        - unresolved_identity_slots
+    construct_disposition:
+      vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+      value: string
+    causal_admission_required: boolean
+    initial_causal_disposition:
+      vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
+      value: string
+    rejected_premises: list
+    handles_detected: list
+    explicit_observations: list
+    observations_preserved: list
+    answer_target: string
+    physical_variables: list
+    candidate_substrates: list
+    candidate_operations: list
+    state_transition: string
+    candidate_dependency_paths: list
+    required_scale_translations: list
+    required_chain_slots: list
+    unresolved_chain_slots: list
+    discriminating_questions: list
+    compiled_questions: list
+    compilation_confidence:
+      state: [high, moderate, low, unresolved]
+      basis: list
+
+  confidence_rule: >
+    Compilation confidence measures security of the source-to-target and source-to-physical mappings. Familiar
+    terminology, corpus volume, disciplinary agreement, or confidence in later evidence cannot raise it.
+
+  failure_semantics:
+    target_name_supplies_identity: grouping_handle_only_or_premise_rejected
+    identity_shortcut_has_no_recoverable_generator: identity_unresolved
+    non_equivalent_operationalizations_share_name: grouping_handle_only
+    heterogeneity_has_no_generator: grouping_handle_only_or_identity_unresolved
+    diagnostic_label_supplies_entity: premise_rejected_and_causal_rejected
+    diagnostic_label_supplies_defect_location: premise_rejected_and_causal_rejected
+    no_explicit_observation_beyond_label: premise_rejected
+    heterogeneous_poorly_predictive_work: causal_rejected
+    ambiguous_admitted_observation: preserve_multiple_candidate_compilations
+    no_physical_variables_for_explicit_observation: underspecified
+    multiple_routes_fit: retain_alternatives_and_generate_discriminating_questions
+    descriptive_question: do_not_impose_a_mechanism_requirement
+
+  forbidden_outputs:
+    - definition_only_rewrite
+    - label_synonym_swap
+    - inferred_trait_bundle_from_label
+    - evidence_search_to_rescue_rejected_premise
+    - charitable_substitution_for_rejected_entity
+    - causal_question_downgraded_to_association
+    - heterogeneous_associations_rephrased_as_causal_contribution
+    - failed_causal_claim_recast_as_causal_uncertainty
+    - observation_erasure
+    - unsupported_single_route
+    - hidden_change_of_question_scope
+    - confidence_from_familiarity
+    - target_identity_from_corpus_agreement
+    - broader_target_effect_from_exact_protocol_effect

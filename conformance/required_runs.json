@@ -1,0 +1,38 @@
+{
+  "schema_version": "v1",
+  "status": "candidate",
+  "policy": {
+    "semantic_results_required_for_adoption": true,
+    "required_fixture_sets": [
+      "generic",
+      "neuroscience"
+    ],
+    "critical_fixture_failure_tolerance": 0,
+    "minimum_independent_runs_per_critical_variant": 3,
+    "required_result_metadata": [
+      "provider.name",
+      "provider.model",
+      "provider.runtime_hash",
+      "provider.kernel_hash",
+      "provider.cartridge_hash",
+      "provider.fixture_hash",
+      "provider.target_identity_contract_hash",
+      "provider.physical_contract_hash",
+      "provider.temperature",
+      "provider.seed"
+    ],
+    "result_invalidation_triggers": [
+      "runtime_hash_change",
+      "kernel_hash_change",
+      "cartridge_hash_change",
+      "fixture_hash_change",
+      "target_identity_contract_hash_change",
+      "physical_contract_hash_change",
+      "provider_model_change"
+    ],
+    "narrative_invariance_required": true,
+    "data_sensitivity_required": true,
+    "scope_separation_required": true,
+    "positive_causal_control_required": true
+  }
+}

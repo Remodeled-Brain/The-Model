@@ -1,0 +1,346 @@
+{
+  "schema_version": "v1",
+  "status": "candidate",
+  "fixture_set": "generic",
+  "purpose": "Domain-neutral semantic conformance fixtures for data-first causality, physical continuity, metabolic binding, and target-identity reconstruction.",
+  "fixtures": [
+    {
+      "id": "observational-narrative-invariance",
+      "critical": true,
+      "mutation_type": "narrative_invariance",
+      "invariant_relations": [
+        {
+          "relation_id": "exposure_to_outcome",
+          "fields": ["causal_disposition", "closure_state", "scope"]
+        }
+      ],
+      "variants": [
+        {
+          "id": "confident_narrative",
+          "input": {
+            "question": "Does biological exposure X cause organism outcome Y?",
+            "narrative": "Exposure X is a powerful driver of outcome Y.",
+            "data": {
+              "design": "cross-sectional group comparison",
+              "effect": "small overlapping mean difference",
+              "prediction": "poor out-of-sample",
+              "confounding": "unresolved"
+            }
+          },
+          "expected": {
+            "relations": {
+              "exposure_to_outcome": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "descriptive_only",
+                "target_relation": "endogenous_dependency"
+              }
+            },
+            "required_stripped_assertions": ["Exposure X is a powerful driver of outcome Y."],
+            "physical_relations": {
+              "exposure_to_outcome": {
+                "explanatory_scope": "biological",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        },
+        {
+          "id": "cautious_narrative",
+          "input": {
+            "question": "Does biological exposure X cause organism outcome Y?",
+            "narrative": "Exposure X was associated with outcome Y.",
+            "data": {
+              "design": "cross-sectional group comparison",
+              "effect": "small overlapping mean difference",
+              "prediction": "poor out-of-sample",
+              "confounding": "unresolved"
+            }
+          },
+          "expected": {
+            "relations": {
+              "exposure_to_outcome": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "descriptive_only",
+                "target_relation": "endogenous_dependency"
+              }
+            },
+            "required_stripped_assertions": [],
+            "physical_relations": {
+              "exposure_to_outcome": {
+                "explanatory_scope": "biological",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ],
+      "physical_invariant_relations": [
+        {
+          "relation_id": "exposure_to_outcome",
+          "fields": ["explanatory_scope", "physical_chain.status", "physical_chain.metabolic_binding.status"]
+        }
+      ]
+    },
+    {
+      "id": "intervention-data-sensitivity",
+      "critical": true,
+      "mutation_type": "data_sensitivity",
+      "variants": [
+        {
+          "id": "weak_intervention",
+          "input": {
+            "question": "Did biological intervention X cause organism outcome Y?",
+            "narrative": "Intervention X was effective.",
+            "data": {
+              "comparison": "weak",
+              "effect": "small heterogeneous mean shift",
+              "attrition": "substantial",
+              "durability": "unclear",
+              "intermediate_route": "unmeasured"
+            }
+          },
+          "expected": {
+            "relations": {
+              "intervention_to_outcome": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "descriptive_only",
+                "target_relation": "intervention_to_outcome"
+              }
+            },
+            "required_stripped_assertions": ["Intervention X was effective."],
+            "physical_relations": {
+              "intervention_to_outcome": {
+                "explanatory_scope": "behavioral",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        },
+        {
+          "id": "decisive_intervention",
+          "input": {
+            "question": "Did biological intervention X cause organism outcome Y?",
+            "narrative": "Intervention X changed outcome Y.",
+            "data": {
+              "comparison": "valid randomized counterfactual",
+              "effect": "near-universal large specific effect",
+              "attrition": "negligible",
+              "durability": "durable",
+              "replication": "independent",
+              "intermediate_route": "unmeasured"
+            }
+          },
+          "expected": {
+            "relations": {
+              "intervention_to_outcome": {
+                "causal_disposition": "causal_admitted",
+                "closure_state": "closed",
+                "target_relation": "intervention_to_outcome"
+              }
+            },
+            "required_stripped_assertions": [],
+            "physical_relations": {
+              "intervention_to_outcome": {
+                "explanatory_scope": "behavioral",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "intervention-scope-separation",
+      "critical": true,
+      "mutation_type": "scope_separation",
+      "variants": [
+        {
+          "id": "exact_and_broader_targets",
+          "input": {
+            "question": "Does decisive biological intervention X prove X is the endogenous origin of condition Z?",
+            "data": {
+              "intervention_relation": "large specific replicated outcome",
+              "endogenous_route": "not independently tested",
+              "etiology": "not independently tested",
+              "metabolic_route": "unmeasured"
+            }
+          },
+          "expected": {
+            "relations": {
+              "intervention_to_outcome": {
+                "causal_disposition": "causal_admitted",
+                "closure_state": "closed",
+                "target_relation": "intervention_to_outcome"
+              },
+              "endogenous_origin": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "unresolved",
+                "target_relation": "etiology_or_origin"
+              }
+            },
+            "required_stripped_assertions": ["Intervention target X is the endogenous origin of condition Z."],
+            "physical_relations": {
+              "intervention_to_outcome": {
+                "explanatory_scope": "behavioral",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              },
+              "endogenous_origin": {
+                "explanatory_scope": "biological",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "proxy-process-language",
+      "critical": true,
+      "mutation_type": "single",
+      "variants": [
+        {
+          "id": "proxy_only",
+          "input": {
+            "question": "Did intervention X induce biological process P?",
+            "data": {
+              "measurement": "pre-post proxy signal",
+              "translation": "open",
+              "persistence": "unmeasured",
+              "specificity": "unmeasured",
+              "metabolic_route": "unmeasured"
+            }
+          },
+          "expected": {
+            "relations": {
+              "measured_proxy_change": {
+                "causal_disposition": "not_a_causal_question",
+                "closure_state": "proxy_limited",
+                "target_relation": "descriptive_distribution"
+              },
+              "induced_process": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "proxy_limited",
+                "target_relation": "mechanism_or_route"
+              }
+            },
+            "required_stripped_assertions": ["Intervention X induced process P."],
+            "physical_relations": {
+              "measured_proxy_change": {
+                "explanatory_scope": "descriptive_noncausal",
+                "physical_chain.status": "not_required",
+                "physical_chain.metabolic_binding.status": "not_required"
+              },
+              "induced_process": {
+                "explanatory_scope": "biological",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "physical-chain-no-jump",
+      "critical": true,
+      "mutation_type": "single",
+      "variants": [
+        {
+          "id": "component_activity_to_behavior",
+          "input": {
+            "question": "How does component A cause organism behavior B?",
+            "narrative": "Component A controls behavior B by activating metabolism.",
+            "data": {
+              "component_measurement": "activity increased",
+              "behavioral_measurement": "behavior B changed",
+              "physical_carrier": "unmeasured",
+              "chemical_or_energetic_change": "unmeasured",
+              "metabolic_state_change": "unmeasured",
+              "organism_state_transition": "unmeasured"
+            }
+          },
+          "expected": {
+            "relations": {
+              "component_to_behavior": {
+                "causal_disposition": "causal_unresolved",
+                "closure_state": "partial",
+                "target_relation": "mechanism_or_route"
+              }
+            },
+            "required_stripped_assertions": ["Component A controls behavior B by activating metabolism."],
+            "physical_relations": {
+              "component_to_behavior": {
+                "explanatory_scope": "behavioral",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "target-identity-reconstruction",
+      "critical": true,
+      "mutation_type": "scope_separation",
+      "variants": [
+        {
+          "id": "exact_protocol_measure_vs_broader_target",
+          "input": {
+            "question": "Did intervention X change target T?",
+            "narrative": "Intervention X changed target T.",
+            "speaker_intent": "a general change that persists across ordinary conditions",
+            "data": {
+              "assigned_object": "complete protocol containing intervention, contact, task selection, reporting, and measurement",
+              "source_defined_target": "one name grouping initiation delay, completion, self-report, and a composite classification",
+              "measured_outcome": "reported initiation and completion under selected study conditions",
+              "identity_generator": "absent",
+              "operational_equivalence": "not independently established",
+              "heterogeneity_generator": "absent",
+              "transport_scope": "protocol-bound",
+              "comparison": "valid only for assignment to the complete protocol",
+              "active_component_identity": "not isolated",
+              "replication": "absent",
+              "physical_and_metabolic_route": "unmeasured"
+            }
+          },
+          "expected": {
+            "relations": {
+              "protocol_to_recorded_outcome": {
+                "causal_disposition": "causal_unresolved",
+                "closure_state": "partial",
+                "target_relation": "intervention_to_outcome",
+                "construct_relation": "construct_independent"
+              },
+              "intervention_changes_target_t": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "label_dependent",
+                "target_relation": "intervention_to_outcome",
+                "construct_relation": "construct_indexed"
+              }
+            },
+            "required_stripped_assertions": ["Intervention X changed target T."],
+            "physical_relations": {
+              "protocol_to_recorded_outcome": {
+                "explanatory_scope": "behavioral",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              },
+              "intervention_changes_target_t": {
+                "explanatory_scope": "behavioral",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

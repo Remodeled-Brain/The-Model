@@ -1,0 +1,37 @@
+{
+  "name": "the-model-question-runtime",
+  "version": "v0.05-v5",
+  "status": "adopted",
+  "role": "primary question reconstruction and answering runtime",
+  "source_files": [
+    "00_purpose_and_scope.md",
+    "kernel/chain_contract.yaml",
+    "kernel/physical_continuity.yaml",
+    "kernel/target_identity.yaml",
+    "kernel/evidence_admission.yaml",
+    "kernel/evidence_admission_fixtures.json",
+    "runtime/question_compiler.yaml",
+    "runtime/target_identity_gate.yaml",
+    "runtime/answerability_planner.yaml",
+    "runtime/evidence_binding_contract.yaml",
+    "runtime/answer_contract.yaml",
+    "runtime/target_identity_answer_contract.yaml",
+    "runtime/physical_answer_contract.yaml",
+    "runtime/fixtures.json",
+    "runtime/target_identity_fixtures.json"
+  ],
+  "domain_modules": [
+    "cartridges/neuroscience.yaml",
+    "cartridges/neuroscience_physical_continuity.yaml",
+    "cartridges/neuroscience_fixtures.json"
+  ],
+  "support_manifests": [
+    "manifests/ingest.json"
+  ],
+  "generated": [
+    "dist/the_model_runtime.txt"
+  ],
+  "build": {
+    "dist/the_model_runtime.txt": "scripts/build_master_prompt.py"
+  }
+}

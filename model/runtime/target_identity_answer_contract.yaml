@@ -1,0 +1,104 @@
+target_identity_answer_contract:
+  status: candidate
+  layer: primary_runtime
+  kernel_ref: model/kernel/target_identity.yaml#target_identity
+  compiler_ref: model/runtime/target_identity_gate.yaml#target_identity_gate
+  extends:
+    - model/runtime/answerability_planner.yaml#answerability_planner
+    - model/runtime/evidence_binding_contract.yaml#evidence_binding_contract
+    - model/runtime/answer_contract.yaml#answer_contract
+  purpose: >
+    Preserve target-identity reconstruction through planning, evidence binding, and final wording so downstream
+    stages cannot restore a name that the compiler separated into exact relations.
+
+  planner_extension:
+    required_inputs:
+      - speaker_intent_record
+      - target_identity_records
+      - exact_relations_eligible_for_evidence_review
+      - identity_disposition_by_target
+      - unresolved_identity_slots_by_target
+      - transport_status_by_target
+    planning_rules:
+      - plan_evidence_for_each_exact_relation_separately
+      - include_identity_generator_and_operational_equivalence_burdens_when_the_named_target_is_requested
+      - include_transport_burden_when_speaker_scope_exceeds_source_conditions
+      - preserve_constructed_measurement_identity_at_its_construction_scope
+      - do_not_plan_mechanism_for_a_target_whose_identity_is_premise_rejected
+      - do_not_use_strong_design_to_reopen_failed_identity
+    answerability_caps:
+      grouping_handle_only: exact_relations_only
+      identity_unresolved: exact_relations_and_identity_failure_report
+      premise_rejected: surviving_observations_only
+      generated_identity_conditional: demonstrated_conditions_only
+      constructed_measurement_identity: construction_scope_only
+
+  binder_extension:
+    per_binding_required_fields:
+      - target_identity_record_id
+      - exact_target_relation_id
+      - operationalization_id
+      - identity_disposition
+      - generator_pointer
+      - generator_conditions
+      - measurement_or_construction_operation
+      - transport_scope
+      - identity_bridge_contribution
+    binding_order:
+      - bind_to_exact_measured_or_constructed_relation
+      - test_operational_equivalence
+      - test_shared_generator
+      - test_transport
+      - only_then_bind_to_shared_named_target
+    non_pooling_rules:
+      - same_name_does_not_authorize_pooling
+      - different_tasks_or_instruments_remain_separate_without_equivalence
+      - incompatible_thresholds_populations_or_time_horizons_remain_separate
+      - heterogeneous_effects_do_not_average_into_identity
+      - citation_or_paper_count_does_not_close_identity
+    exact_relation_preservation: >
+      Failure of a shared named target cannot erase evidence that validly binds to one exact measured or constructed
+      relation. Preserve that relation and block transfer to the broader target.
+
+  answer_extension:
+    required_answer_sequence:
+      - answer_the_speaker_intended_relation_directly
+      - state_the_exact_relation_the_corpus_measured_or_constructed
+      - state_identity_disposition_and_generator_scope
+      - distinguish_any_broader_source_claim
+      - state_causal_disposition_for_each_material_target
+      - render_transport_limits
+      - render_shortest_supported_physical_chain_and_open_slots_when_explanatory
+    interaction_rule: >
+      When speaker ambiguity materially changes the answer and cannot be resolved from context, present the smallest
+      observable fork. Otherwise reconstruct silently and state the bounded target used.
+    wording_rules:
+      - attach_conditions_to_every_conditional_or_constructed_identity
+      - use_the_shared_name_only_as_a_handle_when_identity_is_grouping_handle_only
+      - say_what_was_measured_before_saying_what_the_source_called_it
+      - render_unexplained_heterogeneity_as_identity_failure_or_open_generator_slots
+      - preserve_exact_causality_without_construct_transfer
+    forbidden_wording_patterns:
+      - the_study_measured_named_target_when_it_only_measured_one_operationalization
+      - the_intervention_treated_named_target_when_only_an_exact_relation_closed
+      - the_target_is_complex_or_multidimensional_as_a_substitute_for_identity_analysis
+      - the_construct_is_validated_by_a_scale_factor_model_or_intervention_response_alone
+      - real_world_effect_without_transport_across_generation_and_measurement_conditions
+      - shared_name_used_to_hide_speaker_corpus_or_source_measurement_mismatch
+
+  output_schema_extension:
+    speaker_intent_summary: required
+    target_identity_summary_by_target: required
+    exact_corpus_relations: required
+    identity_generator_and_scope: required
+    identity_breaking_evidence: required
+    unresolved_identity_slots: required
+    transport_limits: required
+    broader_claims_blocked_by_identity: required
+
+  invariants:
+    compilation_identity_survives_downstream_stages: true
+    evidence_binds_to_exact_relation_first: true
+    final_wording_cannot_restore_failed_identity: true
+    exact_effect_survives_broader_identity_failure: true
+    speaker_intent_remains_distinct_from_corpus_measurement: true

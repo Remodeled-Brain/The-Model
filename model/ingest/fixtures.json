@@ -1,0 +1,122 @@
+{
+  "schema_version": "v4",
+  "status": "candidate",
+  "purpose": "Domain-neutral conformance contracts for data-first ingest, design-specific admission, and relation-level failure routing.",
+  "execution_scope": {
+    "ci": "validates structure, manifest inclusion, and required fields",
+    "semantic": "provider runs apply ingest to the source pattern and compare the record with this contract"
+  },
+  "required_record_sections": [
+    "identity",
+    "source_ingress",
+    "evidence_axes",
+    "data_record",
+    "presumption",
+    "inference_audit",
+    "extraction",
+    "validation",
+    "body_weight_inputs",
+    "provenance",
+    "outputs"
+  ],
+  "fixtures": [
+    {
+      "id": "observational-causal-overreach",
+      "source_pattern": "An observational study reports an adjusted association and describes it as causal despite no manipulated source, weak counterfactual exposure, untested alternatives, and incomplete route evidence.",
+      "required_gates": ["data_extraction", "evidence_axis_classification", "inference_audit", "design_admission", "causal_admission"],
+      "allowed_channels": ["descriptive_support", "route_partial", "provenance_only"],
+      "blocked_roles": ["causal_support_without_observational_burden", "mechanism_from_adjustment", "counterfactual_from_modeling"]
+    },
+    {
+      "id": "decisive-controlled-intervention",
+      "source_pattern": "A controlled manipulation produces a large, highly consistent, specific, durable measured outcome with valid comparison, negligible attrition, and independent replication.",
+      "required_gates": ["data_extraction", "evidence_axis_classification", "design_admission", "practical_significance", "heterogeneity_control", "comparator_integrity", "durability", "independence"],
+      "allowed_channels": ["mechanistic_grounded", "route_partial", "descriptive_support"],
+      "blocked_roles": ["scope_transfer_to_unmeasured_targets"]
+    },
+    {
+      "id": "weak-intervention-effectiveness-narrative",
+      "source_pattern": "An intervention is called effective although the data show a small mean change, broad response overlap, weak comparator, high attrition, short follow-up, or substantial null and adverse outcomes.",
+      "required_gates": ["data_extraction", "inference_audit", "comparator_integrity", "practical_significance", "heterogeneity_control", "durability"],
+      "allowed_channels": ["descriptive_support", "method_support", "provenance_only"],
+      "blocked_roles": ["effectiveness_language", "causal_support_for_claimed_scope", "group_mean_hides_response_distribution"]
+    },
+    {
+      "id": "intervention-scope-transfer",
+      "source_pattern": "A measured intervention effect is used to infer origin, endogenous mechanism, construct validity, or a broader cross-scale explanation.",
+      "required_gates": ["inference_audit", "causal_admission", "scale_translation"],
+      "allowed_channels": ["mechanistic_grounded", "route_partial", "descriptive_support"],
+      "blocked_roles": ["etiology_from_intervention_target", "endogenous_mechanism_without_route", "construct_validity_from_response", "cross_scale_scope_transfer"]
+    },
+    {
+      "id": "construct-indexed-observation",
+      "source_pattern": "Samples and outcomes are defined by the same theoretical category, instrument, threshold, or selection rule, and recurring differences are interpreted as evidence for the category.",
+      "required_gates": ["construct_admission", "instrument_and_task_dependency", "inference_audit"],
+      "allowed_channels": ["label_dependent_observation", "descriptive_support", "provenance_only"],
+      "blocked_roles": ["construct_validation", "entity_grounding", "causal_support_without_construct_escape"]
+    },
+    {
+      "id": "proxy-named-as-mechanism",
+      "source_pattern": "A proxy, classifier, assay, surrogate, composite, or downstream readout correlates with an outcome and is described as the mechanism or causal process.",
+      "required_gates": ["evidence_axis_classification", "inference_audit", "proxy_translation", "scale_translation"],
+      "allowed_channels": ["proxy_only", "source_scale_only", "descriptive_support"],
+      "blocked_roles": ["proxy_as_mechanism", "untranslated_causal_support", "target_scale_grounding"]
+    },
+    {
+      "id": "named-process-without-measurement",
+      "source_pattern": "A post-exposure measurement change is renamed as a broad process without specifying substrate, variable, operation, timing, persistence, comparator, or dependency to the target outcome.",
+      "required_gates": ["data_extraction", "inference_audit", "measurement_admission", "proxy_translation", "scale_translation"],
+      "allowed_channels": ["proxy_only", "source_scale_only", "descriptive_support"],
+      "blocked_roles": ["named_process_as_observation", "named_process_as_mechanism", "functional_claim_without_dependency"]
+    },
+    {
+      "id": "same-input-divergent-output",
+      "source_pattern": "Nominally matched inputs produce divergent measured outputs, and the divergence is renamed rather than used to open the missing differentiator.",
+      "required_gates": ["data_extraction", "controlled_sameness_missing_differentiator", "inference_audit"],
+      "allowed_channels": ["route_partial", "disconfirmation"],
+      "blocked_roles": ["complete_causal_frame", "label_absorbs_missing_differentiator"]
+    },
+    {
+      "id": "statistical-without-practical",
+      "source_pattern": "A sensitive analysis reports a statistically significant difference with small magnitude, broad overlap, incomplete noise or threshold context, and no stable practical effect.",
+      "required_gates": ["data_extraction", "practical_significance", "heterogeneity_control"],
+      "allowed_channels": ["descriptive_support", "source_scale_only"],
+      "blocked_roles": ["effectiveness_from_significance", "practical_importance", "individual_state_assignment", "causal_support"]
+    },
+    {
+      "id": "postdictive-prediction",
+      "source_pattern": "A model separates known outcomes after the fact and is described as predictive, generative, or causal.",
+      "required_gates": ["temporality", "prediction", "causal_admission", "inference_audit"],
+      "allowed_channels": ["descriptive_support", "method_support"],
+      "blocked_roles": ["prediction_weight", "prospective_grounding", "causal_support_from_postdiction"]
+    },
+    {
+      "id": "cross-scale-language",
+      "source_pattern": "A source-scale measurement is translated to a target-scale mechanism through shared terminology rather than a carried variable and demonstrated dependency path.",
+      "required_gates": ["causal_admission", "scale_translation", "proxy_translation"],
+      "allowed_channels": ["source_scale_only", "proxy_only", "route_partial"],
+      "blocked_roles": ["target_scale_grounding", "cross_scale_causal_support"]
+    },
+    {
+      "id": "correlated-volume",
+      "source_pattern": "Many papers repeat a small association using shared cohorts, datasets, instruments, interventions, comparators, outcomes, pipelines, or inferential bridges.",
+      "required_gates": ["independence", "inference_audit", "practical_significance"],
+      "allowed_channels": ["descriptive_support", "provenance_only"],
+      "blocked_roles": ["grounding_by_count", "independence_by_publication_count", "mechanism_from_correlated_volume"]
+    },
+    {
+      "id": "synthesis-inherits-input-failure",
+      "source_pattern": "A review or pooled analysis combines inputs with construct, comparator, measurement, attrition, proxy, design, or bridge failures and presents a stronger conclusion.",
+      "required_gates": ["source_ingress", "inference_audit", "independence"],
+      "allowed_channels": ["descriptive_support", "provenance_only"],
+      "blocked_roles": ["synthesis_repairs_invalid_inputs", "narrower_uncertainty_as_causal_closure", "review_status_as_admission"]
+    },
+    {
+      "id": "premise-breaking-dominance",
+      "source_pattern": "A direct independent result breaks a necessary construct, counterfactual, prediction, bridge, or route premise while many downstream papers assume it.",
+      "required_gates": ["construct_admission", "causal_admission", "evidence_role_classification", "independence"],
+      "allowed_channels": ["disconfirmation", "descriptive_support", "provenance_only"],
+      "blocked_roles": ["downstream_volume_rescues_premise", "association_count_outweighs_failure", "soft_causal_restating_after_failure"]
+    }
+  ]
+}

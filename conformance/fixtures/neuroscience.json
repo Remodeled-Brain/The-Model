@@ -1,0 +1,274 @@
+{
+  "schema_version": "v1",
+  "status": "candidate",
+  "fixture_set": "neuroscience",
+  "purpose": "Neuroscience-cartridge semantic fixtures applying data-first causality, physical continuity, metabolic binding, and target-identity reconstruction.",
+  "fixtures": [
+    {
+      "id": "cbt-depression-effectiveness",
+      "critical": true,
+      "mutation_type": "single",
+      "variants": [
+        {
+          "id": "weak_comparator_heterogeneous_scale",
+          "input": {
+            "question": "Is CBT effective at treating depression?",
+            "narrative": "CBT is an effective treatment for depression.",
+            "data": {
+              "sample": "diagnosis-indexed",
+              "outcome": "rating-scale composite",
+              "comparator": "weak and variable",
+              "effect": "modest mean change with broad heterogeneity",
+              "attrition": "material",
+              "durability": "limited",
+              "physical_and_metabolic_route": "unmeasured"
+            }
+          },
+          "expected": {
+            "relations": {
+              "cbt_to_scale_change": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "descriptive_only",
+                "target_relation": "intervention_to_outcome"
+              },
+              "cbt_treats_depression": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "label_dependent",
+                "target_relation": "intervention_to_outcome"
+              }
+            },
+            "required_stripped_assertions": ["CBT is an effective treatment for depression."],
+            "physical_relations": {
+              "cbt_to_scale_change": {
+                "explanatory_scope": "behavioral",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              },
+              "cbt_treats_depression": {
+                "explanatory_scope": "biological",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "therapy-neuroplasticity",
+      "critical": true,
+      "mutation_type": "single",
+      "variants": [
+        {
+          "id": "pre_post_imaging_proxy",
+          "input": {
+            "question": "Did therapy induce neuroplasticity?",
+            "narrative": "Therapy induced neuroplasticity.",
+            "data": {
+              "measurement": "pre-post imaging or connectivity proxy",
+              "comparator": "inadequate",
+              "noise_and_practice": "not excluded",
+              "persistence": "not established",
+              "behavioral_dependency": "open",
+              "metabolic_state_change": "unmeasured"
+            }
+          },
+          "expected": {
+            "relations": {
+              "imaging_change": {
+                "causal_disposition": "not_a_causal_question",
+                "closure_state": "proxy_limited",
+                "target_relation": "descriptive_distribution"
+              },
+              "therapy_induced_neuroplasticity": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "proxy_limited",
+                "target_relation": "mechanism_or_route"
+              }
+            },
+            "required_stripped_assertions": ["Therapy induced neuroplasticity."],
+            "physical_relations": {
+              "imaging_change": {
+                "explanatory_scope": "descriptive_noncausal",
+                "physical_chain.status": "not_required",
+                "physical_chain.metabolic_binding.status": "not_required"
+              },
+              "therapy_induced_neuroplasticity": {
+                "explanatory_scope": "biological",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "decisive-neural-stimulation",
+      "critical": true,
+      "mutation_type": "scope_separation",
+      "variants": [
+        {
+          "id": "exact_effect_vs_disorder_origin",
+          "input": {
+            "question": "Did stimulation cause the measured behavioral outcome, and does it prove the region is the disorder?",
+            "data": {
+              "manipulation": "specified physical waveform and substrate",
+              "effect": "near-universal large specific durable",
+              "comparison": "valid",
+              "attrition": "negligible",
+              "replication": "independent",
+              "etiology": "untested",
+              "intermediate_metabolic_route": "unmeasured"
+            }
+          },
+          "expected": {
+            "relations": {
+              "stimulation_to_behavior": {
+                "causal_disposition": "causal_admitted",
+                "closure_state": "closed",
+                "target_relation": "intervention_to_outcome"
+              },
+              "region_is_disorder_origin": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "unresolved",
+                "target_relation": "etiology_or_origin"
+              }
+            },
+            "required_stripped_assertions": ["The stimulated region is the disorder."],
+            "physical_relations": {
+              "stimulation_to_behavior": {
+                "explanatory_scope": "behavioral",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              },
+              "region_is_disorder_origin": {
+                "explanatory_scope": "biological",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "neural-region-physical-chain",
+      "critical": true,
+      "mutation_type": "single",
+      "variants": [
+        {
+          "id": "activity_and_behavior_without_route",
+          "input": {
+            "question": "How does activity in region R produce behavior B?",
+            "narrative": "Region R controls behavior B by increasing metabolic activity.",
+            "data": {
+              "regional_measurement": "activity and hemodynamic signal increased",
+              "behavioral_measurement": "behavior B changed",
+              "ionic_or_chemical_carrier": "unmeasured",
+              "metabolic_maintenance_change": "unmeasured",
+              "organism_state_transition": "unmeasured",
+              "route_discrimination": "absent"
+            }
+          },
+          "expected": {
+            "relations": {
+              "region_to_behavior": {
+                "causal_disposition": "causal_unresolved",
+                "closure_state": "partial",
+                "target_relation": "mechanism_or_route"
+              }
+            },
+            "required_stripped_assertions": ["Region R controls behavior B by increasing metabolic activity."],
+            "physical_relations": {
+              "region_to_behavior": {
+                "explanatory_scope": "behavioral",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "stimulation-target-identity",
+      "critical": true,
+      "mutation_type": "scope_separation",
+      "variants": [
+        {
+          "id": "protocol_effect_vs_construct_regional_and_real_world_claims",
+          "input": {
+            "question": "Does DLPFC stimulation reduce real-world procrastination by increasing task outcome value?",
+            "narrative": "DLPFC stimulation reduced real-world procrastination through increased task outcome value.",
+            "speaker_intent": "a portable reduction in delayed or failed task execution across ordinary conditions",
+            "data": {
+              "assignment": "active versus sham repeated research protocol",
+              "device_output": "2 mA scalp current setting",
+              "target_engagement": "not directly measured",
+              "outcome": "self-selected task completion and procrastination reports under repeated prompting and verification",
+              "target_identity_generator": "not independently established",
+              "operational_equivalence": "initiation completion report and classification are not shown to be the same generated relation",
+              "mediator": "self-reported task outcome value",
+              "attrition_and_analysis_integrity": "incompletely closed",
+              "replication": "absent",
+              "ecological_transport": "not tested",
+              "physical_and_metabolic_route": "unmeasured"
+            }
+          },
+          "expected": {
+            "relations": {
+              "protocol_assignment_to_recorded_task_behavior": {
+                "causal_disposition": "causal_unresolved",
+                "closure_state": "partial",
+                "target_relation": "intervention_to_outcome",
+                "construct_relation": "construct_independent"
+              },
+              "stimulation_reduces_procrastination": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "label_dependent",
+                "target_relation": "intervention_to_outcome",
+                "construct_relation": "construct_indexed"
+              },
+              "dlpfc_value_mechanism": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "unresolved",
+                "target_relation": "mechanism_or_route",
+                "construct_relation": "construct_indexed"
+              },
+              "real_world_transport": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "source_scale_only",
+                "target_relation": "cross_scale_translation",
+                "construct_relation": "construct_indexed"
+              }
+            },
+            "required_stripped_assertions": ["DLPFC stimulation reduced real-world procrastination through increased task outcome value."],
+            "physical_relations": {
+              "protocol_assignment_to_recorded_task_behavior": {
+                "explanatory_scope": "behavioral",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              },
+              "stimulation_reduces_procrastination": {
+                "explanatory_scope": "behavioral",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              },
+              "dlpfc_value_mechanism": {
+                "explanatory_scope": "behavioral",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              },
+              "real_world_transport": {
+                "explanatory_scope": "cross_scale",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

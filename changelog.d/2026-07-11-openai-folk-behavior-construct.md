@@ -1,0 +1,1 @@
+- **candidate** Added mandatory folk-behavior construct reconstruction before evidence review, with exact-measurement preservation, ecological-scope limits, neuroscience procrastination regressions, semantic conformance fixtures, CI validation, and adoption gating (OpenAI, 2026-07-11)

@@ -1,0 +1,380 @@
+evidence_binding_contract:
+  status: candidate
+  layer: primary_runtime
+  purpose: >
+    Bind only admitted observations and closed inferential bridges to exact physical-chain segments. Causal scope is
+    earned separately for each target relation from the design, actual data, effect distribution, and exposed dependency
+    path. Biological and behavioral binding must pass through metabolically maintained state or preserve the missing
+    segment as open.
+
+  closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+  construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+  causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
+  physical_continuity_ref: model/kernel/physical_continuity.yaml#physical_continuity
+  evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission
+  presumption_ref: model/kernel/evidence_admission.yaml#evidence_admission.presumptive_classification
+  ingest_crosswalk_ref: model/ingest/failure_routing.yaml#ingest_failure_routing.closure_state_crosswalk
+
+  required_inputs:
+    - hard_causality_request
+    - construct_disposition
+    - initial_causal_disposition
+    - rejected_premises
+    - answerability_plan
+    - audited_corpus_records
+    - physical_chain_plan_by_target
+    - metabolic_binding_plan_by_target
+
+  admission_sequence:
+    - classify_design_construct_measurement_target_and_chain_exposure
+    - assign_the_most_restrictive_applicable_initial_state
+    - compare_source_narrative_to_the_actual_data
+    - audit_observations_and_inferential_bridges
+    - bind_admitted_observations_to_explicit_physical_segments
+    - bind_biological_scope_through_metabolically_maintained_state
+    - evaluate_each_target_relation_separately
+    - preserve_restrictions_where_required_data_bridges_physical_segments_or_metabolic_joins_are_missing
+    - bind_only_eligible_relations
+
+  design_target_rules:
+    observational:
+      initial_role: descriptive_only
+      rule: >
+        Observational records bind measured distributions and relations at their observed scope. Causal binding is
+        permitted only when the exact target relation affirmatively satisfies the observational causal-upgrade burden
+        in evidence_admission_ref. Adjustment, recurrence, large samples, or causal vocabulary are insufficient.
+    interventional:
+      initial_role: unresolved
+      eligible_causal_target: intervention_to_outcome
+      rule: >
+        A controlled manipulation may bind causally to its measured outcome when manipulation integrity, comparator,
+        timing, measurement validity, effect magnitude, full response distribution, heterogeneity, specificity,
+        durability, attrition, and disconfirmation checks close for that relation.
+      physical_route_rule: >
+        The exact intervention-to-outcome relation may close while intermediate physical and metabolic segments remain
+        partial. Bind the known physical intervention and measured target transition, then preserve the open segments.
+      scope_limit: >
+        Causal admission for intervention_to_outcome does not automatically bind etiology, endogenous mechanism,
+        construct validity, cross-scale explanation, or a closed internal physical route. Those claims require separate
+        closed bridges and physical-chain segments.
+    natural_or_quasi_experimental:
+      initial_role: unresolved
+      rule: >
+        Bind according to the quality of the counterfactual, exposure assignment, temporal order, alternative-route
+        control, stability of the measured effect, and physical continuity of the requested target. The design label
+        supplies no automatic causal status.
+    synthesis:
+      initial_role: provenance_only
+      rule: >
+        Reviews and meta-analyses inherit the admission state, design limitations, construct dependence, proxy distance,
+        missing data, physical-chain gaps, metabolic-binding gaps, and bridge failures of their inputs. Pooling can narrow
+        uncertainty only for an already admissible relation.
+
+  physical_chain_binding:
+    universal_floor: all_admitted_causes_and_operations_are_physical
+    required_for:
+      - biological_causal_target
+      - behavioral_causal_target
+      - mechanism_or_route_target
+      - etiology_or_origin_target
+      - cross_scale_translation_into_biology_or_behavior
+    segment_fields:
+      - source_state
+      - physical_change
+      - carrier_or_constraint
+      - target_state
+      - timing
+      - conditions
+    biological_binding_fields:
+      - physical_or_chemical_input
+      - energetic_or_material_carrier
+      - metabolic_state_change
+      - biological_operation
+      - organism_state_or_behavior
+    binding_rule: >
+      Bind each observation or bridge only to the physical segment it directly supports. A named region component
+      construct faculty intervention process metabolism energy activation signaling regulation processing information
+      or network change cannot fill an unmeasured carrier operation or state transition.
+    open_segment_rule: >
+      Missing physical or metabolic segments remain open and visible. They do not erase a valid narrower observation or
+      exact intervention effect, and they cannot be silently promoted through narrative synthesis.
+    mechanism_closure_rule: >
+      Mechanism binding requires every physical carrier join metabolic state relation biological operation and target
+      transition required by the claim to close under the stated conditions.
+
+  restrictive_relations:
+    construct_indexed:
+      initial_closure_state: label_dependent
+      escape_rule: >
+        The target relation remains label_dependent until it is specified, measured, predicted, and replicated
+        independently of the construct-defining label, instrument, threshold, or selected cohort.
+    proxy_or_surrogate:
+      initial_closure_state: proxy_limited
+      rule: >
+        Bind the measured proxy relation only. A causal or mechanistic target requires a closed physical translation
+        path or a distinct direct-dependency record.
+    source_scale_only:
+      initial_closure_state: source_scale_only
+      rule: Bind only at the measured scale until the carried variable and intermediate dependencies close translation.
+
+  data_authority:
+    rule: >
+      The binding claim is generated from the actual outcome data. Narrative statements such as effective, treats,
+      induces, normalizes, improves, causes, or changes the brain are stripped when effect magnitude, comparator,
+      durability, response distribution, measurement validity, or route evidence do not support that scope.
+    required_checks:
+      - outcome_definition_matches_claim
+      - comparator_supports_the_counterfactual
+      - full_response_distribution_is_available
+      - practical_effect_exceeds_noise_overlap_and_threshold
+      - heterogeneity_is_bounded_or_generated
+      - attrition_missingness_and_crossover_are_bounded
+      - timing_and_durability_match_the_claim
+      - adverse_and_opposing_outcomes_are_in_scope
+      - measurement_is_direct_or_translation_is_closed
+      - analysis_flexibility_and_outcome_switching_are_bounded
+    narrative_cannot_override_failed_check: true
+
+  corpus_boundary:
+    default_source_status: unadmitted_assertion
+    reviewed_does_not_mean_admitted: true
+    peer_review_supplies_weight: false
+    author_conclusion_supplies_weight: false
+    consensus_supplies_weight: false
+    meta_analysis_repairs_invalid_inputs: false
+    rule: >
+      Bind the observation or closed bridge, never the paper's prose conclusion. A source becomes eligible relation by
+      relation after data extraction, presumptive classification, physical-chain extraction, and bridge closure.
+
+  inference_boundary:
+    required_record_fields:
+      - evidence_axes
+      - presumptive_class
+      - presumed_closure_state
+      - data_fields_available
+      - data_fields_missing
+      - admitted_observations
+      - stripped_assertions
+      - bridge_ledger
+      - shared_assumption_families
+      - strongest_surviving_claim
+      - eligible_causal_target
+      - explanatory_scope
+      - physical_chain_status
+      - physical_chain_segments
+      - metabolic_binding_status
+      - unresolved_physical_chain_slots
+    binding_eligibility:
+      direct_observation: eligible_at_measured_scope
+      observational_relation_without_full_causal_closure: descriptive_only
+      intervention_relation_with_all_admission_checks_closed: eligible_for_intervention_to_outcome_causality
+      intervention_relation_with_failed_or_missing_checks: descriptive_or_unresolved_only
+      exact_intervention_effect_with_partial_internal_route: eligible_for_exact_causality_with_partial_mechanism
+      bridge_closed: eligible_for_the_exact_target_relation
+      bridge_partially_closed: capped_at_the_closed_source_side
+      construct_indexed_without_escape: label_dependent_only
+      proxy_without_translation: proxy_limited_only
+      unadmitted_assertion: ineligible
+      causal_rejected: ineligible_for_the_rejected_causal_target
+      mechanism_with_open_physical_or_metabolic_route: ineligible_for_mechanistic_language
+      non_probative: ineligible_for_the_named_conclusion
+
+  causal_boundary:
+    applies_when: hard_causality_request_is_true
+    rule: >
+      Causal weight is relation-specific. Every necessary design, construct, direction, dependency, prediction,
+      heterogeneity, magnitude, translation, independence, data-quality, bridge, and disconfirmation test must close
+      for the exact requested relation. The answer must also preserve physical continuity and expose biological metabolic
+      binding or its open slots.
+    necessary_checks:
+      - target_relation_identity
+      - design_supports_target_counterfactual
+      - construct_coherence
+      - temporal_direction
+      - dependency_or_intervention_integrity
+      - comparator_validity
+      - effect_distribution_and_practical_magnitude
+      - heterogeneity_and_condition_stability
+      - durability_appropriate_to_claim
+      - missingness_attrition_and_analysis_integrity
+      - predictive_or_route_discriminating_adequacy_when_required
+      - physical_scale_translation_when_claimed
+      - physical_carrier_and_state_transition_when_mechanism_is_claimed
+      - metabolic_binding_at_biological_scope_when_mechanism_is_claimed
+      - independent_evidence_family_convergence
+      - inferential_bridge_closure
+      - survival_of_relevant_disconfirmation
+    hard_failures:
+      - source_narrative_exceeds_data
+      - construct_indexed_without_escape
+      - proxy_offered_as_untranslated_mechanism
+      - pre_post_change_without_valid_counterfactual
+      - intervention_effect_generalized_beyond_the_manipulated_relation
+      - unsupported_inferential_bridge
+      - heterogeneous_effects_without_generated_conditions_or_routes
+      - poor_out_of_sample_prediction_when_prediction_is_required
+      - postdictive_only_separation
+      - small_average_difference_with_broad_overlap
+      - failed_required_scale_translation
+      - action_at_distance_between_named_components
+      - metabolism_energy_activation_or_signaling_used_as_operator
+      - mechanism_claim_with_open_physical_or_metabolic_route
+    failed_causal_claim_support_role: forbidden
+    soft_causal_paraphrase_after_failure: forbidden
+
+  evidence_role_classes:
+    premise_breaking: Evidence that invalidates a required entity, unity, defect, direction, prediction, bridge, counterfactual, physical carrier, metabolic binding, or translation premise.
+    route_closing: Evidence that directly closes a required physical dependency segment or join under stated conditions.
+    route_discriminating: Evidence that distinguishes surviving physical routes through different predicted consequences.
+    segment_supporting: Evidence that supports one bounded eligible physical segment without closing the full route.
+    descriptive_only: Evidence that closes only a measured descriptive relation.
+    non_probative: Evidence that cannot bear on the named conclusion after admission causal and physical-chain checks.
+
+  binding_unit:
+    definition: One eligible admitted observation or closed bridge bound to one or more named physical-chain segments.
+    required_fields:
+      - provenance
+      - evidence_axes
+      - presumptive_class
+      - presumed_closure_state
+      - data_fields_available
+      - data_fields_missing
+      - admitted_observation_or_bridge
+      - bridge_status
+      - shared_assumption_family
+      - supported_segment
+      - target_relation
+      - support_role
+      - evidence_role_class
+      - measured_scale
+      - translation_limit
+      - closure_state
+      - independence_status
+      - evidence_family_id
+      - applicable_conditions
+      - effect_distribution
+      - comparator
+      - durability
+      - physical_chain_segment
+      - metabolic_binding_contribution
+      - unresolved_physical_chain_slots
+      - non_probative_for
+    closure_state_rule: >
+      Initial closure follows the most restrictive applicable design, construct, measurement, scale, physical-chain,
+      and metabolic-binding relation. A stronger state may be assigned only to the exact target relation whose data,
+      bridges, and required physical segments close.
+
+  binding_rules:
+    - Classify every relation before local checks.
+    - Every biological or behavioral relation remains on one continuous physical chain.
+    - Metabolically maintained state binds physical and chemical change to biological operation.
+    - Observational evidence begins descriptive or more restricted and does not receive causal binding by default.
+    - Intervention evidence may earn causal binding for the exact manipulated relation.
+    - Intervention evidence is not categorically causal or categorically noncausal.
+    - Exact intervention causality may coexist with partial internal physical or metabolic route closure.
+    - Treatment or intervention labels do not substitute for comparator effect magnitude response distribution durability or specificity.
+    - Etiology endogenous mechanism construct validity cross-scale and mechanism claims require bridges beyond intervention-to-outcome efficacy.
+    - Construct-indexed records begin label_dependent.
+    - Proxy records begin proxy_limited.
+    - Bind only eligible admitted observations or closed bridges.
+    - Support attaches only to the segment target relation and conditions actually measured.
+    - Author conclusions abstracts discussions reviews and consensus statements do not bind directly.
+    - Disconfirming evidence binds to the exact premise bridge segment counterfactual prediction physical carrier metabolic join or scale translation it breaks.
+    - Correlated reports and shared inferential bridges remain grouped and cannot create independent weight by count.
+
+  body_of_evidence_assessment:
+    unit_of_counting: independent_evidence_family_after_bridge_and_physical_chain_audit
+    family_grouping_keys:
+      - construct
+      - design
+      - cohort
+      - dataset
+      - pipeline
+      - assay
+      - proxy
+      - intervention
+      - comparator
+      - outcome_measure
+      - task
+      - instrument
+      - laboratory_lineage
+      - model_lineage
+      - shared_assumption_family
+      - physical_carrier
+      - metabolic_binding_assumption
+    required_dimensions:
+      design_mode: What counterfactual can the design actually support?
+      target_relation: Which exact relation is being claimed?
+      data_narrative_fit: Does the claim match the actual effect distribution and comparator?
+      construct_admission: Does the relation require the questioned entity to exist before measurement?
+      measurement_directness: Is the target measured directly or through a proxy or composite?
+      claim_directness: Does the record test the exact physical segment or bridge claimed?
+      counterfactual_validity: Does the design support the claimed causal contrast?
+      effect_magnitude: Is the effect practically large relative to noise overlap and threshold?
+      response_heterogeneity: Is variation bounded or generated by explicit conditions?
+      durability: Does persistence match the claim?
+      attrition_and_missingness: Could the observed effect be generated by sample flow?
+      physical_continuity: Is every required component-to-component transition physically carried?
+      metabolic_binding: Does biological scope pass through a supported change in metabolically maintained state?
+      bridge_integrity: Which inferential transitions remain unsupported?
+      scale_translation: Does a demonstrated dependency carry the result to the requested scale?
+      independence: Does the record add a distinct failure mode?
+      disconfirmation_power: Does it break a required premise or relation?
+    priority_order:
+      - premise_breaking
+      - route_closing
+      - route_discriminating
+      - segment_supporting
+      - descriptive_only
+      - non_probative
+    dominance_rules:
+      - The actual data outrank the source narrative.
+      - Failure of a necessary counterfactual construct bridge physical carrier metabolic join or causal premise defeats downstream records that assume it.
+      - A strong controlled intervention can outweigh many observational associations for the exact manipulated relation.
+      - Intervention efficacy cannot be transferred automatically to etiology endogenous mechanism or construct validity.
+      - Intervention efficacy also cannot establish a closed internal mechanism without the physical and metabolic route.
+      - Independent convergence gains weight only when distinct methods close the same relation through different failure modes.
+      - Repeated use of one construct cohort dataset task instrument assay proxy intervention comparator pipeline bridge or metabolic assumption counts as one family.
+      - A synthesis inherits the admission physical-chain and bridge failures of its inputs.
+      - Small average differences with broad overlap cannot establish individual-level defect or unitary mechanism.
+      - Heterogeneous weakly predictive observations cannot be restated as causal contribution.
+      - Publication prestige peer review consensus and citation count do not alter chain contribution.
+    body_verdicts:
+      premise_rejected: A required construct or entity premise fails admission.
+      causal_claim_rejected: The exact causal proposition fails a required design data bridge or physical-chain test.
+      disconfirmed: Eligible evidence breaks the claimed route or necessary relation under stated conditions.
+      unsupported: No eligible evidence closes the requested relation.
+      bounded_support: One or more bounded relations close but the full requested relation does not.
+      supported: Independent evidence closes the exact required path and survives disconfirmation.
+      contested: Compatible eligible evidence remains in conflict after all required checks.
+    no_numeric_average: true
+
+  conflict_handling:
+    required_checks:
+      - verify_target_relation_identity
+      - separate_design_condition_scale_and_comparator_differences
+      - compare_effect_distributions_not_only_headline_direction
+      - check_independence_and_shared_pipeline
+      - inspect_measurement_and_translation_limits
+      - compare_physical_carriers_metabolic_conditions_and_open_chain_slots
+    surviving_conflict_state: contested
+    majority_vote_closes_conflict: false
+
+  output_schema:
+    bindings: list
+    evidence_families: list
+    stripped_narrative_claims: list
+    excluded_or_capped_records: list
+    strongest_admissible_support_path: list
+    strongest_disconfirmation_path: list
+    per_target_causal_assessment: map
+    per_target_physical_chain: map
+    per_target_metabolic_binding: map
+    unresolved_physical_chain_slots: map
+    body_of_evidence_verdict:
+      vocabulary_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.body_of_evidence_assessment.body_verdicts
+      value: string
+    body_of_evidence_basis: list
+    per_segment_closure:
+      vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+      values: map

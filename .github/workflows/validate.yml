@@ -1,0 +1,32 @@
+name: Validate repository
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "candidate/**"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate manifests, builds, and fixtures
+        run: python scripts/validate_repo.py
+      - name: Validate premise rejection and evidence weighting
+        run: python scripts/validate_model_policy.py
+      - name: Validate target identity reconstruction
+        run: python scripts/validate_target_identity.py
+      - name: Validate semantic and adoption conformance contracts
+        run: python scripts/validate_conformance.py
+      - name: Validate physical continuity and metabolic binding
+        run: python scripts/validate_physical_continuity.py --fixtures-only

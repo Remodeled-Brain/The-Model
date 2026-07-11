@@ -1,0 +1,311 @@
+chain_contract:
+  status: candidate
+  layer: runtime_kernel
+  purpose: Define the physical structure every compiled question, evidence binding, and answer must preserve.
+
+  physical_continuity_ref: model/kernel/physical_continuity.yaml#physical_continuity
+
+  binding_chain:
+    sequence:
+      - physics
+      - chemistry
+      - metabolically_maintained_biology
+      - behavior
+    rule: Each later layer remains generated through the preceding physical layers. No layer introduces a separate causal currency.
+
+  invariants:
+    every_explanatory_term_must_degrade_to_a_physical_path: true
+    every_biological_explanation_must_bind_through_metabolically_maintained_state: true
+    biology_has_no_separate_force_or_causal_currency: true
+    behavior_has_no_separate_force_or_causal_currency: true
+    physical_chain_may_be_shortened_but_not_broken: true
+    open_physical_or_metabolic_segments_remain_explicit: true
+    labels_may_group_but_cannot_generate: true
+    implementation_location_cannot_supply_origin_by_name: true
+    observed_difference_cannot_supply_its_missing_differentiator: true
+    proxy_cannot_supply_mechanism_without_translation: true
+    operation_and_product_remain_distinct: true
+    question_reconstruction_must_preserve_the_observation: true
+    observations_may_not_be_inferred_from_a_label_definition: true
+    downstream_evidence_cannot_rescue_a_rejected_construct: true
+    publication_volume_cannot_outweigh_failure_of_a_required_premise: true
+    causal_language_requires_causal_admission: true
+    causal_admission_is_target_relation_specific: true
+    causal_admission_does_not_imply_mechanistic_closure: true
+    intervention_status_neither_grants_nor_denies_causality: true
+    heterogeneous_poorly_predictive_work_cannot_be_rephrased_as_causal: true
+
+  construct_admission:
+    owner: model/kernel/chain_contract.yaml
+    purpose: Prevent conventional labels and faculty nouns from entering the chain as physical entities.
+    dispositions:
+      - admitted
+      - grouping_handle_only
+      - premise_rejected
+      - underspecified
+    meanings:
+      admitted: The questioned relation is specified through independently measurable variables and may enter chain construction.
+      grouping_handle_only: The term may identify an administrative sampling or descriptive grouping but supplies no causal unity.
+      premise_rejected: The question assigns entity defect source or mechanism status to a handle with no independently generated physical referent.
+      underspecified: An explicit observation exists but the variables required to construct the requested relation are absent.
+    required_tests:
+      - proposed_entity_specified_independently_of_its_label
+      - group_membership_does_not_supply_biological_unity_or_shared_route
+      - defect_or_source_relation_is_measured_rather_than_named
+      - at_least_one_observation_or_state_relation_exists_independently_of_the_handle
+    rejection_rules:
+      - If all physical content is supplied by a diagnostic taxonomic faculty spectrum or controller handle reject the premise.
+      - If a grouping label is treated as a unitary defect mechanism or object located in a named substrate reject the premise.
+      - A rejected premise stops mechanism search for the labeled entity.
+      - Preserve only observations explicitly supplied by the question or directly measured by evidence.
+      - Do not manufacture a property bundle or surrogate phenotype from a label definition.
+      - A rejected label may remain visible only as grouping or social-administrative metadata.
+    consumer_rule: Runtime and ingest consumers must reference these dispositions and may not rescue a rejected premise through retrieval.
+
+  causal_claim_admission:
+    owner: model/kernel/chain_contract.yaml
+    trigger_terms:
+      - cause
+      - caused_by
+      - defect
+      - dysfunction
+      - controls
+      - drives
+      - underlies
+      - mechanism
+      - responsible_for
+      - located_in
+      - biological_basis
+      - treats
+      - effective
+      - induces
+      - normalizes
+    dispositions:
+      - causal_admitted
+      - causal_rejected
+      - causal_unresolved
+      - not_a_causal_question
+    meanings:
+      causal_admitted: The exact target relation has an admitted construct and every design data dependency bridge and translation requirement applicable to that relation closes.
+      causal_rejected: A necessary premise counterfactual dependency data or bridge requirement fails for the exact target relation.
+      causal_unresolved: The target relation is admissible but the available evidence neither closes nor positively breaks its causal path.
+      not_a_causal_question: The source requests description or interpretation without causal attribution.
+    universal_required_tests:
+      - target_relation_is_explicit_and_measurable
+      - construct_is_admitted_independently_of_the_label
+      - temporal_order_supports_the_claimed_direction
+      - design_supports_the_claimed_counterfactual
+      - measured_effect_distribution_supports_the_claimed_scope
+      - effect_magnitude_is_practically_relevant_relative_to_overlap_variance_and_noise
+      - heterogeneity_is_bounded_by_conditions_or_generated_routes
+      - measurement_is_direct_or_required_translation_closes
+      - relevant_disconfirmation_does_not_break_a_required_premise_or_segment
+    required_tests_by_target:
+      intervention_to_outcome:
+        - manipulation_integrity
+        - valid_comparator_or_counterfactual
+        - timing_matches_the_manipulated_relation
+        - response_distribution_is_large_consistent_and_specific_enough_for_the_claim
+        - durability_matches_the_claim
+        - attrition_missingness_crossover_and_adverse_outcomes_are_bounded
+        - replication_or_internal_strength_is_proportionate_to_claim_scope
+      observational_causal_relation:
+        - alternative_routes_and_confounding_paths_are_affirmatively_tested
+        - negative_controls_or_equivalent_failure_probes_are_available
+        - relation_is_stable_across_relevant_conditions_and_operationalizations
+        - independent_evidence_families_recur
+        - prediction_is_required_when_the_proposed_relation_entails_prediction
+      endogenous_dependency_or_mechanism:
+        - intervention_or_direct_dependency_evidence_bears_on_the_required_route
+        - route_position_and_direction_are_closed
+        - competing_routes_are_discriminated
+        - physical_carrier_and_state_transition_are_closed
+        - metabolic_binding_is_closed_at_biological_scope
+        - route_specific_predictions_recur_when_route_identity_entails_distinct_predictions
+      etiology_or_origin:
+        - source_relation_precedes_the_generated_outcome
+        - endogenous_route_from_source_to_outcome_closes
+        - intervention_response_is_not_used_as_origin_without_the_additional_route
+      cross_scale_translation:
+        - carried_variable_is_identified
+        - intermediate_dependencies_close
+        - source_and_target_conditions_are_compatible
+        - biological_scale_binds_through_metabolically_maintained_state
+    prediction_rule: >
+      Prediction is mandatory when the claimed causal relation entails future-state prediction route identity
+      generalization or individual assignment. A decisive controlled intervention can close the exact manipulated
+      relation through direct counterfactual evidence without an unrelated prediction requirement.
+    scope_rule: >
+      Causal admission attaches only to the exact target relation. Intervention-to-outcome causality does not
+      automatically establish etiology endogenous mechanism construct validity cross-scale explanation or a closed
+      internal physical route.
+    physical_chain_rule: >
+      Every causal answer remains on one continuous physical surface. At biological or behavioral scope the answer
+      identifies the physically carried change and its relation to metabolically maintained state, or marks the
+      missing physical and metabolic segments explicitly. Causal admission for an exact intervention effect may
+      coexist with partial mechanistic closure. Mechanism language may not.
+    hard_failure_rules:
+      - A rejected construct forces causal_rejected for claims that require it.
+      - An invalid or missing counterfactual rejects the claimed intervention effect.
+      - A narrative stronger than the measured effect rejects the excess causal scope.
+      - Highly heterogeneous effects without route-bounded conditions reject a unitary claim.
+      - Poor out-of-sample prediction rejects a relation when that relation should predict the target.
+      - Postdictive separation cannot satisfy prospective direction or prediction.
+      - Small overlapping average differences cannot establish a defect dysfunction or individual causal state.
+      - A named site cannot become a defect source or controller from localization activity or perturbability alone.
+      - A treatment target cannot become etiology or endogenous mechanism without separate route closure.
+      - Metabolism energy activation signaling processing regulation information and network change cannot supply a missing operation by name.
+      - A mechanism claim with an open physical carrier metabolic binding or organism-state transition fails.
+      - Any failed necessary test defeats downstream records that presuppose the failed relation.
+    language_rule: >
+      Causal verbs and causal-feeling paraphrases are allowed only for a target relation with causal_admitted.
+      Rejected targets cannot be restated as contributions roles bases dysfunctions deficits mechanisms mediation
+      effectiveness normalization or partial causes. Biological causal prose must also expose its physical and
+      metabolic binding or its unresolved slots.
+    answer_rule: >
+      State the target-specific causal verdict before descriptive context. Preserve any narrower admitted observation
+      or intervention relation without transferring it to broader targets. For biological or behavioral targets,
+      follow with the shortest supported physical chain and identify any open metabolic route.
+    consumer_rule: Runtime and ingest consumers must reference these dispositions and keep causal status relation-specific.
+
+  chain_segment:
+    required_fields:
+      - source_substrate
+      - operation
+      - carried_change
+      - target_substrate_or_state
+      - direction_or_dependency
+      - timing
+      - constraints
+      - measured_scale
+      - evidence_status
+      - unresolved_route_slots
+    biological_scope_fields:
+      - physical_or_chemical_input
+      - energetic_or_material_carrier
+      - metabolic_state_change
+      - biological_operation
+      - organism_state_or_behavior
+    join_requirements:
+      - upstream_output_matches_downstream_input
+      - temporal_order_matches_claimed_direction
+      - scale_crossing_has_an_explicit_carrier_or_dependency
+      - biological_scale_crossing_has_explicit_metabolic_binding_or_open_slot
+      - constraints_remain_compatible_across_the_join
+      - no_author_label_supplies_the_missing_operation
+    join_failure: open_chain_slot
+
+  operation_grammar:
+    purpose: Describe what a physical route does to reachable organism states without inventing a controller.
+    operations:
+      make_available: Add a reachable transition or route under stated constraints.
+      weight: Alter the relative tendency of already available transitions.
+      stabilize: Keep a state or route within a viable range over time.
+      suppress_or_block: Reduce or prevent a transition from becoming executable.
+      release: Remove a constraint that prevented an available transition from executing.
+      maintain: Continue the physical conditions required for a state or route.
+      switch: Change which available route is currently stabilized or executable.
+      differentiate: Add route state or interface distinctions through development or learning.
+      redeploy: Reuse an existing viable operation in a later-added route or interface.
+    guard: An operation must name a physical change and its carrier not an internal agent or an unexpanded metabolic noun.
+
+  organism_state_contract:
+    definition: >
+      A behavior-level explanation identifies a reachable or stabilizable organism-state transition under constraint
+      and the continuous physical route that changes its availability weighting stabilization blocking release
+      maintenance switching differentiation or redeployment. At biological scope that route binds through
+      metabolically maintained state.
+    required_questions:
+      - What organism-state relation is changed or maintained?
+      - Which physical operation changes that relation?
+      - What substrate carrier and dependency path carry the change?
+      - What energetic or material condition changes metabolically maintained state?
+      - Which constraints define viability and reachability?
+      - Which observations distinguish source route implementation and readout?
+
+  route_roles:
+    source: The dependency whose change initiates the required segment under the tested conditions.
+    route: The continuous physical path carrying the change.
+    implementation: A substrate on which the route is expressed or can be perturbed.
+    readout: A measured consequence that may remain downstream or proxy-limited.
+    rule: Role assignment requires timing dependency carrier and state-transition evidence. Location and perturbability alone are insufficient.
+
+  scale_translation:
+    required_fields:
+      - source_scale
+      - target_scale
+      - carried_variable
+      - intermediate_dependencies
+      - temporal_order
+      - constraints
+      - translation_limit
+    closure_rule: >
+      A scale transition closes only when a demonstrated physical dependency carries the measured change from the
+      source scale into the target relation required by the question. Translation into biological or behavioral scope
+      must pass through metabolically maintained state or identify that join as open.
+    shared_vocabulary_closes_translation: false
+
+  route_discrimination:
+    required_when_multiple_routes_survive:
+      - competing_route_predictions
+      - discriminating_measurement_or_perturbation
+      - expected_temporal_difference
+      - compensation_or_redundancy_check
+    rule: Retain alternative routes until an observation distinguishes their generated consequences.
+
+  closure_vocabulary:
+    owner: model/kernel/chain_contract.yaml
+    states:
+      - closed
+      - partial
+      - descriptive_only
+      - source_scale_only
+      - proxy_limited
+      - label_dependent
+      - contested
+      - unresolved
+      - contradicted
+    meanings:
+      closed: Every segment and join required for the stated conclusion is closed under the stated conditions.
+      partial: A physical route is supported but at least one required segment or join remains open.
+      descriptive_only: The evidence closes a descriptive claim without closing a generating route.
+      source_scale_only: The measured claim is supported at its source scale while translation to the requested scale remains open.
+      proxy_limited: A measured proxy or correlate is supported while translation to the claimed mechanism remains open.
+      label_dependent: The surviving observation depends on pre-labeled groups and does not independently generate the grouping distinction.
+      contested: Compatible evidence binds to the same relation under the same conditions and remains in unresolved conflict after review.
+      unresolved: Available evidence does not assign another closure state to the required segment join or target relation.
+      contradicted: Evidence breaks the asserted segment join or target relation under the stated conditions.
+    missing_segment_rule: Missing segments use unresolved and remain listed separately.
+    contested_rule: Contested is assigned only after relation condition scale independence measurement and translation checks.
+    consumer_rule: Runtime and ingest consumers must reference this vocabulary and may not define additional closure states.
+
+  confidence_propagation:
+    rule: >
+      Confidence attaches to the exact target relation and chain path required for a conclusion. It cannot exceed the
+      weakest required data counterfactual bridge physical segment metabolic binding or translation step.
+    dimensions:
+      - compilation
+      - evidence_admission
+      - causal_target
+      - segment_closure
+      - metabolic_binding
+      - scale_translation
+      - answer_translation
+    global_single_score: forbidden
+
+  guards:
+    - no_magic_noun_as_operator
+    - no_metabolism_as_magic_operator
+    - no_action_at_a_distance_between_components
+    - no_definition_sorting_in_place_of_generation
+    - no_region_as_source_without_dependency_and_timing
+    - no_conservation_as_weight_without_operation_and_route
+    - no_statistical_significance_as_practical_significance
+    - no_effectiveness_without_target_comparator_distribution_and_durability
+    - no_named_process_without_direct_measurement_and_dependency
+    - no_intervention_scope_transfer
+    - no_confidence_transfer_from_unrelated_closed_relations
+    - no_mechanism_search_for_a_rejected_construct
+    - no_evidence_laundry_list_to_rescue_folklore
+    - no_causal_restating_of_heterogeneous_poorly_predictive_work
+    - no_soft_causal_language_after_causal_rejection

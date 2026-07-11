@@ -1,0 +1,180 @@
+{
+  "schema_version": "v3",
+  "status": "candidate",
+  "purpose": "Shared regressions for data-first admission, design-specific causal scope, and inferential-bridge auditing.",
+  "fixtures": [
+    {
+      "id": "observational-defaults-noncausal",
+      "source_pattern": "A purely observational literature reports recurring associations and uses adjustment, large samples, or disciplinary consensus to describe the relation as causal.",
+      "required": [
+        "classify the design as observational",
+        "begin at descriptive_only or a more restrictive construct proxy or scale state",
+        "preserve the measured association and effect distribution at their exact scope",
+        "require affirmative closure of temporal direction alternative routes practical magnitude condition stability negative controls independent replication and every claimed bridge before causal promotion"
+      ],
+      "forbidden": [
+        "treat adjustment as a measured counterfactual",
+        "promote recurrence or sample size into causal closure",
+        "use causal vocabulary because the field commonly does so"
+      ]
+    },
+    {
+      "id": "decisive-intervention-can-close-manipulated-relation",
+      "source_pattern": "A controlled intervention manipulates a specified variable and produces a large, highly consistent, specific, durable outcome with valid comparison, negligible attrition, clear timing, and independent replication.",
+      "required": [
+        "classify the design as interventional",
+        "evaluate manipulation integrity comparator effect distribution heterogeneity specificity durability attrition and disconfirmation",
+        "permit causal_admitted for the exact intervention_to_outcome relation when every required test closes",
+        "treat the strength and consistency of the actual data as load-bearing"
+      ],
+      "forbidden": [
+        "reject causal status merely because the intervention is called a treatment",
+        "cap a decisive manipulated relation at descriptive_only",
+        "transfer the admitted intervention effect automatically to etiology endogenous mechanism or construct validity"
+      ]
+    },
+    {
+      "id": "intervention-scope-does-not-transfer",
+      "source_pattern": "An intervention changes a measured outcome, and the source infers that the intervention target is the endogenous cause, full mechanism, or biological basis of the untreated condition.",
+      "required": [
+        "evaluate intervention_to_outcome causality separately from etiology endogenous_dependency and mechanism_or_route",
+        "bind only the target relation whose comparator data and bridges close",
+        "require separate dependency and translation bridges for endogenous mechanism or origin"
+      ],
+      "forbidden": [
+        "infer endogenous cause from treatment target",
+        "infer construct validity from treatment response",
+        "describe an admitted intervention effect as proof of the full causal chain"
+      ]
+    },
+    {
+      "id": "narrative-effective-exceeds-data",
+      "source_pattern": "A source calls an intervention effective although the underlying result is a small average change, broad response overlap, weak comparator, high attrition, short follow-up, or substantial adverse and null outcomes.",
+      "required": [
+        "extract the full response distribution comparator magnitude uncertainty attrition durability and adverse outcomes",
+        "set the data_supported_scope from those fields rather than the word effective",
+        "strip treatment effectiveness language when practical and counterfactual requirements fail"
+      ],
+      "forbidden": [
+        "equate statistical significance with effectiveness",
+        "hide heterogeneous nonresponse behind a group mean",
+        "repeat the abstract conclusion when the data support only a narrow or uncertain change"
+      ]
+    },
+    {
+      "id": "named-process-claim-needs-direct-data",
+      "source_pattern": "A source reports a post-intervention imaging, assay, score, or biomarker change and concludes that the intervention induced a broad named biological process.",
+      "required": [
+        "preserve the exact measured substrate variable magnitude timing and comparator",
+        "classify proxy or source-scale distance before assigning process language",
+        "require direct measurement persistence specificity and a closed dependency path for the named process claim"
+      ],
+      "forbidden": [
+        "rename any pre-post biological measurement as the named process",
+        "treat an imaging or biomarker change as mechanism by default",
+        "infer functional improvement from biological-sounding language"
+      ]
+    },
+    {
+      "id": "construct-indexed-defaults-label-dependent",
+      "source_pattern": "A literature selects participants by a diagnosis or theoretical construct, measures conventional tasks or biomarkers, and interprets recurring group differences as evidence about the construct.",
+      "required": [
+        "assign presumptive_class construct_indexed before local checks",
+        "assign presumed_closure_state label_dependent",
+        "require affirmative construct escape before any stronger state",
+        "preserve label_dependent when escape evidence is missing or partial"
+      ],
+      "forbidden": [
+        "start the record neutral",
+        "upgrade because one local guard passes",
+        "treat recurring construct-internal findings as independent convergence",
+        "use publication count or meta-analysis to escape label dependence"
+      ]
+    },
+    {
+      "id": "proxy-requires-translation",
+      "source_pattern": "A biomarker, imaging signal, classifier score, assay output, surrogate endpoint, or downstream readout correlates with an outcome and is described as mechanistic.",
+      "required": [
+        "assign presumptive_class proxy_or_surrogate",
+        "assign presumed_closure_state proxy_limited",
+        "preserve the measured proxy relation at its exact scope",
+        "require a closed physical translation path or distinct direct-dependency evidence for mechanism"
+      ],
+      "forbidden": [
+        "promote the proxy through repeated correlation",
+        "treat translation language as bridge closure",
+        "bind the proxy directly to mechanism or cross-scale causality"
+      ]
+    },
+    {
+      "id": "author-conclusion-is-assertion",
+      "source_pattern": "A paper measures a bounded relation and concludes that the result causes, treats, normalizes, underlies, or induces a broader target.",
+      "required": [
+        "set the source conclusion status to unadmitted_assertion",
+        "preserve only the direct measurement at its measured scope",
+        "create a separate bridge for every increase in causal target or explanatory scale",
+        "assign zero causal weight until every required bridge closes"
+      ],
+      "forbidden": [
+        "bind the abstract or discussion conclusion directly",
+        "treat hedged causal wording as descriptive neutrality",
+        "repeat the author's causal verb in the answer"
+      ]
+    },
+    {
+      "id": "consensus-repeats-one-bridge",
+      "source_pattern": "Many papers and reviews repeat the same construct assignment or causal bridge using shared assumptions, instruments, outcomes, and analysis conventions.",
+      "required": [
+        "collapse the repeated bridge into one shared assumption family",
+        "count no independent convergence unless distinct methods independently close the same bridge",
+        "retain direct observations separately from the repeated interpretation"
+      ],
+      "forbidden": [
+        "treat consensus as evidence",
+        "treat publication count as bridge closure",
+        "call recurring terminology convergent mechanism evidence"
+      ]
+    },
+    {
+      "id": "meta-analysis-inherits-input-failure",
+      "source_pattern": "A synthesis pools studies that share construct dependence, weak comparators, broad overlap, attrition, task dependence, proxy status, or unsupported causal bridges.",
+      "required": [
+        "inherit every construct design measurement comparator missing-data and bridge failure from the inputs",
+        "preserve any pooled estimate only at the admissible relation and scope",
+        "block pooling from repairing invalid inputs"
+      ],
+      "forbidden": [
+        "promote the pooled result to causal support",
+        "treat narrower confidence intervals as mechanism closure",
+        "use review status as admission"
+      ]
+    },
+    {
+      "id": "prediction-failure-breaks-causal-story",
+      "source_pattern": "A proposed unitary causal relation is accompanied by heterogeneous effects and poor out-of-sample prediction despite claims that the literature is complex or multifactorial.",
+      "required": [
+        "treat poor prediction as positive evidence against the proposed unitary relation when prediction is entailed",
+        "treat unbounded heterogeneity as failure of the unitary route",
+        "assign causal_rejected rather than preserving the story under generic uncertainty"
+      ],
+      "forbidden": [
+        "restate weak prediction as partial causal contribution",
+        "describe the evidence as mixed after the failure path is established"
+      ]
+    },
+    {
+      "id": "sparse-observation-over-rich-story",
+      "source_pattern": "After unsupported constructs and bridges are removed, only a narrow assay, task, intervention, or group-level observation survives.",
+      "required": [
+        "return the sparse surviving observation at its exact scope",
+        "list the data requirements and bridges that blocked stronger binding",
+        "withhold unsupported causal mechanism effectiveness defect dysfunction and biological-process language"
+      ],
+      "forbidden": [
+        "reconstruct a richer causal narrative from surrounding literature",
+        "treat loss of the story as loss of the observation",
+        "fill missing bridges with disciplinary convention"
+      ]
+    }
+  ]
+}

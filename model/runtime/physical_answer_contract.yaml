@@ -1,0 +1,80 @@
+physical_answer_contract:
+  status: candidate
+  layer: primary_runtime
+  purpose: >
+    Make universal physical continuity and biological metabolic binding visible in answers without
+    converting either into boilerplate or a replacement magic noun.
+
+  physical_continuity_ref: model/kernel/physical_continuity.yaml#physical_continuity
+  chain_contract_ref: model/kernel/chain_contract.yaml#chain_contract
+
+  planning_sequence:
+    - classify_the_requested_explanatory_scope
+    - identify_the_physical_perturbation_or_constraint
+    - identify_the_carrier_and_chemical_or_energetic_change
+    - bind_biological_scope_through_metabolically_maintained_state
+    - identify_the_biological_operation
+    - identify_the_organism_state_transition_or_behavior
+    - mark_every_unresolved_segment_or_join
+    - generate_the_shortest_sufficient_chain
+    - render_only_claims_supported_by_that_chain
+
+  causal_and_mechanistic_separation:
+    rule: >
+      Counterfactual evidence may close an exact causal relation while the internal physical route remains
+      partial. Preserve the causal result and expose the unresolved metabolic route. Mechanistic language
+      requires the route itself to close.
+    exact_intervention_effect_with_partial_route: allowed
+    mechanism_claim_with_partial_route: forbidden
+
+  biological_answer_requirements:
+    required_record_fields:
+      - explanatory_scope
+      - physical_chain
+      - physical_chain.status
+      - physical_chain.segments
+      - physical_chain.unresolved_slots
+      - physical_chain.metabolic_binding
+    required_prose_roles:
+      - direct_answer
+      - physical_chain
+    metabolic_chain_claim_rule: >
+      A biological or behavioral answer includes a physical-chain claim that names the metabolically
+      maintained state relation or identifies it as an unresolved slot. The claim cannot merely say that
+      metabolism, energy, activation, signaling, or a named region caused the result.
+
+  answer_shape:
+    - state_the_direct_target_specific_answer
+    - describe_the_shortest_supported_physical_chain
+    - identify_the_metabolic_binding_and_biological_operation
+    - state_open_segments_without_filling_them
+    - distinguish_exact_causal_effect_from_mechanistic_or_etiologic_scope
+
+  decision_record_extension:
+    explanatory_scope_values:
+      - physical
+      - chemical
+      - biological
+      - behavioral
+      - cross_scale
+      - descriptive_noncausal
+    physical_chain_status_values:
+      - closed
+      - partial
+      - not_required
+    claim_role_values:
+      - direct_answer
+      - physical_chain
+      - scope_limit
+      - descriptive_context
+
+  forbidden_patterns:
+    - component_A_causes_component_B_without_a_carrier_or_state_transition
+    - region_activity_presented_as_behavioral_force
+    - metabolism_caused_it
+    - energy_did_the_work
+    - signaling_produced_the_effect_without_specified_signal_carrier_target_and_state_change
+    - activation_presented_as_an_operation
+    - named_process_presented_as_a_physical_segment
+    - exact_intervention_causality_rewritten_as_closed_endogenous_mechanism
+    - open_metabolic_route_hidden_from_the_answer

@@ -1,0 +1,1 @@
+- **[candidate]** Added canonical causal decision records, deterministic claim-to-answer rendering, generic and neuroscience mutation fixtures, positive and negative validator controls, a pluggable provider runner, CI validation, and a strict adoption gate requiring three fresh zero-failure runs per critical variant. (chatgpt, 2026-07-11)
