@@ -1,0 +1,10 @@
+{
+  "expected_error_code": "METABOLISM_AS_MAGIC_OPERATOR",
+  "base": "../../selftests/pass/decisive_intervention.json",
+  "mutations": [
+    {
+      "path": "decision_record.claims.1.text",
+      "value": "Metabolism caused outcome Y."
+    }
+  ]
+}
