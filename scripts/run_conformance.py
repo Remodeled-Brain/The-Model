@@ -68,7 +68,7 @@ def main()->int:
                   "runtime":{"manifest":RUNTIME_MANIFEST.relative_to(ROOT).as_posix(),"sha256":runtime_hash,"text":runtime},
                   "decision_record_schema":schema,
                   "fixture":{"fixture_set":fixture_set,"fixture_id":fixture["id"],"mutation_type":fixture["mutation_type"],"variant_id":variant["id"],"input":variant["input"]},
-                  "instruction":"Return only a decision_record JSON object. Extract actual data before narrative, separate every target relation, keep every explanation on one continuous physical chain, bind biological and behavioral claims through metabolically maintained state, mark unmeasured physical or metabolic segments unresolved rather than inventing them, and place final wording only in structured claims."
+                  "instruction":"Return only a decision_record JSON object. Run construct compilation before evidence review: reconstruct familiar behavioral, diagnostic, faculty, and ecological labels into exact measured events, timings, conditions, and measurement operations, and keep the broader construct as a separate target. Extract actual data before narrative, separate every target relation, keep every explanation on one continuous physical chain, bind biological and behavioral claims through metabolically maintained state, mark unmeasured physical or metabolic segments unresolved rather than inventing them, and place final wording only in structured claims."
                 }
                 record=call_provider(command,payload)
                 result={
