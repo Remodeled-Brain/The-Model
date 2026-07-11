@@ -13,7 +13,7 @@ Paper ingest is the adaptive evidence-maintenance subsystem under that runtime. 
 | Path | Role |
 |------|------|
 | `model/00_purpose_and_scope.md` | Candidate purpose and operating boundary |
-| `model/kernel/` | Shared physical-chain invariants |
+| `model/kernel/` | Shared physical-chain invariants and canonical closure vocabulary |
 | `model/runtime/` | Question compiler, answerability planner, evidence binder, answer contract, and machine-readable conformance contracts |
 | `model/ingest/` | Adaptive evidence-maintenance architecture, gates, routing, records, and fixtures |
 | `model/cartridges/` | Domain-specific handle instances and translation vocabulary |
@@ -42,13 +42,13 @@ python scripts/build_master_prompt.py model/manifests/ingest.json
 
 Generated artifacts are written under `model/dist/` and are not committed.
 
-Validate manifest authority, cartridge inclusion, capability reach, fixture structure, stale references, and generated outputs:
+Validate manifest authority, shared closure vocabulary, ingest-to-kernel crosswalks, cartridge inclusion, capability reach, fixture structure, stale references, and generated outputs:
 
 ```bash
 python scripts/validate_repo.py
 ```
 
-The machine-readable fixtures are executable as structural contracts in CI. Scientific semantic conformance still requires running a provider against them and recording the result under `conformance/results/`.
+CI validates repository structure, load graphs, vocabulary alignment, fixture shape, and generated-artifact integrity. No provider execution harness exists in this PR. Scientific semantic behavior is therefore not tested by CI. Provider runs must execute the fixture questions separately and record their results under `conformance/results/`.
 
 ## Candidate status
 
