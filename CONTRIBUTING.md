@@ -13,6 +13,8 @@ This file governs work in the repository across providers. Read it before editin
 
 Use `governance/reviewer_protocol.md`. Test layer fit, contradiction, reification, operation-product fusion, chain generation, redundancy, calibration, coupled-file drift, and failure modes. Return a concrete verdict and the smallest safe patch.
 
+Runtime or evidence-admission architecture also requires semantic conformance. Structural CI validates the harness only. Before adoption, run the generic and active-cartridge fixture sets through the provider and validate the fresh result bundles with `scripts/validate_adoption_conformance.py`. The required run count, freshness hashes, positive controls, and zero-failure rule live in `conformance/required_runs.json`.
+
 ## 3. Repository layers
 
 - Primary purpose and shared chain kernel → `model/00_purpose_and_scope.md` and `model/kernel/`.
@@ -22,7 +24,7 @@ Use `governance/reviewer_protocol.md`. Test layer fit, contradiction, reificatio
 - Runtime load graphs → `model/manifests/`.
 - Review and adoption rules → `governance/`.
 - Provider-specific adapters and incompatibilities → `providers/<provider>/`.
-- Standardized conformance results → `conformance/results/`.
+- Standardized conformance contracts and results → `conformance/`.
 - Durable architecture decisions → `decisions/`.
 - Frozen shipped bundles → `packets/`.
 
@@ -45,6 +47,15 @@ Run repository validation before proposing merge:
 
 ```bash
 python scripts/validate_repo.py
+python scripts/validate_model_policy.py
+python scripts/validate_conformance.py
+python scripts/validate_adoption_conformance.py --policy-only
+```
+
+The full adoption check intentionally fails without fresh complete provider results:
+
+```bash
+python scripts/validate_adoption_conformance.py
 ```
 
 ## 5. Log each change
