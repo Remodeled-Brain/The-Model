@@ -2,11 +2,28 @@ evidence_binding_contract:
   status: candidate
   layer: primary_runtime
   purpose: >
-    Bind reviewed corpus records to the exact chain segments required by an answerability plan without
-    allowing paper framing, recency, volume, model agreement, or shared vocabulary to substitute for closure.
+    Bind reviewed corpus records to exact chain segments and evaluate the body of evidence without allowing
+    rejected constructs, paper framing, publication volume, recency, model agreement, or shared vocabulary
+    to substitute for physical closure.
 
   closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+  construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
   ingest_crosswalk_ref: model/ingest/failure_routing.yaml#ingest_failure_routing.closure_state_crosswalk
+
+  required_inputs:
+    - construct_disposition
+    - rejected_premises
+    - answerability_plan
+    - reviewed_corpus
+
+  premise_boundary:
+    rule: >
+      When construct_disposition is premise_rejected, records that presuppose the rejected label as a biological
+      entity cannot bind as support for its mechanism, defect, source, or localization. Retrieval may test the
+      premise, bind disconfirmation, or provide explicitly requested descriptive context. It may not rescue the
+      premise by assembling nearby associations.
+    rejected_construct_support_role: forbidden
+    downstream_volume_can_reverse_rejection: false
 
   corpus_modes:
     frozen:
@@ -27,6 +44,16 @@ evidence_binding_contract:
     - constraint
     - missing_route_slot
     - disconfirmation_target
+    - construct_disposition
+    - rejected_premise
+
+  evidence_role_classes:
+    premise_breaking: Evidence that invalidates a required entity, unity, defect, direction, or translation premise.
+    route_closing: Evidence that directly closes a required dependency segment or join under stated conditions.
+    route_discriminating: Evidence that distinguishes surviving routes through different predicted consequences.
+    segment_supporting: Evidence that supports one bounded segment without closing the full route.
+    descriptive_only: Evidence that closes only a measured descriptive relation.
+    non_probative: Evidence that cannot bear on the requested conclusion after construct, scale, timing, magnitude, or independence checks.
 
   binding_unit:
     definition: One reviewed evidence record bound to one or more named chain segments.
@@ -34,25 +61,75 @@ evidence_binding_contract:
       - provenance
       - supported_segment
       - support_role
+      - evidence_role_class
       - measured_scale
       - translation_limit
       - closure_state
       - recency_status
       - independence_status
+      - evidence_family_id
       - applicable_conditions
+      - non_probative_for
     closure_state_rule: >
       The closure state must be a kernel state. Ingest records enter through ingest_crosswalk_ref;
       binder-derived contested status is assigned only through conflict_handling.
 
   binding_rules:
     - Support attaches only to the segment and conditions actually measured.
+    - Evidence depending on a rejected construct cannot support that construct's biological unity or mechanism.
     - Proxy evidence requires translation closure before binding to mechanism.
     - Implementation-site evidence requires timing and dependency closure before binding to source.
     - Scale crossing requires an explicit carried variable and intermediate dependency path.
     - A route-closing intervention may bind more strongly than a descriptive association only for the segment it tests.
-    - Disconfirming evidence binds to the exact segment or join it breaks.
+    - Disconfirming or premise-breaking evidence binds to the exact premise, segment, or join it breaks.
     - Unresolved evidence remains visible without granting closure.
     - Correlated reports remain grouped and cannot create independent weight by count.
+
+  body_of_evidence_assessment:
+    unit_of_counting: independent_evidence_family
+    family_grouping_keys:
+      - cohort
+      - dataset
+      - pipeline
+      - assay
+      - task
+      - diagnostic_instrument
+      - laboratory_lineage
+      - model_lineage
+    required_dimensions:
+      construct_admission: Does the evidence require the questioned entity to exist before measurement?
+      claim_directness: Does it measure the exact premise, segment, join, or outcome claimed?
+      measurement_validity: Is the measured variable physically interpretable under the stated conditions?
+      causal_leverage: Does timing, perturbation, dependency position, or prospective design bear on direction?
+      scale_translation: Does a demonstrated dependency carry the result to the requested scale?
+      practical_magnitude: Is the effect large relative to overlap, variance, noise, range, and functional threshold?
+      independence: Does the record add a distinct failure mode rather than repeat a family?
+      route_discrimination: Does it separate candidate routes rather than merely recur under one framing?
+      disconfirmation_power: Does it break a required premise or necessary segment?
+    priority_order:
+      - premise_breaking
+      - route_closing
+      - route_discriminating
+      - segment_supporting
+      - descriptive_only
+      - non_probative
+    dominance_rules:
+      - Failure of a necessary construct or chain premise defeats any number of downstream records that assume it.
+      - Direct route-closing or route-breaking evidence outranks association for the same claimed relation.
+      - Independent convergence gains weight only when distinct methods close the same relation through different failure modes.
+      - Repeated use of one cohort, dataset, task, diagnostic instrument, assay, or pipeline counts as one evidence family.
+      - Small group-average differences with broad overlap cannot establish a unitary defect, entity, or individual-level state.
+      - Postdictive separation cannot establish causal origin, prediction, or generative route.
+      - Label-dependent, proxy-limited, source-scale-only, or practically trivial results cannot accumulate into mechanism by volume.
+      - Publication prestige and citation count do not alter chain contribution.
+    body_verdicts:
+      premise_rejected: A required construct or entity premise fails admission.
+      disconfirmed: Admissible evidence breaks the claimed route or necessary segment under the stated conditions.
+      unsupported: No admissible evidence closes the requested relation.
+      bounded_support: One or more bounded segments close, but the full requested relation does not.
+      supported: Independent evidence closes the required path and survives relevant disconfirmation.
+      contested: Compatible admissible evidence remains in conflict after all required checks.
+    no_numeric_average: true
 
   recency_policy:
     rule: >
@@ -94,6 +171,14 @@ evidence_binding_contract:
 
   output_schema:
     bindings: list
+    evidence_families: list
+    excluded_or_capped_records: list
+    strongest_admissible_support_path: list
+    strongest_disconfirmation_path: list
+    body_of_evidence_verdict:
+      vocabulary_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.body_of_evidence_assessment.body_verdicts
+      value: string
+    body_of_evidence_basis: list
     per_segment_closure:
       vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
       values: map
