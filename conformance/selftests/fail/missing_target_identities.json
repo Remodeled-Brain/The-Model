@@ -1,0 +1,10 @@
+{
+  "expected_error_code": "TARGET_IDENTITIES_REQUIRED",
+  "base": "../pass/decisive_intervention.json",
+  "mutations": [
+    {
+      "path": "decision_record.target_identities",
+      "value": "__DELETE__"
+    }
+  ]
+}
