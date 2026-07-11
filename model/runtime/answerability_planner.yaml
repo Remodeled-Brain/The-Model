@@ -2,11 +2,15 @@ answerability_planner:
   status: candidate
   layer: primary_runtime
   purpose: >
-    Determine what empirical work is required to answer each compiled question, which chain segments
-    are available, and which narrower conclusions remain answerable when the full route is open.
+    Determine what empirical work is required for admitted questions, which chain segments are available,
+    and when the source premise must be rejected without opening a mechanism search.
+
+  construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
 
   input_required:
     - question_type
+    - construct_disposition
+    - rejected_premises
     - answer_target
     - compiled_questions
     - candidate_dependency_paths
@@ -16,6 +20,33 @@ answerability_planner:
     - state_transition
     - required_scale_translations
     - required_chain_slots
+
+  admission_routing:
+    premise_rejected:
+      plan:
+        - state_the_premise_failure
+        - identify_the_handle_that_supplied_false_entity_or_defect_status
+        - prevent_entity_level_mechanism_retrieval
+        - preserve_only_explicit_observations_if_any
+      evidence_allowed:
+        - evidence_testing_construct_coherence
+        - evidence_disconfirming_the_entity_or_defect_premise
+        - descriptive_context_explicitly_requested_by_the_user
+      evidence_forbidden:
+        - papers_that_presuppose_the_rejected_entity_as_support_for_its_mechanism
+        - literature_search_for_a_more_charitable_surrogate_question
+      output_status: premise_rejected
+    grouping_handle_only:
+      plan:
+        - retain_label_only_as_grouping_metadata
+        - require_independently_measured_variables_for_any_physical_question
+    admitted:
+      plan:
+        - continue_to_chain_planning
+    underspecified:
+      plan:
+        - name_the_missing_measurement_or_relation
+        - do_not_fill_it_from_conventional_definitions
 
   planning_dimensions:
     measurement:
@@ -70,9 +101,13 @@ answerability_planner:
       - source_and_target_conditions_are_compatible
     route_discrimination:
       - candidate_routes_generate_distinct_predictions
-      - a discriminating_observation_favors_or_breaks_a_route
+      - a_discriminating_observation_favors_or_breaks_a_route
 
   output_schema:
+    construct_disposition:
+      vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+      value: string
+    premise_rejection_basis: list
     per_compiled_question:
       - required_measurements
       - required_perturbations
@@ -86,11 +121,13 @@ answerability_planner:
       - incompatible_evidence
       - narrower_answerable_targets
     answerability_status:
-      state: [answerable, partially_answerable, descriptive_only, currently_unanswerable]
+      state: [premise_rejected, answerable, partially_answerable, descriptive_only, currently_unanswerable]
       basis: list
 
   rules:
-    - A missing route produces an explicit research requirement.
+    - Premise rejection precedes and terminates mechanism planning for the rejected entity.
+    - A rejected diagnostic construct cannot be rescued by substituting traits, deficits, or region associations not stated in the question.
+    - A missing route produces an explicit research requirement only for an admitted observation.
     - Partial closure permits conclusions that use only the closed path.
     - Missing segments outside a narrower conclusion do not cap that conclusion.
     - Descriptive evidence may fully answer a descriptive question.
