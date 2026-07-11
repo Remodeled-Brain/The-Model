@@ -10,6 +10,8 @@ import validate_repo as vr
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 MODEL = ROOT / "model"
 KERNEL = MODEL / "kernel" / "chain_contract.yaml"
+EVIDENCE_ADMISSION = MODEL / "kernel" / "evidence_admission.yaml"
+EVIDENCE_FIXTURES = MODEL / "kernel" / "evidence_admission_fixtures.json"
 COMPILER = MODEL / "runtime" / "question_compiler.yaml"
 PLANNER = MODEL / "runtime" / "answerability_planner.yaml"
 BINDER = MODEL / "runtime" / "evidence_binding_contract.yaml"
@@ -19,9 +21,12 @@ RECORD_SCHEMA = MODEL / "ingest" / "record_schema.yaml"
 RUNTIME_FIXTURES = MODEL / "runtime" / "fixtures.json"
 INGEST_FIXTURES = MODEL / "ingest" / "fixtures.json"
 CARTRIDGE = MODEL / "cartridges" / "neuroscience.yaml"
+RUNTIME_MANIFEST = MODEL / "manifests" / "runtime.json"
+INGEST_MANIFEST = MODEL / "manifests" / "ingest.json"
 
 CONSTRUCT_REF = "model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions"
 CAUSAL_REF = "model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions"
+EVIDENCE_REF = "model/kernel/evidence_admission.yaml#evidence_admission"
 EVIDENCE_ROLE_REF = "model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.evidence_role_classes"
 BODY_VERDICT_REF = "model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.body_of_evidence_assessment.body_verdicts"
 
@@ -30,6 +35,20 @@ def require_text(path: pathlib.Path, fragments: list[str]) -> None:
     text = path.read_text(encoding="utf-8")
     for fragment in fragments:
         vr.require(fragment in text, f"{path.relative_to(ROOT)} missing policy fragment: {fragment}")
+
+
+def fixture_ids(path: pathlib.Path) -> set[str]:
+    data = vr.load_json(path)
+    fixtures = data.get("fixtures", [])
+    return {item.get("id") for item in fixtures if isinstance(item, dict)}
+
+
+def fixture_by_id(path: pathlib.Path, fixture_id: str) -> dict:
+    data = vr.load_json(path)
+    for item in data.get("fixtures", []):
+        if isinstance(item, dict) and item.get("id") == fixture_id:
+            return item
+    raise vr.ValidationError(f"fixture missing: {fixture_id}")
 
 
 def validate_construct_admission() -> None:
@@ -108,13 +127,75 @@ def validate_causal_admission() -> None:
             "A causal-rejected answer must not be softened into mixed, complex, multifactorial, linked, associated, or may-contribute framing.",
         ],
     )
+
+
+def validate_evidence_admission() -> None:
+    for path in (BINDER, ANSWER, INGEST_RULES, RECORD_SCHEMA):
+        require_text(path, [EVIDENCE_REF])
+
+    runtime_manifest = vr.load_json(RUNTIME_MANIFEST)
+    ingest_manifest = vr.load_json(INGEST_MANIFEST)
+    for manifest, name in ((runtime_manifest, "runtime"), (ingest_manifest, "ingest")):
+        sources = set(manifest.get("source_files", []))
+        vr.require("kernel/evidence_admission.yaml" in sources, f"{name} manifest omits evidence admission kernel")
+        vr.require("kernel/evidence_admission_fixtures.json" in sources, f"{name} manifest omits evidence admission fixtures")
+
     require_text(
-        CARTRIDGE,
+        EVIDENCE_ADMISSION,
         [
-            "highly heterogeneous and poorly predictive",
-            "Do not restate those findings as contributions, roles, dysfunctions",
+            "source_claim_status: unadmitted_assertion",
+            "causal_weight: zero",
+            "author_interpretation_is_evidence: false",
+            "consensus_is_evidence: false",
+            "meta_analysis_repairs_invalid_inputs: false",
+            "Read to locate inferential debt, not to preserve the paper's intended story.",
+            "The model must prefer a sparse surviving observation over a rich unsupported causal narrative.",
         ],
     )
+    require_text(
+        INGEST_RULES,
+        [
+            "default_status: unadmitted_assertion",
+            "default_causal_weight: zero",
+            "abstract_or_discussion_conclusion_as_evidence",
+            "shared_inferential_bridges_never_count_as_independent_convergence: true",
+        ],
+    )
+    require_text(
+        BINDER,
+        [
+            "reviewed_does_not_mean_admitted: true",
+            "Bind the observation or closed bridge, never the paper's prose conclusion.",
+            "A meta-analysis inherits construct, measurement, direction, task, and bridge failures from its inputs.",
+        ],
+    )
+    require_text(
+        ANSWER,
+        [
+            "The answer may summarize only admitted observations and closed bridges.",
+            "unsupported_bridge_hidden_in_summary_language",
+            "inference_audit:",
+        ],
+    )
+    require_text(
+        RECORD_SCHEMA,
+        [
+            "source_claim_status_default: unadmitted_assertion",
+            "causal_weight_default: zero",
+            "bridge_ledger",
+            "source_conclusion_never_binds_directly: true",
+        ],
+    )
+
+    expected_fixtures = {
+        "author-conclusion-is-assertion",
+        "consensus-repeats-one-bridge",
+        "meta-analysis-inherits-input-failure",
+        "prediction-failure-breaks-causal-story",
+        "sparse-observation-over-rich-story",
+    }
+    missing = expected_fixtures - fixture_ids(EVIDENCE_FIXTURES)
+    vr.require(not missing, f"missing evidence admission fixtures: {sorted(missing)}")
 
 
 def validate_evidence_weighting() -> None:
@@ -141,24 +222,10 @@ def validate_evidence_weighting() -> None:
     }
     vr.require(verdicts == expected_verdicts, f"body verdicts drifted: {sorted(verdicts)}")
 
-    require_text(BINDER, ["evidence_role_classes:", "unit_of_counting: independent_evidence_family", "no_numeric_average: true"])
+    require_text(BINDER, ["evidence_role_classes:", "unit_of_counting: independent_evidence_family_after_bridge_audit", "no_numeric_average: true"])
     require_text(ANSWER, [BODY_VERDICT_REF, "exclude_non_probative_records_from_the_support_narrative"])
     require_text(INGEST_RULES, [EVIDENCE_ROLE_REF, "publication_volume_never_supplies_weight: true"])
-    require_text(RECORD_SCHEMA, [EVIDENCE_ROLE_REF, "body_weight_inputs:", "evidence_family_id"])
-
-
-def fixture_ids(path: pathlib.Path) -> set[str]:
-    data = vr.load_json(path)
-    fixtures = data.get("fixtures", [])
-    return {item.get("id") for item in fixtures if isinstance(item, dict)}
-
-
-def fixture_by_id(path: pathlib.Path, fixture_id: str) -> dict:
-    data = vr.load_json(path)
-    for item in data.get("fixtures", []):
-        if isinstance(item, dict) and item.get("id") == fixture_id:
-            return item
-    raise vr.ValidationError(f"fixture missing: {fixture_id}")
+    require_text(RECORD_SCHEMA, [EVIDENCE_ROLE_REF, "body_weight_inputs:", "shared_assumption_family_id"])
 
 
 def validate_regressions() -> None:
@@ -208,6 +275,7 @@ if __name__ == "__main__":
     try:
         validate_construct_admission()
         validate_causal_admission()
+        validate_evidence_admission()
         validate_evidence_weighting()
         validate_regressions()
     except (vr.ValidationError, OSError) as exc:
