@@ -12,6 +12,7 @@ MODEL = ROOT / "model"
 
 KERNEL = MODEL / "kernel" / "target_identity.yaml"
 RUNTIME_GATE = MODEL / "runtime" / "target_identity_gate.yaml"
+DOWNSTREAM = MODEL / "runtime" / "target_identity_answer_contract.yaml"
 RUNTIME_FIXTURES = MODEL / "runtime" / "target_identity_fixtures.json"
 INGEST_GATE = MODEL / "ingest" / "target_identity_extraction.yaml"
 INGEST_SCHEMA = MODEL / "ingest" / "target_identity_record_schema.yaml"
@@ -68,6 +69,7 @@ def validate_manifests() -> None:
     runtime_required = {
         "kernel/target_identity.yaml",
         "runtime/target_identity_gate.yaml",
+        "runtime/target_identity_answer_contract.yaml",
         "runtime/target_identity_fixtures.json",
     }
     ingest_required = {
@@ -89,6 +91,12 @@ def validate_manifests() -> None:
         < runtime_sources.index("runtime/target_identity_gate.yaml")
         < runtime_sources.index("runtime/answerability_planner.yaml"),
         "target-identity gate must extend the compiler before planning",
+    )
+    vr.require(
+        runtime_sources.index("runtime/answer_contract.yaml")
+        < runtime_sources.index("runtime/target_identity_answer_contract.yaml")
+        < runtime_sources.index("runtime/physical_answer_contract.yaml"),
+        "target-identity answer contract must extend planning binding and answer behavior before physical rendering",
     )
     vr.require(
         ingest_sources.index("ingest/rules.yaml")
@@ -137,6 +145,16 @@ def validate_policy() -> None:
             "ask_smallest_useful_fork_when:",
             "no_blacklist_rule:",
             "Causal weighting must wait until the exact target relation",
+        ],
+    )
+    require_text(
+        DOWNSTREAM,
+        [
+            "planner_extension:",
+            "binder_extension:",
+            "answer_extension:",
+            "bind_to_exact_measured_or_constructed_relation",
+            "final_wording_cannot_restore_failed_identity: true",
         ],
     )
     require_text(
