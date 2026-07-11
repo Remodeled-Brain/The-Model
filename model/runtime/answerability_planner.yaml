@@ -2,14 +2,17 @@ answerability_planner:
   status: candidate
   layer: primary_runtime
   purpose: >
-    Determine what empirical work is required for admitted questions, which chain segments are available,
-    and when the source premise must be rejected without opening a mechanism search.
+    Determine what empirical work is required for admitted questions, apply the hard-causality gate,
+    and terminate questions whose causal proposition fails construct, prediction, heterogeneity, or route requirements.
 
   construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+  causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
 
   input_required:
     - question_type
+    - hard_causality_request
     - construct_disposition
+    - initial_causal_disposition
     - rejected_premises
     - answer_target
     - compiled_questions
@@ -26,6 +29,7 @@ answerability_planner:
       plan:
         - state_the_premise_failure
         - identify_the_handle_that_supplied_false_entity_or_defect_status
+        - assign_causal_rejected_when_the_question_is_causal
         - prevent_entity_level_mechanism_retrieval
         - preserve_only_explicit_observations_if_any
       evidence_allowed:
@@ -40,13 +44,55 @@ answerability_planner:
       plan:
         - retain_label_only_as_grouping_metadata
         - require_independently_measured_variables_for_any_physical_question
+        - reject_unitary_causal_claims_about_the_grouping_handle
     admitted:
       plan:
-        - continue_to_chain_planning
+        - continue_to_chain_and_causal_planning
     underspecified:
       plan:
         - name_the_missing_measurement_or_relation
         - do_not_fill_it_from_conventional_definitions
+
+  causal_admission_plan:
+    applies_when: hard_causality_request_is_true
+    required_checks:
+      construct_coherence:
+        - construct_is_admitted_independently_of_the_label
+        - target_relation_is_directly_specified
+      temporal_direction:
+        - claimed_source_precedes_required_change
+        - timing_matches_the_claimed_operation
+      dependency_or_intervention:
+        - intervention_or_dependency_evidence_tests_the_required_route
+        - systemic_collapse_compensation_and_reverse_causation_are_bounded
+      prediction:
+        - route_generates_specific_out_of_sample_predictions
+        - predictive_performance_exceeds_realistic_baselines
+        - performance_survives_relevant_comparators_and_condition_changes
+      heterogeneity:
+        - effect_direction_and_route_are_stable_or_condition_bounded
+        - subgroup_or_context_variation_is_generated_by_explicit_routes
+        - broad_overlap_does_not_support_a_unitary_defect_or_individual_state
+      practical_magnitude:
+        - effect_is_large_relative_to_variance_overlap_noise_and_functional_threshold
+      scale_translation:
+        - carried_variable_and_intermediate_dependencies_close_the_requested_scale
+      independent_convergence:
+        - independent_evidence_families_test_the_same_required_relation
+        - convergence_uses_distinct_failure_modes
+      disconfirmation:
+        - no_required_premise_or_segment_is_broken_by_stronger_evidence
+    hard_failure_results:
+      rejected_construct: causal_rejected
+      heterogeneous_unbounded_effects: causal_rejected
+      poor_out_of_sample_prediction: causal_rejected
+      postdictive_only_body: causal_rejected
+      small_overlapping_group_differences: causal_rejected
+      missing_route_with_otherwise_admissible_construct: causal_unresolved
+      failed_scale_translation: causal_rejected_for_the_requested_cross_scale_claim
+    rule: >
+      A hard causal question may not be answered with association language. When any necessary causal test fails,
+      the requested causal proposition receives causal_rejected and mechanism planning stops for that proposition.
 
   planning_dimensions:
     measurement:
@@ -64,6 +110,16 @@ answerability_planner:
         - What must precede what?
         - Is the evidence predictive, prospective, concurrent, retrospective, or postdictive?
         - Does the measured interval match the claimed operation?
+    prediction:
+      asks:
+        - What does the proposed route predict out of sample?
+        - Does it outperform realistic baselines and competing routes?
+        - Does prediction survive independent cohorts, tasks, conditions, and operationalizations?
+    heterogeneity:
+      asks:
+        - Is variation bounded by explicit conditions or routes?
+        - Are direction, magnitude, and route stable enough to support the requested causal unit?
+        - Does broad overlap defeat a defect or individual-state claim?
     translation:
       asks:
         - Which physical steps carry the measured change across scales?
@@ -107,11 +163,17 @@ answerability_planner:
     construct_disposition:
       vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
       value: string
+    causal_disposition:
+      vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
+      value: string
+    causal_failure_basis: list
     premise_rejection_basis: list
     per_compiled_question:
       - required_measurements
       - required_perturbations
       - required_temporality
+      - required_predictions
+      - required_heterogeneity_bounds
       - required_dependency_closure
       - required_translation_steps
       - compensation_or_redundancy_checks
@@ -121,12 +183,14 @@ answerability_planner:
       - incompatible_evidence
       - narrower_answerable_targets
     answerability_status:
-      state: [premise_rejected, answerable, partially_answerable, descriptive_only, currently_unanswerable]
+      state: [premise_rejected, causal_rejected, causal_unresolved, answerable, partially_answerable, descriptive_only, currently_unanswerable]
       basis: list
 
   rules:
     - Premise rejection precedes and terminates mechanism planning for the rejected entity.
     - A rejected diagnostic construct cannot be rescued by substituting traits, deficits, or region associations not stated in the question.
+    - A failed hard-causality gate terminates causal explanation for the requested proposition.
+    - Heterogeneous poorly predictive work remains descriptive or non-probative and cannot be restated as causal.
     - A missing route produces an explicit research requirement only for an admitted observation.
     - Partial closure permits conclusions that use only the closed path.
     - Missing segments outside a narrower conclusion do not cap that conclusion.
