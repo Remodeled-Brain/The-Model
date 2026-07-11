@@ -1,16 +1,18 @@
 ingest_failure_routing:
   status: candidate
   layer: evidence_maintenance
-  purpose: Preserve useful evidence while preventing failed roles from entering chain closure.
+  purpose: Preserve useful observations while applying restrictive evidence presumptions before any support upgrade.
 
   closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+  evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission.presumptive_classification
 
   default:
     source_record: keep
     provenance: keep
     support_notes: keep
-    direct_grounding: deny_or_cap
-    promotion: deny_until_required_gates_pass
+    direct_grounding: deny
+    causal_weight: zero
+    promotion: deny_until_presumption_escape_and_required_gates_pass
 
   support_channels:
     - mechanistic_grounded
@@ -24,14 +26,14 @@ ingest_failure_routing:
     - provenance_only
 
   channel_meanings:
-    mechanistic_grounded: Required route and translation segments are closed for the claimed scope.
-    route_partial: A physical route survives but one or more required dependency segments remain open.
+    mechanistic_grounded: Required construct-independent route and translation segments are closed for the claimed scope.
+    route_partial: A construct-independent physical route survives but one or more required dependency segments remain open.
     source_scale_only: The measurement is valid at its measured scale but translation to the requested scale is open.
-    proxy_only: The measured variable correlates with the target but the translation route is open.
-    descriptive_support: A sound descriptive, epidemiological, phenomenological, association, or first-report claim.
-    label_dependent_observation: The observation survives only as a relation among pre-labeled groups.
+    proxy_only: The measured variable is a proxy, correlate, classifier, surrogate, or downstream readout and cannot bind causally.
+    descriptive_support: A sound descriptive intervention-outcome, epidemiological, phenomenological, association, or first-report claim.
+    label_dependent_observation: The observation survives only as a relation among construct-selected or pre-labeled groups.
     method_support: The source constrains measurement, assay, perturbation, or analysis behavior without closing the target segment.
-    disconfirmation: The source breaks an asserted segment or exposes a missing differentiator.
+    disconfirmation: The source breaks an asserted construct, bridge, segment, prediction, or route.
     provenance_only: The source remains in the record without a support role.
 
   closure_state_crosswalk:
@@ -52,24 +54,87 @@ ingest_failure_routing:
       closure vocabulary. Contested is assigned by the evidence binder after cross-record conflict review,
       not by a single ingest record.
 
+  presumption_routing:
+    construct_indexed:
+      initial_channel: label_dependent_observation
+      initial_closure_state: label_dependent
+      causal_binding: forbidden
+      upgrade_requires:
+        - every_construct_escape_condition_passed
+        - exact_bridge_closed
+        - exact_chain_segment_closed
+        - construct_independent_replication
+      missing_escape_evidence: preserve_initial_classification
+    proxy_record:
+      initial_channel: proxy_only
+      initial_closure_state: proxy_limited
+      causal_binding: forbidden
+      mechanism_binding: forbidden
+      upgrade_rule: >
+        Proxy records do not upgrade into causal evidence. A distinct direct-dependency record must be created
+        and evaluated independently.
+    treatment_response:
+      initial_channel: descriptive_support
+      initial_closure_state: descriptive_only
+      secondary_channel_when_label_selected: label_dependent_observation
+      may_bind:
+        - intervention_to_measured_outcome
+        - adverse_effect
+        - dose_timing_response_distribution
+      may_not_bind:
+        - etiology
+        - pathogenesis
+        - diagnostic_construct_validity
+        - endogenous_mechanism
+        - defect_or_dysfunction
+        - biological_basis
+    direct_construct_independent:
+      initial_channel: provenance_only
+      initial_closure_state: unresolved
+      causal_binding: denied_until_all_required_bridges_and_segments_close
+
   gate_intersection:
     notes: union
     permissions: intersection
+    presumption_survives_local_passes: true
     rule: >
-      Every applicable gate contributes its own support channel, translation limit, and blocked role.
-      A failed gate denies only the role it tests. Unresolved does not grant closure and is not treated
-      as a failed observation.
+      Every applicable gate contributes its support channel, translation limit, and blocked role. A local pass
+      cannot erase a restrictive presumption. Upgrade occurs only after every applicable escape condition and
+      every required bridge and segment closes. Unresolved never grants closure.
 
   aggregation:
     rule: >
-      Support-only records never become grounding by raw count. Correlated records count once for
-      visibility and must be grouped by shared cohort, dataset, pipeline, or model lineage.
+      Support-only records never become grounding by raw count. Correlated records and records sharing a construct,
+      cohort, dataset, pipeline, task, instrument, proxy, or inferential bridge count as one family for weighting.
     count_can_raise_visibility: true
     count_can_create_grounding: false
+    count_can_escape_presumption: false
     independence_required_for_accumulation: true
 
   hard_zero_scope:
     rule: Hard zero applies to a claimed role, never to the source itself.
+    construct_indexed_without_escape:
+      zeroes:
+        - causal_binding
+        - mechanism_binding
+        - etiologic_binding
+        - construct_validation
+      preserves:
+        - label_dependent_observation
+        - descriptive_support
+        - provenance
+    treatment_response:
+      zeroes:
+        - etiology
+        - pathogenesis
+        - endogenous_mechanism
+        - diagnostic_construct_validity
+        - biological_basis
+      preserves:
+        - intervention_outcome_relation
+        - adverse_effect_relation
+        - dose_timing_response_distribution
+        - provenance
     postdictive_claim:
       zeroes:
         - prediction_weight
@@ -88,6 +153,7 @@ ingest_failure_routing:
     proxy_without_translation:
       zeroes:
         - direct_mechanism_binding
+        - causal_binding
       preserves:
         - proxy_only
         - assay_observation
@@ -100,6 +166,11 @@ ingest_failure_routing:
         - perturbation_leverage_note
 
   output_required:
+    - presumptive_class
+    - presumed_closure_state
+    - presumption_basis
+    - escape_conditions_tested
+    - escape_conditions_passed
     - support_channels
     - closure_state
     - blocked_roles
