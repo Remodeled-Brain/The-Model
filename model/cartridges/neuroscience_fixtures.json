@@ -2,7 +2,7 @@
   "schema_version": "v1",
   "status": "candidate",
   "domain": "neuroscience and clinical neurobehavioral claims",
-  "purpose": "Domain-specific regressions applying the generic construct, causal, data-first, and evidence-admission kernels.",
+  "purpose": "Domain-specific regressions applying the generic construct, target-identity, causal, data-first, and evidence-admission kernels.",
   "fixtures": [
     {
       "id": "neuro-region-as-agent",
@@ -148,6 +148,41 @@
         "translate through shared terminology",
         "treat an animal task label as the human faculty",
         "use source-scale intervention effects as direct clinical mechanism"
+      ]
+    },
+    {
+      "id": "neuro-stimulation-target-identity",
+      "mode": "question",
+      "source_question": "Does DLPFC stimulation reduce real-world procrastination by increasing task outcome value?",
+      "required": [
+        "separate the speaker target source-defined target exact recorded task outcomes and claimed real-world target",
+        "treat procrastination and task outcome value as target names requiring recoverable generators rather than fixed internal states",
+        "bind randomization only to assignment to the complete protocol and recorded outcomes",
+        "require delivered field and target-engagement evidence before treating DLPFC as the manipulated substrate",
+        "treat statistical mediation as an arrangement among measurements rather than a physical carrier",
+        "require independent transport across tasks conditions and deployment before real-world efficacy"
+      ],
+      "forbidden": [
+        "treat 2 mA programmed device output as demonstrated regional manipulation",
+        "let zero endpoint variance or large effect repair target identity",
+        "rewrite selected daily-life tasks as ecological validity",
+        "allow regionalist or mediator language to fill the missing chain"
+      ]
+    },
+    {
+      "id": "neuro-target-identity-positive-control",
+      "mode": "condition",
+      "condition": "A neural intervention directly and reproducibly changes one exact task-transition relation across independent replications while broader faculty or behavioral labels remain identity-unresolved.",
+      "required": [
+        "permit causal admission for the exact task-transition relation when manipulation and outcome burdens close",
+        "keep broader faculty or behavioral targets separate",
+        "state apparatus task population timing and transport limits",
+        "preserve partial mechanism status when the internal physical route remains open"
+      ],
+      "forbidden": [
+        "reject the exact effect because a broader label fails",
+        "use the exact effect to validate the broader label",
+        "infer endogenous regional control from intervention leverage"
       ]
     }
   ]
