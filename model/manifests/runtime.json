@@ -6,6 +6,7 @@
     "00_purpose_and_scope.md",
     "kernel/chain_contract.yaml",
     "kernel/evidence_admission.yaml",
+    "kernel/evidence_admission_fixtures.json",
     "runtime/question_compiler.yaml",
     "runtime/answerability_planner.yaml",
     "runtime/evidence_binding_contract.yaml",
