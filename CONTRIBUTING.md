@@ -13,7 +13,7 @@ This file governs work in the repository across providers. Read it before editin
 
 Use `governance/reviewer_protocol.md`. Test layer fit, contradiction, reification, operation-product fusion, chain generation, redundancy, calibration, coupled-file drift, and failure modes. Return a concrete verdict and the smallest safe patch.
 
-Runtime or evidence-admission architecture also requires semantic conformance. Structural CI validates the harness only. Before adoption, run the generic and active-cartridge fixture sets through the provider and validate the fresh result bundles with `scripts/validate_adoption_conformance.py`. The required run count, freshness hashes, positive controls, and zero-failure rule live in `conformance/required_runs.json`.
+Runtime or evidence-admission architecture also requires semantic conformance. Structural CI validates the harness only. Before adoption, run the generic and active-cartridge fixture sets through the provider and validate the fresh result bundles with `scripts/validate_conformance.py --adoption`. The required run count, freshness hashes, positive controls, and zero-failure rule live in `conformance/required_runs.json`.
 
 ## 3. Repository layers
 
@@ -49,13 +49,12 @@ Run repository validation before proposing merge:
 python scripts/validate_repo.py
 python scripts/validate_model_policy.py
 python scripts/validate_conformance.py
-python scripts/validate_adoption_conformance.py --policy-only
 ```
 
 The full adoption check intentionally fails without fresh complete provider results:
 
 ```bash
-python scripts/validate_adoption_conformance.py
+python scripts/validate_conformance.py --adoption
 ```
 
 ## 5. Log each change
