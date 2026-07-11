@@ -1,0 +1,34 @@
+{
+  "expected_error_code": "TARGET_SCOPE_TRANSFER",
+  "base": "../pass/decisive_intervention.json",
+  "mutations": [
+    {
+      "path": "decision_record.query",
+      "value": "Did the successful intervention prove the origin of condition Z?"
+    },
+    {
+      "path": "decision_record.relations.0.id",
+      "value": "etiology"
+    },
+    {
+      "path": "decision_record.relations.0.target_relation",
+      "value": "etiology_or_origin"
+    },
+    {
+      "path": "decision_record.relations.0.scope",
+      "value": "etiologic origin of condition Z"
+    },
+    {
+      "path": "decision_record.claims.0.relation_id",
+      "value": "etiology"
+    },
+    {
+      "path": "decision_record.claims.0.text",
+      "value": "The intervention target caused condition Z."
+    },
+    {
+      "path": "rendered_answer",
+      "value": "The intervention target caused condition Z."
+    }
+  ]
+}
