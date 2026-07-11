@@ -2,16 +2,19 @@ question_compiler:
   status: candidate
   layer: primary_runtime
   purpose: >
-    Convert a source question into one or more chain-bound questions while preserving the observation,
-    distinction, requested relation, and requested resolution carried by the source wording.
+    Reject invalid source premises before reconstruction, then convert admitted questions into chain-bound
+    questions while preserving only observations and distinctions actually supplied by the source.
 
+  construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
   trigger: every question requesting description, explanation, prediction, intervention, or causal attribution
 
   stages:
     - classify_question_type
     - identify_requested_relation_scope_and_resolution
     - detect_handles_and_hidden_operators
-    - preserve_observations_and_distinctions
+    - evaluate_construct_admission
+    - identify_explicit_observations_without_label_inference
+    - reject_invalid_premise_or_continue
     - identify_required_organism_state_relation
     - extract_or_propose_physical_variables_and_substrates
     - assign_candidate_operations_from_the_kernel_grammar
@@ -43,21 +46,48 @@ question_compiler:
     - conservation_or_age_as_explanation
     - statistical_or_clinical_promise_language
 
+  construct_admission:
+    required_tests:
+      - can_the_questioned_entity_be_specified_without_the_label
+      - does_an_explicit_observation_survive_handle_removal
+      - is_biological_unity_demonstrated_rather_than_supplied_by_group_membership
+      - is_the_proposed_defect_source_or_location_relation_independently_measured
+    premise_rejection_triggers:
+      - diagnostic_label_treated_as_a_unitary_biological_entity
+      - diagnostic_label_treated_as_a_defect_located_in_a_named_region
+      - faculty_or_controller_noun_contains_all_explanatory_content
+      - no_explicit_observation_survives_handle_removal
+    premise_rejection_behavior:
+      - answer_the_rejected_premise_directly
+      - stop_entity_level_mechanism_search
+      - do_not_retrieve_evidence_to_accommodate_the_rejected_construct
+      - preserve_the_label_only_as_a_grouping_or_social_administrative_handle
+      - offer_a_replacement_measurement_question_only_when_an_explicit_observation_exists_or_the_user_requests_one
+    disposition_rule: Use exactly one disposition from construct_admission_ref.
+
+  observation_admission_rule: >
+    Preserve only observations, measured differences, behaviors, transitions, or practical constraints explicitly
+    supplied by the question. A diagnostic definition, literature stereotype, or familiar phenotype bundle may not
+    be imported as a substitute observation.
+
   preservation_rule: >
-    Removing causal work from a handle must preserve the measured difference, reported behavior,
+    Removing causal work from a handle must preserve the explicit measured difference, reported behavior,
     experienced transition, requested distinction, or practical constraint that generated the question.
 
   reconstruction_rule: >
-    Replace unsupported operators with questions about substrate, variable, operation, timing, dependency,
-    constraint, scale, and organism-state transition. Generate the path rather than substituting a preferred noun.
+    Reconstruction begins only after construct admission. Replace unsupported operators with questions about
+    substrate, variable, operation, timing, dependency, constraint, scale, and organism-state transition. Do not
+    reconstruct a rejected entity into a charitable nearby claim and then answer that substitute.
 
   multiple_compilations:
     allowed_when:
-      - a source label groups distinct outcomes
-      - more than one physical route fits the observation
-      - the requested scope is ambiguous
+      - an admitted observation supports more than one physical route
+      - the requested scope is ambiguous after premise admission
       - the available variables support different resolutions
-    rule: Keep candidate compilations separate and state what observation would distinguish them.
+    forbidden_when:
+      - the only source of variation is a rejected diagnostic or faculty label
+      - candidate compilations merely rescue an entity premise rejected by the admission gate
+    rule: Keep admitted candidate compilations separate and state what observation would distinguish them.
 
   output_schema:
     source_question: string
@@ -65,9 +95,14 @@ question_compiler:
     requested_relation: string
     requested_scope: string
     requested_resolution: string
-    answer_target: string
+    construct_disposition:
+      vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+      value: string
+    rejected_premises: list
     handles_detected: list
+    explicit_observations: list
     observations_preserved: list
+    answer_target: string
     physical_variables: list
     candidate_substrates: list
     candidate_operations: list
@@ -87,15 +122,20 @@ question_compiler:
     corpus volume, or confidence in later evidence cannot raise it.
 
   failure_semantics:
-    ambiguous_source_question: preserve_multiple_candidate_compilations
-    no_physical_variables_available: emit_measurement_requirements
-    handle_contains_all_explanatory_content: preserve_observation_and_mark_route_unresolved
+    diagnostic_label_supplies_entity: premise_rejected
+    diagnostic_label_supplies_defect_location: premise_rejected
+    no_explicit_observation_beyond_label: premise_rejected
+    ambiguous_admitted_observation: preserve_multiple_candidate_compilations
+    no_physical_variables_for_explicit_observation: underspecified
     multiple_routes_fit: retain_alternatives_and_generate_discriminating_questions
     descriptive_question: do_not_impose_a_mechanism_requirement
 
   forbidden_outputs:
     - definition_only_rewrite
     - label_synonym_swap
+    - inferred_trait_bundle_from_diagnostic_label
+    - evidence_search_to_rescue_rejected_premise
+    - charitable_substitution_for_rejected_entity
     - observation_erasure
     - unsupported_single_route
     - hidden_change_of_question_scope
