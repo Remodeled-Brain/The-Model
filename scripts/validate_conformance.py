@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate semantic causal decision records and mutation fixtures."""
 from __future__ import annotations
-import argparse, json, pathlib, re, sys
+import argparse, copy, json, pathlib, re, sys
 from typing import Any
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
@@ -147,7 +147,7 @@ def validate_result(result:dict[str,Any], variants=None):
     req(result.get("schema_version")=="v1","RESULT_SCHEMA_VERSION","v1 required")
     for f in ("run_id","fixture_set","fixture_id","variant_id"): req(string(result.get(f)),"RESULT_IDENTITY_REQUIRED",f)
     provider=result.get("provider"); req(isinstance(provider,dict),"PROVIDER_METADATA_REQUIRED","provider")
-    for f in ("name","model","runtime_hash","kernel_hash","fixture_hash"): req(string(provider.get(f)),"PROVIDER_METADATA_FIELD",f)
+    for f in ("name","model","runtime_hash","kernel_hash","cartridge_hash","fixture_hash"): req(string(provider.get(f)),"PROVIDER_METADATA_FIELD",f)
     record=result.get("decision_record"); req(isinstance(record,dict),"DECISION_RECORD_REQUIRED","decision_record")
     validate_decision_record(record)
     req(result.get("rendered_answer")==render_answer(record),"RENDERED_ANSWER_DRIFT","rendered answer")
@@ -174,10 +174,22 @@ def validate_mutation_groups(rows,fixtures):
             ps=[projection(r["decision_record"],fixture) for r in items]
             req(all(p==ps[0] for p in ps[1:]),"NARRATIVE_CHANGED_CAUSAL_RESULT",str(key))
 
+def set_path(root,path,value):
+    parts=path.split("."); target=root
+    for part in parts[:-1]: target=target[int(part)] if isinstance(target,list) else target[part]
+    last=parts[-1]
+    if value=="__DELETE__":
+        if isinstance(target,list): del target[int(last)]
+        else: del target[last]
+    elif isinstance(target,list): target[int(last)]=value
+    else: target[last]=value
 def selftests():
     for path in sorted(PASS.glob("*.json")): validate_result(load(path))
     for path in sorted(FAIL.glob("*.json")):
         wrapper=load(path); expected=wrapper.get("expected_error_code"); result=wrapper.get("result")
+        if result is None and string(wrapper.get("base")):
+            result=copy.deepcopy(load((path.parent/wrapper["base"]).resolve()))
+            for mutation in wrapper.get("mutations",[]): set_path(result,mutation["path"],mutation["value"])
         req(string(expected) and isinstance(result,dict),"SELFTEST_FORMAT",str(path))
         try: validate_result(result)
         except ConformanceError as e: req(e.code==expected,"SELFTEST_WRONG_FAILURE",f"{path}: {e.code}")
