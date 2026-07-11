@@ -2,7 +2,7 @@
   "schema_version": "v1",
   "status": "candidate",
   "fixture_set": "neuroscience",
-  "purpose": "Neuroscience-cartridge semantic fixtures applying data-first causality, physical continuity, metabolic binding, and folk-behavior reconstruction.",
+  "purpose": "Neuroscience-cartridge semantic fixtures applying data-first causality, physical continuity, metabolic binding, and target-identity reconstruction.",
   "fixtures": [
     {
       "id": "cbt-depression-effectiveness",
@@ -192,21 +192,23 @@
       ]
     },
     {
-      "id": "stimulation-procrastination-construct",
+      "id": "stimulation-target-identity",
       "critical": true,
       "mutation_type": "scope_separation",
       "variants": [
         {
-          "id": "protocol_effect_vs_folk_regional_and_real_world_claims",
+          "id": "protocol_effect_vs_construct_regional_and_real_world_claims",
           "input": {
             "question": "Does DLPFC stimulation reduce real-world procrastination by increasing task outcome value?",
             "narrative": "DLPFC stimulation reduced real-world procrastination through increased task outcome value.",
+            "speaker_intent": "a portable reduction in delayed or failed task execution across ordinary conditions",
             "data": {
               "assignment": "active versus sham repeated research protocol",
               "device_output": "2 mA scalp current setting",
               "target_engagement": "not directly measured",
               "outcome": "self-selected task completion and procrastination reports under repeated prompting and verification",
-              "folk_construct_unity": "not independently established",
+              "target_identity_generator": "not independently established",
+              "operational_equivalence": "initiation completion report and classification are not shown to be the same generated relation",
               "mediator": "self-reported task outcome value",
               "attrition_and_analysis_integrity": "incompletely closed",
               "replication": "absent",
