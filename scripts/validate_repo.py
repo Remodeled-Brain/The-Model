@@ -188,6 +188,19 @@ def validate_manifest(path: pathlib.Path) -> dict[str, Any]:
     return manifest
 
 
+def iter_active_reference_files() -> Iterable[pathlib.Path]:
+    tracked = set(tracked_files())
+    for root in ACTIVE_REFERENCE_ROOTS:
+        if root.is_file():
+            if root in tracked and root.resolve() != VALIDATOR:
+                yield root
+            continue
+        if root.is_dir():
+            for path in root.rglob("*"):
+                if path.is_file() and path in tracked and path.resolve() != VALIDATOR:
+                    yield path
+
+
 def validate_closure_vocabulary() -> None:
     states = yaml_list(KERNEL, "states")
     require(len(states) == len(set(states)), "kernel closure vocabulary contains duplicate states")
@@ -212,8 +225,8 @@ def validate_closure_vocabulary() -> None:
     require(conflict_state == "contested", "surviving evidence conflict must use contested")
     require(conflict_state in states, "binder conflict state is absent from kernel vocabulary")
 
-    for path in tracked_files():
-        if path in {KERNEL, VALIDATOR} or not path.is_file():
+    for path in iter_active_reference_files():
+        if path == KERNEL or not path.is_file():
             continue
         try:
             text = path.read_text(encoding="utf-8")
@@ -313,19 +326,6 @@ def validate_ingest_fixtures() -> None:
             require(fixture.get(field) not in (None, "", []), f"{fixture_id}: {field} missing")
         unknown = sorted(set(fixture["allowed_channels"]) - valid_channels)
         require(not unknown, f"{fixture_id}: unknown ingest support channels: {unknown}")
-
-
-def iter_active_reference_files() -> Iterable[pathlib.Path]:
-    tracked = set(tracked_files())
-    for root in ACTIVE_REFERENCE_ROOTS:
-        if root.is_file():
-            if root in tracked and root.resolve() != VALIDATOR:
-                yield root
-            continue
-        if root.is_dir():
-            for path in root.rglob("*"):
-                if path.is_file() and path in tracked and path.resolve() != VALIDATOR:
-                    yield path
 
 
 def validate_cleanup() -> None:
