@@ -1,5 +1,7 @@
 # The Model
 
+**Current release:** v0.05 v5, adopted July 11, 2026.
+
 A platform-agnostic scaffold developed collaboratively across multiple LLMs. The repository is the shared source of truth so provider copies do not silently diverge.
 
 ## Purpose
@@ -61,15 +63,15 @@ Domain cartridges own specialized examples, failure patterns, translation burden
 
 | Path | Role |
 |------|------|
-| `model/00_purpose_and_scope.md` | Candidate purpose and operating boundary |
+| `model/00_purpose_and_scope.md` | Adopted v0.05 v5 purpose and operating boundary |
 | `model/kernel/` | Shared target-identity, physical-chain, metabolic, construct, causal, and evidence-admission invariants |
 | `model/runtime/` | Question compiler, target-identity gate, answerability planner, evidence binder, answer contracts, and domain-neutral fixtures |
 | `model/ingest/` | Target-identity crosswalks, data-first evidence maintenance, physical-chain extraction, design gates, routing, and record contracts |
 | `model/cartridges/` | Domain-specific examples, physical-chain applications, translation vocabulary, and fixtures |
-| `model/manifests/runtime.json` | Authoritative candidate question-runtime load graph |
-| `model/manifests/ingest.json` | Authoritative candidate ingest load graph |
-| `model/manifest.json` | Default-manifest selector only |
-| `governance/` | Candidate review and adoption rules |
+| `model/manifests/runtime.json` | Authoritative v0.05 v5 question-runtime load graph |
+| `model/manifests/ingest.json` | Authoritative v0.05 v5 ingest load graph |
+| `model/manifest.json` | Default-manifest selector and release status |
+| `governance/` | Review and adoption rules for later changes |
 | `providers/` | Provider-specific adapters and incompatibility notes only |
 | `conformance/` | Canonical decision-record schema, mutation fixtures, validator self-tests, provider results, and adoption-run policy |
 | `decisions/` | Durable architecture decisions |
@@ -121,15 +123,15 @@ python scripts/run_conformance.py \
   --fixture-set all
 ```
 
-CI validates the structural and deterministic harnesses and any committed result bundles. It does not call external providers. Adoption requires fresh complete result bundles accepted by:
+CI validates the structural and deterministic harnesses and any committed result bundles. It does not call external providers. Fresh provider conformance remains required before claiming that a specific provider reliably executes the v0.05 v5 contracts:
 
 ```bash
 python scripts/validate_adoption.py
 ```
 
-## Candidate status
+## Release status
 
-This architectural refactor remains candidate until explicitly adopted. See `CONTRIBUTING.md`, `governance/reviewer_protocol.md`, and `governance/candidate_adoption_gate.yaml`.
+v0.05 v5 is the adopted repository snapshot. Structural and deterministic CI passed at release. Live-provider result bundles were not available during adoption, so provider compliance remains unverified and must be established separately for each provider and model version.
 
 ## Start here for an LLM
 
