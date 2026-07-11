@@ -1,0 +1,1 @@
+- **[candidate]** Bound ingest record closure states to the kernel vocabulary and support-channel crosswalk, with validation against drift (OpenAI, 2026-07-11)

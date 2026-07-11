@@ -21,6 +21,7 @@ KERNEL = MODEL / "kernel" / "chain_contract.yaml"
 ANSWER_CONTRACT = MODEL / "runtime" / "answer_contract.yaml"
 EVIDENCE_BINDER = MODEL / "runtime" / "evidence_binding_contract.yaml"
 FAILURE_ROUTING = MODEL / "ingest" / "failure_routing.yaml"
+INGEST_RECORD_SCHEMA = MODEL / "ingest" / "record_schema.yaml"
 RUNTIME_FIXTURES = MODEL / "runtime" / "fixtures.json"
 INGEST_FIXTURES = MODEL / "ingest" / "fixtures.json"
 CLOSURE_REF = "model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states"
@@ -210,10 +211,13 @@ def validate_closure_vocabulary() -> None:
     answer_text = ANSWER_CONTRACT.read_text(encoding="utf-8")
     binder_text = EVIDENCE_BINDER.read_text(encoding="utf-8")
     routing_text = FAILURE_ROUTING.read_text(encoding="utf-8")
+    record_schema_text = INGEST_RECORD_SCHEMA.read_text(encoding="utf-8")
     require(CLOSURE_REF in answer_text, "answer contract does not reference kernel closure vocabulary")
     require(CLOSURE_REF in binder_text, "evidence binder does not reference kernel closure vocabulary")
     require(CLOSURE_REF in routing_text, "ingest routing does not reference kernel closure vocabulary")
+    require(CLOSURE_REF in record_schema_text, "ingest record schema does not reference kernel closure vocabulary")
     require(CROSSWALK_REF in binder_text, "evidence binder does not reference ingest closure crosswalk")
+    require(CROSSWALK_REF in record_schema_text, "ingest record schema does not reference ingest closure crosswalk")
 
     channels = yaml_list(FAILURE_ROUTING, "support_channels")
     crosswalk = yaml_mapping(FAILURE_ROUTING, "channels")

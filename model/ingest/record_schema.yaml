@@ -2,6 +2,8 @@ ingest_record_schema:
   status: candidate
   schema_version: v1
   layer: support_layer
+  closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+  support_channel_crosswalk_ref: model/ingest/failure_routing.yaml#ingest_failure_routing.closure_state_crosswalk
 
   identity:
     paper_id:
@@ -53,6 +55,9 @@ ingest_record_schema:
         - unresolved_slots
     chain_segments:
       required: true
+      closure_state_rule: >
+        Use exactly one kernel closure state. When the state derives from an ingest support channel,
+        use support_channel_crosswalk_ref rather than assigning a second ingest-specific vocabulary.
       per_segment_fields:
         - segment_id
         - relation
