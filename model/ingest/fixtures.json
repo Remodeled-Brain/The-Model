@@ -1,7 +1,7 @@
 {
-  "schema_version": "v2",
+  "schema_version": "v3",
   "status": "candidate",
-  "purpose": "Machine-readable conformance contracts for construct admission and adaptive evidence maintenance.",
+  "purpose": "Machine-readable conformance contracts for construct admission, causal admission, and adaptive evidence maintenance.",
   "execution_scope": {
     "ci": "validates structure, manifest inclusion, and required fields",
     "semantic": "provider runs apply ingest to the source pattern and compare the record with this contract"
@@ -18,16 +18,23 @@
     {
       "id": "diagnostic-entity-premise",
       "source_pattern": "A paper treats ADHD, autism, or another diagnostic category as one biological entity or defect and searches for its location or mechanism.",
-      "required_gates": ["strip_and_extract", "construct_admission", "instrument_and_task_dependency"],
+      "required_gates": ["strip_and_extract", "construct_admission", "causal_admission", "instrument_and_task_dependency"],
       "allowed_channels": ["label_dependent_observation", "descriptive_support", "provenance_only"],
-      "blocked_roles": ["biological_entity_grounding", "unitary_defect_claim", "regional_localization_of_diagnosis", "mechanism_weight_for_construct"]
+      "blocked_roles": ["biological_entity_grounding", "unitary_defect_claim", "regional_localization_of_diagnosis", "mechanism_weight_for_construct", "causal_support"]
+    },
+    {
+      "id": "heterogeneous-poor-prediction",
+      "source_pattern": "A heterogeneous label-selected literature reports unstable group associations, broad overlap, weak external prediction, and no stable route-specific dependency, then describes the findings as causal, contributory, or mechanistic.",
+      "required_gates": ["construct_admission", "causal_admission", "predictive_adequacy", "heterogeneity_control", "practical_significance", "independence"],
+      "allowed_channels": ["descriptive_support", "label_dependent_observation", "proxy_only", "provenance_only"],
+      "blocked_roles": ["causal_support", "mechanism_support", "contribution_language", "biological_basis_language", "defect_or_dysfunction_claim"]
     },
     {
       "id": "diagnostic-biomarker",
       "source_pattern": "A paper compares pre-labeled diagnostic cohorts, reports a statistically significant assay difference, and calls the measured variable a biomarker or mechanism.",
-      "required_gates": ["strip_and_extract", "construct_admission", "proxy_promotion", "practical_significance", "scale_translation"],
+      "required_gates": ["strip_and_extract", "construct_admission", "causal_admission", "proxy_promotion", "practical_significance", "scale_translation"],
       "allowed_channels": ["label_dependent_observation", "proxy_only", "source_scale_only", "descriptive_support"],
-      "blocked_roles": ["diagnostic_grounding", "biomarker_as_mechanism", "organism_level_translation_without_route"]
+      "blocked_roles": ["diagnostic_grounding", "biomarker_as_mechanism", "organism_level_translation_without_route", "causal_support"]
     },
     {
       "id": "same-input-divergent-output",
@@ -39,51 +46,51 @@
     {
       "id": "statistical-without-practical",
       "source_pattern": "A sensitive assay reports a small significant group-average difference with broad overlap and no magnitude context, noise floor, biological range, threshold, or independent replication.",
-      "required_gates": ["practical_significance", "instrument_and_task_dependency"],
+      "required_gates": ["causal_admission", "practical_significance", "instrument_and_task_dependency"],
       "allowed_channels": ["descriptive_support", "source_scale_only", "label_dependent_observation"],
-      "blocked_roles": ["biological_significance", "clinical_significance", "mechanism_weight", "unitary_defect_claim", "individual_state_assignment"]
+      "blocked_roles": ["biological_significance", "clinical_significance", "mechanism_weight", "unitary_defect_claim", "individual_state_assignment", "causal_support"]
     },
     {
       "id": "region-as-source",
-      "source_pattern": "Activity or perturbation at a named region is described as control, defect, or causal origin without timing, dependency position, or competing-route controls.",
-      "required_gates": ["strip_and_extract", "region_source_closure"],
+      "source_pattern": "Activity or perturbation at a named region is described as control, defect, or causal origin without timing, dependency position, route prediction, or competing-route controls.",
+      "required_gates": ["strip_and_extract", "causal_admission", "region_source_closure", "predictive_adequacy"],
       "allowed_channels": ["descriptive_support", "method_support"],
-      "blocked_roles": ["origin_weight", "controller_claim", "defect_explanation_by_location"]
+      "blocked_roles": ["origin_weight", "controller_claim", "defect_explanation_by_location", "causal_support"]
     },
     {
       "id": "conservation-as-explanation",
       "source_pattern": "A conserved or ancient structure is treated as causally sufficient because of its age or conservation.",
-      "required_gates": ["strip_and_extract", "conservation_dependency", "region_source_closure"],
+      "required_gates": ["strip_and_extract", "causal_admission", "conservation_dependency", "region_source_closure"],
       "allowed_channels": ["descriptive_support", "route_partial"],
       "blocked_roles": ["causal_weight_from_conservation", "source_status_from_age"]
     },
     {
       "id": "postdictive-prediction",
-      "source_pattern": "A model or analysis separates diagnostic groups after outcomes are known and is described as predictive, generative, or evidence of a shared defect.",
-      "required_gates": ["temporality", "strip_and_extract", "construct_admission"],
+      "source_pattern": "A model or analysis separates diagnostic groups after outcomes are known and is described as predictive, generative, causal, or evidence of a shared defect.",
+      "required_gates": ["temporality", "predictive_adequacy", "causal_admission", "strip_and_extract", "construct_admission"],
       "allowed_channels": ["descriptive_support", "method_support", "label_dependent_observation"],
-      "blocked_roles": ["prediction_weight", "direct_generative_grounding", "construct_validity"]
+      "blocked_roles": ["prediction_weight", "direct_generative_grounding", "construct_validity", "causal_support"]
     },
     {
       "id": "cross-scale-language",
       "source_pattern": "A molecular, cellular, imaging, or animal measurement is translated to an organism-level behavioral mechanism through shared terminology rather than a demonstrated dependency path.",
-      "required_gates": ["scale_translation", "proxy_promotion"],
+      "required_gates": ["causal_admission", "scale_translation", "proxy_promotion"],
       "allowed_channels": ["source_scale_only", "proxy_only", "route_partial"],
-      "blocked_roles": ["target_scale_grounding", "direct_behavioral_mechanism"]
+      "blocked_roles": ["target_scale_grounding", "direct_behavioral_mechanism", "cross_scale_causal_support"]
     },
     {
       "id": "correlated-volume",
       "source_pattern": "Many papers repeat a small label-selected association using shared cohorts, datasets, diagnostic instruments, tasks, pipelines, labs, or model lineages.",
-      "required_gates": ["independence", "instrument_and_task_dependency", "practical_significance"],
+      "required_gates": ["causal_admission", "independence", "instrument_and_task_dependency", "practical_significance"],
       "allowed_channels": ["descriptive_support", "label_dependent_observation"],
-      "blocked_roles": ["grounding_by_count", "independence_by_publication_count", "mechanism_from_correlated_volume"]
+      "blocked_roles": ["grounding_by_count", "independence_by_publication_count", "mechanism_from_correlated_volume", "causal_support"]
     },
     {
       "id": "premise-breaking-dominance",
-      "source_pattern": "A direct independent result breaks a necessary entity, unity, defect, or route premise while many downstream papers assume that premise and report associations.",
-      "required_gates": ["construct_admission", "evidence_role_classification", "independence"],
+      "source_pattern": "A direct independent result breaks a necessary entity, unity, defect, prediction, or route premise while many downstream papers assume that premise and report associations.",
+      "required_gates": ["construct_admission", "causal_admission", "evidence_role_classification", "independence"],
       "allowed_channels": ["disconfirmation", "descriptive_support", "provenance_only"],
-      "blocked_roles": ["downstream_volume_rescues_premise", "association_count_outweighs_premise_failure"]
+      "blocked_roles": ["downstream_volume_rescues_premise", "association_count_outweighs_premise_failure", "soft_causal_restating_after_failure"]
     }
   ]
 }
