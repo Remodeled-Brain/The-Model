@@ -2,16 +2,19 @@ evidence_binding_contract:
   status: candidate
   layer: primary_runtime
   purpose: >
-    Bind reviewed corpus records to exact chain segments and evaluate the body of evidence without allowing
-    rejected constructs, paper framing, publication volume, recency, model agreement, or shared vocabulary
-    to substitute for physical closure.
+    Bind reviewed corpus records to exact chain segments, evaluate hard causal claims, and weight the body of
+    evidence without allowing rejected constructs, heterogeneity, poor prediction, paper framing, publication
+    volume, recency, model agreement, or shared vocabulary to substitute for physical closure.
 
   closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
   construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+  causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
   ingest_crosswalk_ref: model/ingest/failure_routing.yaml#ingest_failure_routing.closure_state_crosswalk
 
   required_inputs:
+    - hard_causality_request
     - construct_disposition
+    - initial_causal_disposition
     - rejected_premises
     - answerability_plan
     - reviewed_corpus
@@ -24,6 +27,34 @@ evidence_binding_contract:
       premise by assembling nearby associations.
     rejected_construct_support_role: forbidden
     downstream_volume_can_reverse_rejection: false
+
+  causal_boundary:
+    applies_when: hard_causality_request_is_true
+    rule: >
+      Evidence may receive causal weight only when the construct, direction, dependency, prediction,
+      heterogeneity, practical magnitude, scale translation, independence, and disconfirmation checks all pass
+      for the exact requested relation. Failure of any necessary test produces causal_rejected for that proposition.
+    necessary_checks:
+      - construct_coherence
+      - temporal_direction
+      - dependency_or_intervention
+      - out_of_sample_route_prediction
+      - realistic_baseline_and_comparator_performance
+      - route_bounded_heterogeneity
+      - practical_magnitude_relative_to_overlap_variance_and_noise
+      - physical_scale_translation
+      - independent_evidence_family_convergence
+      - survival_of_relevant_disconfirmation
+    hard_failures:
+      - rejected_construct
+      - heterogeneous_effects_without_generated_conditions_or_routes
+      - poor_out_of_sample_prediction
+      - postdictive_only_separation
+      - small_group_average_difference_with_broad_overlap
+      - localization_or_activity_without_source_dependency
+      - failed_required_scale_translation
+    failed_causal_claim_support_role: forbidden
+    soft_causal_paraphrase_after_failure: forbidden
 
   corpus_modes:
     frozen:
@@ -38,6 +69,10 @@ evidence_binding_contract:
     - dependency_relation
     - timing_relation
     - perturbation
+    - predictive_target
+    - out_of_sample_performance
+    - comparator
+    - heterogeneity_condition
     - source_scale
     - target_scale
     - state_transition
@@ -45,15 +80,16 @@ evidence_binding_contract:
     - missing_route_slot
     - disconfirmation_target
     - construct_disposition
+    - causal_disposition
     - rejected_premise
 
   evidence_role_classes:
-    premise_breaking: Evidence that invalidates a required entity, unity, defect, direction, or translation premise.
+    premise_breaking: Evidence that invalidates a required entity, unity, defect, direction, predictive, or translation premise.
     route_closing: Evidence that directly closes a required dependency segment or join under stated conditions.
     route_discriminating: Evidence that distinguishes surviving routes through different predicted consequences.
     segment_supporting: Evidence that supports one bounded segment without closing the full route.
     descriptive_only: Evidence that closes only a measured descriptive relation.
-    non_probative: Evidence that cannot bear on the requested conclusion after construct, scale, timing, magnitude, or independence checks.
+    non_probative: Evidence that cannot bear on the requested conclusion after construct, causal, scale, timing, magnitude, or independence checks.
 
   binding_unit:
     definition: One reviewed evidence record bound to one or more named chain segments.
@@ -69,6 +105,7 @@ evidence_binding_contract:
       - independence_status
       - evidence_family_id
       - applicable_conditions
+      - predictive_scope
       - non_probative_for
     closure_state_rule: >
       The closure state must be a kernel state. Ingest records enter through ingest_crosswalk_ref;
@@ -77,13 +114,35 @@ evidence_binding_contract:
   binding_rules:
     - Support attaches only to the segment and conditions actually measured.
     - Evidence depending on a rejected construct cannot support that construct's biological unity or mechanism.
+    - Evidence failing a necessary causal test cannot support a causal verb for the requested proposition.
     - Proxy evidence requires translation closure before binding to mechanism.
     - Implementation-site evidence requires timing and dependency closure before binding to source.
     - Scale crossing requires an explicit carried variable and intermediate dependency path.
     - A route-closing intervention may bind more strongly than a descriptive association only for the segment it tests.
-    - Disconfirming or premise-breaking evidence binds to the exact premise, segment, or join it breaks.
+    - Disconfirming or premise-breaking evidence binds to the exact premise, segment, prediction, or join it breaks.
     - Unresolved evidence remains visible without granting closure.
     - Correlated reports remain grouped and cannot create independent weight by count.
+
+  causal_assessment:
+    dispositions_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
+    required_outputs:
+      - causal_disposition
+      - failed_causal_tests
+      - passed_causal_tests
+      - strongest_causal_support_path
+      - strongest_causal_failure_path
+    disposition_rules:
+      causal_admitted: Every necessary causal test passes for the exact requested relation.
+      causal_rejected: At least one necessary causal premise fails, including construct rejection, unbounded heterogeneity, or poor prediction.
+      causal_unresolved: The construct and target are admissible but the route remains open without a hard failure.
+      not_a_causal_question: The source asks only for description or interpretation.
+    prediction_rule: >
+      Statistical group separation, in-sample classification, or postdictive discrimination is not predictive
+      closure. Prediction must be prospective or genuinely out of sample, outperform realistic baselines, survive
+      relevant comparators, and remain stable under independent operationalizations.
+    heterogeneity_rule: >
+      Heterogeneity supports a causal relation only when explicit conditions or generated routes account for it.
+      Unbounded variation, unstable directions, and broad overlap defeat a unitary defect or mechanism claim.
 
   body_of_evidence_assessment:
     unit_of_counting: independent_evidence_family
@@ -98,9 +157,11 @@ evidence_binding_contract:
       - model_lineage
     required_dimensions:
       construct_admission: Does the evidence require the questioned entity to exist before measurement?
-      claim_directness: Does it measure the exact premise, segment, join, or outcome claimed?
+      claim_directness: Does it measure the exact premise, segment, join, prediction, or outcome claimed?
       measurement_validity: Is the measured variable physically interpretable under the stated conditions?
       causal_leverage: Does timing, perturbation, dependency position, or prospective design bear on direction?
+      predictive_adequacy: Does the route predict out of sample beyond realistic baselines and comparators?
+      heterogeneity_control: Are effect variation and direction generated by explicit conditions or routes?
       scale_translation: Does a demonstrated dependency carry the result to the requested scale?
       practical_magnitude: Is the effect large relative to overlap, variance, noise, range, and functional threshold?
       independence: Does the record add a distinct failure mode rather than repeat a family?
@@ -114,16 +175,17 @@ evidence_binding_contract:
       - descriptive_only
       - non_probative
     dominance_rules:
-      - Failure of a necessary construct or chain premise defeats any number of downstream records that assume it.
+      - Failure of a necessary construct or causal premise defeats any number of downstream records that assume it.
       - Direct route-closing or route-breaking evidence outranks association for the same claimed relation.
       - Independent convergence gains weight only when distinct methods close the same relation through different failure modes.
       - Repeated use of one cohort, dataset, task, diagnostic instrument, assay, or pipeline counts as one evidence family.
       - Small group-average differences with broad overlap cannot establish a unitary defect, entity, or individual-level state.
-      - Postdictive separation cannot establish causal origin, prediction, or generative route.
+      - Poorly predictive or postdictive work cannot be restated as causal contribution, mechanism, role, or biological basis.
       - Label-dependent, proxy-limited, source-scale-only, or practically trivial results cannot accumulate into mechanism by volume.
       - Publication prestige and citation count do not alter chain contribution.
     body_verdicts:
       premise_rejected: A required construct or entity premise fails admission.
+      causal_claim_rejected: A hard causal proposition fails one or more necessary causal tests.
       disconfirmed: Admissible evidence breaks the claimed route or necessary segment under the stated conditions.
       unsupported: No admissible evidence closes the requested relation.
       bounded_support: One or more bounded segments close, but the full requested relation does not.
@@ -175,6 +237,13 @@ evidence_binding_contract:
     excluded_or_capped_records: list
     strongest_admissible_support_path: list
     strongest_disconfirmation_path: list
+    causal_assessment:
+      vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
+      disposition: string
+      passed_tests: list
+      failed_tests: list
+      strongest_support_path: list
+      strongest_failure_path: list
     body_of_evidence_verdict:
       vocabulary_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.body_of_evidence_assessment.body_verdicts
       value: string
