@@ -1,6 +1,6 @@
 ingest_record_schema:
   status: candidate
-  schema_version: v5
+  schema_version: v6
   layer: support_layer
   closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
   construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
@@ -15,17 +15,12 @@ ingest_record_schema:
       required: true
       rule: Resolve canonical identity before writing a canonical record.
     identifiers:
-      fields:
-        - doi
-        - pmid
-        - arxiv
-        - alternate_ids
+      fields: [doi, pmid, arxiv, alternate_ids]
     agent:
       required: true
       form: family/version
     run_id:
       required: true
-      path_component: false
     timestamp:
       required: true
 
@@ -41,12 +36,79 @@ ingest_record_schema:
     source_claim_status_default: unadmitted_assertion
     causal_weight_default: zero
 
+  evidence_axes:
+    required: true
+    required_fields:
+      - design_mode
+      - construct_relation
+      - measurement_relation
+      - target_relations
+      - chain_exposure
+    design_mode_enum:
+      - observational
+      - longitudinal_observational
+      - natural_experiment
+      - quasi_experimental
+      - interventional
+      - simulation_or_model
+      - synthesis
+    construct_relation_enum:
+      - construct_independent
+      - construct_indexed
+      - construct_internal
+    measurement_relation_enum:
+      - direct_target_measurement
+      - direct_dependency_measurement
+      - proxy
+      - surrogate
+      - composite_or_scale
+      - self_report
+      - model_derived
+    target_relation_enum:
+      - descriptive_distribution
+      - predictive_relation
+      - intervention_to_outcome
+      - endogenous_dependency
+      - etiology_or_origin
+      - mechanism_or_route
+      - cross_scale_translation
+
+  data_record:
+    required: true
+    required_fields:
+      - exact_exposure_or_intervention
+      - exact_outcome_definition
+      - baseline_distribution
+      - comparator_or_counterfactual
+      - sample_and_exclusion_flow
+      - effect_distribution
+      - effect_magnitude
+      - uncertainty
+      - overlap_and_response_heterogeneity
+      - missingness_attrition_and_crossover
+      - timing_and_durability
+      - dose_or_exposure_relation
+      - adverse_or_opposing_outcomes
+      - measurement_validity_and_noise
+      - preregistration_and_outcome_switching
+      - analysis_multiplicity
+      - replication_and_condition_stability
+    missing_value_rule: Record unavailable fields explicitly as missing. Never infer them from narrative adjectives.
+    narrative_fit_fields:
+      - claimed_effectiveness_scope
+      - claimed_causal_scope
+      - claimed_mechanism_scope
+      - claimed_named_process
+      - data_supported_scope
+      - overstatement_or_bridge_gap
+
   presumption:
     required: true
     class_enum:
       - construct_indexed
-      - proxy_record
-      - treatment_response
+      - proxy_or_surrogate
+      - observational_record
+      - intervention_record
       - direct_construct_independent
     required_fields:
       - presumptive_class
@@ -61,23 +123,21 @@ ingest_record_schema:
     default_rules:
       construct_indexed:
         closure_state: label_dependent
-        causal_binding: forbidden
-        mechanism_binding: forbidden
-      proxy_record:
+      proxy_or_surrogate:
         closure_state: proxy_limited
-        causal_binding: forbidden
-        mechanism_binding: forbidden
-      treatment_response:
+      observational_record:
         closure_state: descriptive_only
-        causal_binding_scope: intervention_outcome_only
-        etiologic_binding: forbidden
-        endogenous_mechanism_binding: forbidden
+        causal_binding: denied_until_full_observational_burden_closes
+      intervention_record:
+        closure_state: unresolved
+        eligible_causal_target: intervention_to_outcome
+        broader_targets_require_separate_bridges: true
       direct_construct_independent:
         closure_state: unresolved
-        causal_binding: denied_until_exact_bridges_and_segments_close
+        causal_binding: denied_until_exact_data_bridges_and_segments_close
     upgrade_rule: >
-      A stronger closure state may be written only when escape_complete is true and the exact bridge and segment
-      independently close. Missing or untested escape conditions preserve the presumed closure state.
+      A stronger closure state may be written only for the exact target relation whose design, data, counterfactual,
+      bridge, and segment requirements close. Missing requirements preserve the restrictive state for that relation.
 
   inference_audit:
     required: true
@@ -94,6 +154,7 @@ ingest_record_schema:
       - source_statement
       - source_observation
       - target_claim
+      - target_relation
       - bridge_type
       - required_dependencies
       - direct_support
@@ -107,9 +168,7 @@ ingest_record_schema:
       - shared_assumption_families
       - non_probative_claims
       - strongest_surviving_claim
-    rule: >
-      A source conclusion cannot bind directly. Only admitted observations and bridges marked bridge_closed
-      may contribute beyond their measured scope, subject to the record's categorical binding prohibitions.
+    rule: Only admitted observations and closed bridges may contribute beyond their measured scope.
 
   extraction:
     required_fields:
@@ -119,13 +178,11 @@ ingest_record_schema:
       - explicit_observations
       - post_strip_claim
       - construct_disposition
-      - causal_disposition
+      - causal_disposition_by_target
       - rejected_entity_claims
       - rejected_causal_claims
       - handle_dependencies
       - handle_flags
-    construct_disposition_rule: Use exactly one disposition from construct_admission_ref for each questioned construct.
-    causal_disposition_rule: Use exactly one disposition from causal_admission_ref for each hard causal claim.
     optional_fields:
       - source_scale
       - target_scale
@@ -135,39 +192,38 @@ ingest_record_schema:
   validation:
     gate_results:
       required: true
-      state_enum:
-        - pass
-        - fail
-        - unresolved
-        - not_applicable
+      state_enum: [pass, fail, unresolved, not_applicable]
       per_gate_required_fields:
         - gate
+        - target_relation
         - state
         - basis
         - support_channels
         - blocked_roles
         - unresolved_slots
     causal_test_results:
-      required_when: source_claims_cause_defect_dysfunction_control_mechanism_or_biological_basis
+      required_when: any_target_relation_is_causal
       required_fields:
-        - presumption_escape
+        - target_relation_identity
+        - design_supports_counterfactual
         - construct_coherence
         - temporal_direction
-        - dependency_or_intervention
-        - out_of_sample_prediction
-        - baseline_and_comparator_performance
-        - heterogeneity_control
-        - practical_magnitude
+        - dependency_or_intervention_integrity
+        - comparator_validity
+        - effect_distribution_and_practical_magnitude
+        - heterogeneity_and_condition_stability
+        - durability
+        - attrition_missingness_and_analysis_integrity
+        - predictive_or_route_discriminating_adequacy
         - scale_translation
         - independent_convergence
         - inferential_bridge_closure
         - disconfirmation_survival
       output_fields:
-        - causal_disposition
-        - failed_presumptions
-        - failed_causal_tests
-        - failed_inferential_bridges
-        - passed_causal_tests
+        - causal_disposition_by_target
+        - failed_causal_tests_by_target
+        - failed_inferential_bridges_by_target
+        - passed_causal_tests_by_target
     evidence_role:
       required: true
       vocabulary_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.evidence_role_classes
@@ -177,12 +233,10 @@ ingest_record_schema:
         - non_probative_for
     chain_segments:
       required: true
-      closure_state_rule: >
-        Begin with presumed_closure_state. Use a stronger kernel closure state only when escape_complete is true and
-        the exact bridge and segment close. Proxy and treatment-response categorical prohibitions remain in force.
       per_segment_fields:
         - segment_id
         - relation
+        - target_relation
         - presumed_closure_state
         - final_closure_state
         - upgrade_basis
@@ -191,6 +245,8 @@ ingest_record_schema:
 
   body_weight_inputs:
     required_fields:
+      - design_mode
+      - target_relation
       - presumptive_class
       - presumption_escape_status
       - admission_status
@@ -198,17 +254,17 @@ ingest_record_schema:
       - construct_dependency
       - causal_disposition
       - causal_leverage
-      - temporality
-      - prediction_target
-      - out_of_sample_performance
+      - counterfactual_validity
+      - effect_distribution
+      - effect_magnitude
       - realistic_baseline
       - comparator_performance
+      - response_heterogeneity
       - condition_stability
-      - heterogeneity_bound
+      - durability
+      - attrition_and_missingness
       - scale_translation_status
-      - effect_magnitude
-      - variance_envelope
-      - group_overlap
+      - overlap
       - noise_floor
       - functional_threshold_relation
       - replication_status
@@ -217,9 +273,8 @@ ingest_record_schema:
       - shared_assumption_family_id
       - disconfirmation_target
     rule: >
-      These fields describe restrictive presumption, admission, chain contribution, causal eligibility, and family
-      independence. They are not combined into a numerical score and cannot be overridden by publication count,
-      prestige, peer review, consensus, recency, citation volume, treatment response, or proxy recurrence.
+      These fields remain separate. They are not combined into a generic quality score and cannot be overridden by
+      publication count, prestige, peer review, consensus, intervention naming, statistical significance, or narrative strength.
 
   provenance:
     required_fields:
@@ -233,7 +288,9 @@ ingest_record_schema:
       - shared_assumption_family_id
       - shared_construct_id
       - shared_proxy_id
-      - shared_treatment_indication_id
+      - shared_intervention_id
+      - shared_comparator_id
+      - shared_outcome_measure_id
       - shared_pipeline_id
       - shared_cohort_id
       - shared_dataset_id
@@ -243,33 +300,30 @@ ingest_record_schema:
 
   outputs:
     required_fields:
+      - evidence_axes
       - presumptive_class
       - presumed_closure_state
-      - presumption_basis
-      - escape_conditions_tested
-      - escape_conditions_passed
-      - escape_complete
-      - admitted_observations
+      - data_fields_available
+      - data_fields_missing
+      - data_supported_scope
       - stripped_assertions
+      - admitted_observations
       - bridge_ledger
       - shared_assumption_families
       - strongest_surviving_claim
+      - eligible_causal_targets
       - support_channels
       - blocked_roles
       - translation_limits
       - construct_disposition
-      - causal_disposition
-      - failed_presumptions
-      - failed_causal_tests
-      - failed_inferential_bridges
+      - causal_disposition_by_target
+      - failed_causal_tests_by_target
+      - failed_inferential_bridges_by_target
       - evidence_role_class
       - non_probative_for
       - visibility_status
       - promotion_status
-    promotion_status_enum:
-      - none
-      - candidate
-      - blocked
+    promotion_status_enum: [none, candidate, blocked]
 
   lifecycle:
     append_only: true
@@ -282,13 +336,14 @@ ingest_record_schema:
   invariants:
     support_layer_only: true
     no_unilateral_claim_write: true
+    actual_data_outranks_source_narrative: true
     restrictive_presumption_assigned_before_local_checks: true
-    missing_escape_evidence_preserves_presumption: true
-    local_pass_does_not_remove_presumption: true
-    construct_indexed_defaults_to_label_dependent: true
-    proxy_defaults_to_proxy_limited: true
-    proxy_never_binds_causal_segment: true
-    treatment_response_never_binds_etiology_or_endogenous_mechanism: true
+    observational_defaults_to_noncausal: true
+    intervention_is_evaluated_for_exact_target_relation: true
+    intervention_label_neither_grants_nor_denies_causality: true
+    intervention_effect_does_not_automatically_establish_etiology_or_endogenous_mechanism: true
+    statistical_significance_does_not_establish_effectiveness: true
+    named_process_language_does_not_establish_measured_process: true
     source_conclusion_never_binds_directly: true
     causal_weight_defaults_to_zero: true
     peer_review_is_not_admission: true
@@ -299,5 +354,3 @@ ingest_record_schema:
     publication_count_is_not_weight: true
     identity_resolved_before_canonical_write: true
     unresolved_never_grants_closure: true
-    rejected_construct_cannot_receive_entity_level_promotion: true
-    causal_rejected_record_cannot_receive_causal_promotion: true
