@@ -22,6 +22,26 @@ candidate_adoption_gate:
     - calibration
     - coupled_file_drift
     - minimal_patch
+    - semantic_conformance
+    - narrative_invariance
+    - data_sensitivity
+    - scope_separation
+    - positive_causal_control
+    - provider_result_freshness
+
+  semantic_conformance:
+    policy_ref: conformance/required_runs.json
+    decision_record_ref: conformance/decision_record.schema.json
+    validator: scripts/validate_conformance.py
+    requirements:
+      - every critical generic and active-cartridge fixture passes
+      - narrative-only mutations preserve causal and closure results
+      - data mutations change results when the causal burden changes
+      - exact intervention causality remains separate from etiology and endogenous mechanism
+      - decisive-intervention positive controls receive causal admission at exact scope
+      - provider result hashes match the runtime kernel cartridge and fixture versions under review
+      - minimum independent run count is satisfied with zero critical failures
+    rule: Structural CI validates the harness. Adoption requires fresh provider executions recorded under conformance/results.
 
   verdicts:
     - accept
@@ -35,6 +55,10 @@ candidate_adoption_gate:
     model_agreement_is_not_validity: true
     runtime_manifest_entry_requires_adoption: true
     review_record_cannot_override_canonical_source: true
+    structural_ci_is_not_semantic_proof: true
+    adoption_requires_fresh_provider_results: true
+    critical_semantic_failure_tolerance: zero
+    reject_everything_is_not_conformance: true
 
   required_output:
     - verdict
@@ -44,4 +68,6 @@ candidate_adoption_gate:
     - risks
     - redundancy
     - minimal_safe_form
+    - semantic_conformance_status
+    - provider_result_freshness
     - adoption_status
