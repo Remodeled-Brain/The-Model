@@ -1,0 +1,41 @@
+{
+  "schema_version": "v1",
+  "status": "candidate",
+  "purpose": "Generic runtime regressions for mandatory folk-behavior reconstruction before evidence review.",
+  "fixtures": [
+    {
+      "id": "folk-behavior-target-before-evidence",
+      "mode": "question",
+      "source_question": "Does intervention X reduce procrastination?",
+      "required": [
+        "detect procrastination as a folk behavior grouping handle before evaluating the intervention evidence",
+        "remove procrastination as a unitary outcome identity",
+        "preserve only explicitly supplied initiation delay completion deadline reporting and task-condition measurements",
+        "emit separate relations for the exact recorded behavior and the broader folk construct",
+        "reject construct-level efficacy unless independent construct unity and ecological transport close"
+      ],
+      "forbidden": [
+        "treat randomized assignment as validation of procrastination as one target",
+        "infer a standard behavior bundle from the familiar label",
+        "rewrite a protocol-bound measurement contrast as reduced real-world procrastination",
+        "let effect magnitude repair construct identity"
+      ]
+    },
+    {
+      "id": "folk-behavior-positive-narrow-control",
+      "mode": "condition",
+      "condition": "A decisive controlled intervention changes one directly measured initiation or completion relation under stated conditions while the source names the result with a broader folk behavior label.",
+      "required": [
+        "permit causal admission for the exact independently measured relation when its full burden closes",
+        "retain the folk label as grouping_handle_only",
+        "reject transfer from the exact relation to treatment of the unitary folk construct",
+        "state the tested operational and ecological scope"
+      ],
+      "forbidden": [
+        "reject the exact decisive relation merely because the source used a folk label",
+        "allow the exact relation to validate the broader construct",
+        "generalize beyond the tested conditions"
+      ]
+    }
+  ]
+}
