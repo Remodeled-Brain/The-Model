@@ -5,6 +5,7 @@ import argparse, datetime as dt, hashlib, json, pathlib, shlex, subprocess, sys,
 from typing import Any
 import validate_conformance as vc
 import validate_physical_continuity as pc
+import target_identity_contract as ti
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 MODEL=ROOT/"model"
@@ -73,7 +74,7 @@ def main()->int:
                 record=call_provider(command,payload)
                 result={
                   "schema_version":"v1","run_id":run_id,"fixture_set":fixture_set,"fixture_id":fixture["id"],"variant_id":variant["id"],
-                  "provider":{"name":args.provider_name,"model":args.model_id,"runtime_hash":runtime_hash,"kernel_hash":kernel_hash,"cartridge_hash":cartridge_hash,"fixture_hash":fixture_hash,"physical_contract_hash":pc.physical_contract_hash(),"temperature":args.temperature,"seed":str(args.seed)},
+                  "provider":{"name":args.provider_name,"model":args.model_id,"runtime_hash":runtime_hash,"kernel_hash":kernel_hash,"cartridge_hash":cartridge_hash,"fixture_hash":fixture_hash,"target_identity_contract_hash":ti.target_identity_contract_hash(),"physical_contract_hash":pc.physical_contract_hash(),"temperature":args.temperature,"seed":str(args.seed)},
                   "decision_record":record,"rendered_answer":vc.render_answer(record)
                 }
                 vc.validate_result(result,variants)
