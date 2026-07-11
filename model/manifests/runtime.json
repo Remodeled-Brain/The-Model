@@ -14,7 +14,8 @@
     "runtime/fixtures.json"
   ],
   "domain_modules": [
-    "cartridges/neuroscience.yaml"
+    "cartridges/neuroscience.yaml",
+    "cartridges/neuroscience_fixtures.json"
   ],
   "support_manifests": [
     "manifests/ingest.json"
