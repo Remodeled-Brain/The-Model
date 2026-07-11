@@ -1,0 +1,93 @@
+{
+  "schema_version": "v1",
+  "run_id": "selftest",
+  "fixture_set": "selftest",
+  "fixture_id": "selftest",
+  "variant_id": "selftest",
+  "provider": {
+    "name": "selftest",
+    "model": "deterministic",
+    "runtime_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "kernel_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+    "cartridge_hash": "3333333333333333333333333333333333333333333333333333333333333333",
+    "fixture_hash": "2222222222222222222222222222222222222222222222222222222222222222"
+  },
+  "decision_record": {
+    "schema_version": "v1",
+    "query": "Did intervention X cause outcome Y?",
+    "admitted_observations": [
+      "The controlled manipulation changed outcome Y under the tested conditions."
+    ],
+    "stripped_assertions": [],
+    "relations": [
+      {
+        "id": "intervention_to_outcome",
+        "design_mode": "interventional",
+        "target_relation": "intervention_to_outcome",
+        "construct_relation": "construct_independent",
+        "measurement_relation": "direct_target_measurement",
+        "chain_exposure": "dependency_directly_exposed",
+        "scope": "outcome Y under tested conditions",
+        "causal_disposition": "causal_admitted",
+        "closure_state": "closed",
+        "required_checks": [
+          "attrition_missingness_and_crossover_bounded",
+          "bounded_or_generated_heterogeneity",
+          "durability_appropriate_to_claim",
+          "effect_magnitude_and_full_response_distribution",
+          "manipulation_integrity",
+          "measurement_validity",
+          "no_stronger_disconfirmation",
+          "replication_or_internal_strength_proportionate_to_claim_scope",
+          "specificity_against_relevant_alternative_routes",
+          "temporal_precedence",
+          "valid_comparator_or_counterfactual"
+        ],
+        "passed_checks": [
+          "attrition_missingness_and_crossover_bounded",
+          "bounded_or_generated_heterogeneity",
+          "durability_appropriate_to_claim",
+          "effect_magnitude_and_full_response_distribution",
+          "manipulation_integrity",
+          "measurement_validity",
+          "no_stronger_disconfirmation",
+          "replication_or_internal_strength_proportionate_to_claim_scope",
+          "specificity_against_relevant_alternative_routes",
+          "temporal_precedence",
+          "valid_comparator_or_counterfactual"
+        ],
+        "failed_checks": [],
+        "data": {
+          "exact_outcome_definition": "specified",
+          "exact_exposure_or_intervention": "specified",
+          "baseline_distribution": "reported",
+          "comparator_or_counterfactual": "reported",
+          "sample_and_exclusion_flow": "reported",
+          "effect_distribution": "reported",
+          "effect_magnitude": "reported",
+          "uncertainty": "reported",
+          "overlap_and_response_heterogeneity": "reported",
+          "missingness_attrition_and_crossover": "reported",
+          "timing_and_durability": "reported",
+          "dose_or_exposure_relation": "not_applicable",
+          "adverse_or_opposing_outcomes": "reported",
+          "measurement_validity_and_noise": "reported",
+          "preregistration_outcome_switching_and_analysis_multiplicity": "reported",
+          "replication_and_condition_stability": "reported"
+        }
+      }
+    ],
+    "claims": [
+      {
+        "id": "c1",
+        "relation_id": "intervention_to_outcome",
+        "language_class": "causal",
+        "text": "Intervention X caused outcome Y under the tested conditions."
+      }
+    ],
+    "answer_claim_order": [
+      "c1"
+    ]
+  },
+  "rendered_answer": "Intervention X caused outcome Y under the tested conditions."
+}
