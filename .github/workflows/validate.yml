@@ -22,3 +22,5 @@ jobs:
           python-version: "3.12"
       - name: Validate manifests, builds, and fixtures
         run: python scripts/validate_repo.py
+      - name: Validate premise rejection and evidence weighting
+        run: python scripts/validate_model_policy.py
