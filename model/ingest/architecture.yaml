@@ -2,10 +2,10 @@ ingest_architecture:
   status: candidate
   layer: evidence_maintenance
   purpose: >
-    Convert a source into a provenance-bound audited record without allowing construct dependence,
-    proxies, treatment response, significance language, or implementation sites to become causal mechanisms.
+    Convert a source into a provenance-bound relation-level record whose admissible scope is generated from the
+    actual data, design, construct dependence, measurement distance, and exposed chain rather than the source narrative.
 
-  evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission.presumptive_classification
+  evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission
 
   boundary:
     consumes: paper_or_source
@@ -17,82 +17,90 @@ ingest_architecture:
       - write_canonical_claim_state_without_adoption
       - treat_source_conclusions_as_admitted_evidence
 
-  phase_0_presumption:
-    purpose: Assign the restrictive starting classification before any local gate can pass.
+  phase_0_data_and_design:
+    purpose: Extract the actual observations and classify what causal contrast the design can expose.
+    required_outputs:
+      - design_mode
+      - construct_relation
+      - measurement_relation
+      - target_relations
+      - chain_exposure
+      - exact_exposure_or_intervention
+      - exact_outcome_definition
+      - comparator_or_counterfactual
+      - full_effect_distribution
+      - effect_magnitude
+      - response_heterogeneity
+      - timing_and_durability
+      - sample_flow_attrition_and_missingness
+      - measurement_validity_and_noise
+      - analysis_integrity
+    rules:
+      - The actual data outrank the abstract discussion and conclusion.
+      - Observational work begins descriptive or more restricted.
+      - Intervention work begins unresolved and may earn causality for the exact manipulated relation.
+      - Intervention naming neither grants nor denies causality.
+      - Construct dependence and proxy distance remain separate restrictions.
+
+  phase_A_presumption_and_audit:
+    purpose: Assign the most restrictive applicable initial state and expose every inferential bridge.
     required_outputs:
       - presumptive_class
-      - presumption_triggers
       - presumed_closure_state
       - presumed_support_role
       - initially_blocked_roles
-      - escape_conditions_required
-    routing:
-      construct_indexed: label_dependent
-      proxy_record: proxy_limited
-      treatment_response: descriptive_only_with_label_dependent_secondary_state_when_construct_selected
-      direct_construct_independent: unresolved
-    rules:
-      - Construct-indexed work begins label_dependent rather than neutral.
-      - Proxy work begins proxy_limited and cannot bind to causal or mechanistic segments.
-      - Treatment-response work may bind intervention-outcome relations but cannot bind etiology or endogenous mechanism.
-      - Local gate passes cannot erase the presumption.
-      - Missing escape evidence preserves the presumption.
-      - Publication count and meta-analysis cannot escape the presumption.
-
-  phase_A_admissibility:
-    purpose: Strip author-interface text, separate observations from interpretations, and audit inferential bridges.
-    required_outputs:
-      - direct_observations
-      - author_interpretations
-      - measured_substrate
-      - measured_variable
-      - grouping_variable
-      - post_strip_claim
-      - handle_dependencies
-      - handle_flags
+      - admitted_observations
+      - stripped_assertions
       - bridge_ledger
       - shared_assumption_families
-    admissible_if: a physical or descriptive observation survives handle and bridge removal
-    inadmissible_if: no observation survives handle and bridge removal
+    routing:
+      construct_indexed: label_dependent
+      proxy_or_surrogate: proxy_limited
+      observational_record: descriptive_only
+      intervention_record: unresolved
+      direct_construct_independent: unresolved
+    rules:
+      - Missing evidence preserves the restrictive state for the affected relation.
+      - One local pass cannot upgrade the whole record.
+      - Every increase from observation to cause mechanism effectiveness or named process requires a bridge.
 
-  phase_B_validation:
-    purpose: Test presumption escape, route, translation, prediction, heterogeneity, magnitude, and dependency.
+  phase_B_relation_validation:
+    purpose: Test each target relation using the burden appropriate to its design and claimed scope.
     gates:
-      - presumption_escape
       - construct_admission
-      - causal_admission
-      - controlled_sameness_missing_differentiator
-      - region_source_closure
-      - conservation_dependency
-      - proxy_promotion
-      - predictive_adequacy
-      - heterogeneity_control
+      - counterfactual_integrity
+      - manipulation_or_exposure_integrity
+      - temporality
       - practical_significance
+      - response_distribution_and_heterogeneity
+      - durability
+      - attrition_missingness_and_analysis_integrity
+      - prediction_or_route_discrimination_when_required
+      - proxy_translation
       - scale_translation
       - independence
+      - disconfirmation
     outputs:
-      - escape_conditions_tested
-      - escape_conditions_passed
-      - escape_complete
-      - causal_frame_status
-      - failed_presumptions
-      - missing_route_slots
-      - chain_closure_status
-      - proxy_status
-      - translation_limit
+      - data_supported_scope
+      - eligible_causal_targets
+      - causal_disposition_by_target
+      - failed_causal_tests_by_target
+      - failed_inferential_bridges_by_target
+      - final_closure_state_by_target
       - support_channels
       - blocked_roles
 
   phase_C_binding_eligibility:
     purpose: Determine which exact relations the audited record may support.
     rules:
-      - Begin with presumed_closure_state.
-      - Upgrade only after every required escape condition, bridge, and segment closes.
-      - Proxy records never bind causal or mechanistic segments.
-      - Treatment-response records never bind etiology, pathogenesis, construct validity, or endogenous mechanism.
-      - Construct-indexed records without complete escape remain label_dependent.
+      - Bind only admitted observations and closed bridges.
+      - Observational evidence remains descriptive unless the full causal burden closes.
+      - A passing intervention may bind intervention_to_outcome causally under tested conditions.
+      - Intervention effects do not automatically establish etiology endogenous mechanism construct validity or cross-scale explanation.
+      - Proxy relations remain proxy_limited until physical translation closes.
+      - Construct-indexed relations remain label_dependent until construct escape closes.
+      - Narrative strength cannot exceed data-supported scope.
     outputs:
-      - final_closure_state
       - eligible_binding_relations
       - forbidden_binding_relations
       - evidence_role_class
@@ -100,25 +108,20 @@ ingest_architecture:
 
   write_boundary:
     allowed:
+      - evidence_axes
+      - data_record
       - presumptive_classification
-      - escape_test_results
       - admitted_observations
       - stripped_assertions
       - bridge_ledger
       - shared_assumption_families
+      - relation_level_gate_results
       - evidence
       - provenance
-      - paper_links
       - extraction_notes
       - disconfirmation_notes
       - method_notes
-      - category_failure_notes
-      - proxy_status_notes
-      - treatment_response_limits
       - missing_route_notes
-      - descriptive_support_notes
-      - source_tree_handles
-      - watch_items
       - promotion_candidates
       - promotion_gate_results
     canonical_integration: serialized_explicit_adoption_only
@@ -131,16 +134,14 @@ ingest_architecture:
 
   invariants:
     phase_0_before_phase_A_before_phase_B_before_phase_C: true
-    restrictive_presumption_precedes_local_checks: true
-    node_mapping_requires_post_strip_claim: true
-    support_layer_only_during_ingest: true
+    actual_data_outranks_source_narrative: true
+    observational_defaults_to_noncausal: true
+    intervention_is_evaluated_for_exact_target_relation: true
+    intervention_label_neither_grants_nor_denies_causality: true
+    treatment_effect_does_not_automatically_establish_etiology_or_endogenous_mechanism: true
     construct_indexed_defaults_to_label_dependent: true
     proxy_defaults_to_proxy_limited: true
-    proxy_never_binds_causal_segment: true
-    treatment_response_never_binds_etiology_or_endogenous_mechanism: true
-    diagnostic_label_can_group_but_cannot_ground: true
-    region_label_cannot_supply_origin: true
-    conservation_cannot_supply_weight_directly: true
-    analytical_significance_cannot_supply_practical_weight_directly: true
-    failed_gate_preserves_restrictive_state: true
+    analytical_significance_cannot_supply_effectiveness: true
+    named_process_language_cannot_supply_measured_process: true
+    failed_gate_preserves_restrictive_state_for_affected_relation: true
     support_note_count_cannot_create_grounding: true
