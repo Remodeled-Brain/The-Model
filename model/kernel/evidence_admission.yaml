@@ -16,6 +16,92 @@ evidence_admission:
     peer_review_is_evidence: false
     consensus_is_evidence: false
     meta_analysis_repairs_invalid_inputs: false
+    local_guard_passes_create_causal_eligibility: false
+
+  presumptive_classification:
+    rule: >
+      Evidence classes with known construct dependence or inferential distance enter with a restrictive kernel
+      closure state. The presumption is the starting classification, not a penalty applied after a neutral record
+      is admitted. It remains until every escape condition is affirmatively demonstrated.
+    classes:
+      construct_indexed:
+        triggers:
+          - samples selected by diagnosis or theoretical category
+          - outcomes defined by the same diagnostic instrument or construct
+          - treatment-for records indexed by a diagnosis or syndrome label
+          - response-rate records reported within a labeled cohort
+          - task or assay selected because it is conventionally associated with the construct
+          - literature synthesis whose inputs share the construct assumption
+        presumed_closure_state: label_dependent
+        presumed_support_role: label_dependent_observation
+        causal_segment_binding: forbidden
+        mechanism_segment_binding: forbidden
+        etiologic_binding: forbidden
+        escape_requires:
+          - target relation specified independently of the construct label
+          - sampling or replication outside construct-selected cohorts
+          - measurement operationalization independent of the diagnostic instrument or threshold
+          - stability under relabeling threshold perturbation and alternative operationalization
+          - route-specific prospective prediction independent of group membership
+          - direct dependency evidence that does not presuppose the construct
+        count_can_escape: false
+        meta_analysis_can_escape: false
+      proxy_record:
+        triggers:
+          - biomarker
+          - imaging signal
+          - assay output
+          - classifier score
+          - surrogate endpoint
+          - downstream readout
+        presumed_closure_state: proxy_limited
+        presumed_support_role: proxy_only
+        causal_segment_binding: forbidden
+        mechanism_segment_binding: forbidden
+        escape_rule: >
+          A proxy record cannot itself bind to a causal or mechanistic segment. A later record may bind only by
+          directly measuring the required dependency, at which point it is classified as direct dependency evidence
+          rather than upgraded proxy evidence.
+        count_can_escape: false
+        translation_language_can_escape: false
+      treatment_response:
+        triggers:
+          - treatment-for claim
+          - response rate
+          - symptom improvement after intervention
+          - medication class associated with a diagnosis
+          - intervention selected because of the labeled indication
+        presumed_closure_state: label_dependent
+        presumed_support_role: descriptive_support
+        may_bind:
+          - intervention_to_measured_outcome_under_stated_conditions
+          - adverse_effect_relation
+          - dose_timing_and_response_distribution
+        may_not_bind:
+          - etiology
+          - pathogenesis
+          - diagnostic_construct_validity
+          - endogenous_mechanism
+          - defect_or_dysfunction
+          - biological_basis
+        rule: >
+          Treatment response identifies an intervention-outcome relation under the tested conditions. It cannot
+          identify what generated the treated condition, validate the diagnostic entity, or establish that the
+          intervention target is the endogenous causal route.
+      direct_construct_independent:
+        triggers:
+          - variables specified independently of diagnosis theory or proxy status
+          - sampling and measurement do not require the target construct
+          - dependency is directly measured or manipulated
+        presumed_closure_state: unresolved
+        presumed_support_role: provenance_only
+        rule: >
+          Construct independence removes the label-dependent presumption but does not grant support. The record
+          still begins unadmitted and must close the exact bridge and chain segment it claims.
+    upgrade_rule: >
+      No record upgrades because one local guard passes. Upgrade requires affirmative satisfaction of every
+      applicable escape condition plus closure of the exact bridge and segment. Failure to demonstrate escape
+      preserves the presumed state without balancing language.
 
   claim_decomposition:
     required_parts:
@@ -61,6 +147,8 @@ evidence_admission:
       - location_to_source
       - perturbability_to_control
       - proxy_to_mechanism
+      - treatment_response_to_etiology
+      - treatment_target_to_endogenous_route
       - source_scale_to_target_scale
       - retrospective_to_predictive
       - prediction_to_causation
@@ -79,6 +167,8 @@ evidence_admission:
       - Which causal direction was measured and which was inferred?
       - Which scale crossings lack an explicit physical carrier?
       - Which conclusions depend on the diagnostic or theoretical construct being true in advance?
+      - Is a treatment-response relation being smuggled into etiology or endogenous mechanism?
+      - Is a proxy being described as the dependency it merely reads out?
       - Which findings disappear or change under another task, threshold, cohort, comparator, or operationalization?
       - Which nulls, reversals, overlaps, and failed predictions are hidden by summary language?
       - Which papers repeat the same assumption family rather than provide independent closure?
@@ -88,6 +178,9 @@ evidence_admission:
 
   corpus_level_rules:
     - The corpus is a collection of claims and measurements, not a trusted body of conclusions.
+    - Construct-indexed literature is presumed label-dependent until it affirmatively escapes the construct.
+    - Proxy literature is presumed proxy-limited and cannot itself bind to a causal segment.
+    - Treatment-response literature may bind intervention-outcome relations but never etiology or endogenous mechanism.
     - Repetition of one inferential bridge across papers counts as one shared assumption family, not convergence.
     - A meta-analysis inherits construct, measurement, task, selection, and direction failures from its inputs.
     - Publication volume can increase confidence only after exact relation identity, bridge closure, and independence are established.
@@ -98,11 +191,17 @@ evidence_admission:
     - The model must prefer a sparse surviving observation over a rich unsupported causal narrative.
 
   causal_transfer_rule: >
-    No source conclusion, discussion claim, abstract framing, review synthesis, or consensus statement may transfer
-    causal language into the runtime. Causal language is regenerated only from closed construct, dependency,
-    timing, prediction, heterogeneity, magnitude, translation, independence, and disconfirmation paths.
+    No source conclusion, discussion claim, abstract framing, review synthesis, consensus statement, treatment
+    indication, response rate, or proxy association may transfer causal language into the runtime. Causal language
+    is regenerated only from construct-independent direct dependency evidence that closes timing, prediction,
+    heterogeneity, magnitude, translation, independence, and disconfirmation paths.
 
   output_requirements:
+    - presumptive_class
+    - presumed_closure_state
+    - presumption_basis
+    - escape_conditions_tested
+    - escape_conditions_passed
     - admitted_observations
     - stripped_assertions
     - bridge_ledger
@@ -113,6 +212,11 @@ evidence_admission:
     - causal_rejection_basis
 
   forbidden_shortcuts:
+    - neutral_default_for_construct_indexed_evidence
+    - local_guard_pass_as_global_upgrade
+    - treatment_response_as_etiology
+    - treatment_target_as_endogenous_mechanism
+    - proxy_record_as_causal_segment
     - publication_as_admission
     - author_conclusion_as_binding
     - peer_review_as_validation
