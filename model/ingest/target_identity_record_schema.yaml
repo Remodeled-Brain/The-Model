@@ -1,0 +1,93 @@
+target_identity_record_schema:
+  status: candidate
+  schema_version: v1
+  layer: support_layer
+  kernel_ref: model/kernel/target_identity.yaml#target_identity
+  extends: model/ingest/record_schema.yaml#ingest_record_schema
+
+  required_section: target_identity
+
+  speaker_intent_record:
+    required_when: source_question_or_user_request_is_available
+    required_fields:
+      - source_wording
+      - intended_referent_candidates
+      - requested_scope
+      - requested_time_horizon
+      - distinctions_that_change_the_answer
+      - selected_or_inferred_referent
+      - unresolved_material_ambiguity
+
+  per_target_record:
+    required: true
+    required_fields:
+      - source_label
+      - source_defined_target
+      - exact_relations_after_label_removal
+      - identity_generator_pointer
+      - generator_type
+      - generator_status
+      - variables_or_inputs
+      - measurement_reconstruction_or_realization_procedure
+      - aggregation_threshold_or_classification_rule
+      - boundary_conditions_and_regime
+      - uncertainty_and_error_model
+      - operational_equivalence_evidence
+      - identity_breaking_evidence
+      - heterogeneity_generator_and_predictions
+      - alternate_construction_sensitivity
+      - transport_scope_and_status
+      - identity_disposition
+      - mapped_construct_disposition
+      - exact_relations_eligible_for_evidence_review
+      - unresolved_identity_slots
+
+  identity_disposition_enum:
+    - generated_identity_closed
+    - generated_identity_conditional
+    - constructed_measurement_identity
+    - grouping_handle_only
+    - identity_unresolved
+    - premise_rejected
+
+  corpus_crosswalk:
+    required_when: more_than_one_source_or_operationalization_is_available
+    required_fields:
+      - source_operationalizations
+      - same_label_same_measurement
+      - same_label_different_measurement
+      - different_label_same_measurement
+      - cross_measure_prediction
+      - intervention_transfer
+      - direction_magnitude_and_distribution_stability
+      - measurement_invariance
+      - condition_population_and_time_transport
+      - shared_generator_status
+      - failure_tree_findings
+
+  relation_ledger:
+    required_relations_when_present:
+      - speaker_intended_target
+      - source_defined_target
+      - exact_measured_relation
+      - constructed_or_aggregated_measure
+      - claimed_broader_target
+      - claimed_transport_relation
+    per_relation_fields:
+      - relation_id
+      - target_identity_record_id
+      - exact_target_definition
+      - identity_disposition
+      - construct_disposition
+      - evidence_eligibility
+      - scope_conditions
+      - unresolved_identity_slots
+
+  invariants:
+    identity_record_precedes_causal_weight: true
+    speaker_intent_does_not_supply_construct_identity: true
+    corpus_agreement_does_not_supply_identity: true
+    exact_relations_survive_broader_identity_failure: true
+    randomization_does_not_validate_construct: true
+    heterogeneity_requires_generated_differentiators: true
+    constructed_measurement_is_not_automatically_a_natural_kind: true
