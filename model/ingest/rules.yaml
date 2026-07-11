@@ -2,6 +2,7 @@ ingest_rules:
   status: candidate
   layer: evidence_maintenance
   construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+  causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
   evidence_role_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.evidence_role_classes
 
   strip_and_extract:
@@ -22,7 +23,9 @@ ingest_rules:
       - explicit_observations
       - post_strip_claim
       - construct_disposition
+      - causal_disposition
       - rejected_entity_claims
+      - rejected_causal_claims
       - handle_dependencies
       - handle_flags
     handle_categories:
@@ -81,13 +84,46 @@ ingest_rules:
       - regional_localization_of_diagnosis
       - evidence_weight_for_construct_validity
 
+  causal_admission:
+    phase: validation
+    trigger: any_source_claiming_cause_defect_dysfunction_control_mechanism_or_biological_basis
+    rule: >
+      Causal weight requires an admitted construct, temporal direction, dependency or intervention leverage,
+      route-specific out-of-sample prediction, bounded heterogeneity, practical magnitude, scale translation,
+      independent convergence, and survival of disconfirmation. Failure of any necessary test blocks causal language.
+    required_tests:
+      - construct_coherence
+      - temporal_direction
+      - dependency_or_intervention
+      - out_of_sample_prediction
+      - realistic_baseline_and_comparator_performance
+      - route_bounded_heterogeneity
+      - practical_magnitude
+      - scale_translation
+      - independent_convergence
+      - disconfirmation_survival
+    hard_failure_conditions:
+      - rejected_construct
+      - highly_heterogeneous_unbounded_results
+      - poor_or_postdictive_prediction
+      - broad_overlap_with_small_group_mean_difference
+      - region_localization_without_source_dependency
+      - failed_cross_scale_translation
+    hard_failure_output: causal_rejected
+    blocked_roles_after_failure:
+      - causal_support
+      - mechanism_support
+      - contribution_language
+      - dysfunction_or_defect_language
+      - biological_basis_language
+
   evidence_role_classification:
     rule: >
-      Classify each surviving claim by its actual contribution to a required premise, segment, join, or
-      descriptive relation. Do not assign a stronger role from journal prestige, author language, citation count,
+      Classify each surviving claim by its actual contribution to a required premise, segment, join, prediction,
+      or descriptive relation. Do not assign a stronger role from journal prestige, author language, citation count,
       sample size alone, or framework fit.
     roles:
-      premise_breaking: Breaks a required entity, unity, defect, direction, or translation premise.
+      premise_breaking: Breaks a required entity, unity, defect, direction, predictive, or translation premise.
       route_closing: Directly closes a required dependency segment or join under stated conditions.
       route_discriminating: Produces observations that separate surviving routes.
       segment_supporting: Supports one bounded segment without closing the route.
@@ -168,6 +204,31 @@ ingest_rules:
         - no_prediction_weight
         - no_direct_generative_grounding
 
+    predictive_adequacy:
+      rule: >
+        A causal route must generate prospective or genuinely out-of-sample predictions that outperform realistic
+        baselines, survive relevant comparators, and recur under independent operationalizations.
+      required_fields:
+        - prediction_target
+        - train_test_separation
+        - baseline
+        - comparator_routes
+        - calibration
+        - external_validation
+        - condition_stability
+      failure_cap: descriptive_or_non_probative_for_causality
+
+    heterogeneity_control:
+      rule: >
+        Heterogeneity supports a causal relation only when explicit conditions or generated routes account for it.
+        Unstable directions, unexplained subgroup shifts, and broad overlap defeat a unitary defect or mechanism claim.
+      required_fields:
+        - effect_direction_by_condition
+        - magnitude_by_condition
+        - overlap_by_condition
+        - generated_route_for_variation
+      failure_cap: causal_rejected_for_unitary_claim
+
     practical_significance:
       rule: >
         Analytical separability does not establish biological, behavioral, or clinical importance.
@@ -181,7 +242,7 @@ ingest_rules:
         - replication
       broad_overlap_rule: >
         A small group-average difference with broad overlap cannot support a unitary defect, biological entity,
-        or individual-level state assignment.
+        individual-level state assignment, or causal proposition.
       failure_cap: assay_or_measurement_level_only
 
     instrument_and_task_dependency:
@@ -212,6 +273,8 @@ ingest_rules:
     handles_never_generate: true
     rejected_constructs_never_receive_entity_level_support: true
     downstream_records_cannot_rescue_failed_construct_admission: true
+    failed_causal_tests_never_receive_causal_language: true
+    heterogeneous_poorly_predictive_work_never_receives_causal_weight: true
     descriptive_claims_are_positive_support: true
     failed_mechanism_gate_does_not_discard_source: true
     each_gate_caps_only_the_role_it_tests: true
