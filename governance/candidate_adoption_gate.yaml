@@ -15,8 +15,12 @@ candidate_adoption_gate:
     - layer_fit
     - contradiction
     - reification
-    - folk_behavior_construct_translation
-    - ecological_scope_transport
+    - target_identity_generation
+    - speaker_corpus_target_separation
+    - recoverable_identity_shortcuts
+    - operational_equivalence
+    - heterogeneity_generation
+    - transport_scope
     - operation_product
     - chain_generation
     - universal_physical_continuity
@@ -35,26 +39,39 @@ candidate_adoption_gate:
     - positive_causal_control
     - provider_result_freshness
 
+  target_identity_conformance:
+    kernel_ref: model/kernel/target_identity.yaml
+    runtime_ref: model/runtime/target_identity_gate.yaml
+    ingest_ref: model/ingest/target_identity_extraction.yaml
+    record_ref: model/ingest/target_identity_record_schema.yaml
+    validator: scripts/validate_target_identity.py
+    requirements:
+      - target identity is generated from recoverable operations rather than inherited from terminology
+      - speaker intent remains separate from corpus-defined and measured targets
+      - a shortcut is accepted when its generator is recoverable and scope-bounded
+      - non-equivalent operationalizations remain separate target relations
+      - heterogeneity preserves identity only when generated differentiators predict the variation
+      - evidence binds to exact measured or constructed relations before shared names
+      - randomization and effect magnitude cannot repair target identity or transport
+      - domain cartridges supply regressions and vocabulary rather than target-identity trigger lists
+      - exact narrow relations survive broader identity failure
+
   semantic_conformance:
     policy_ref: conformance/required_runs.json
     decision_record_ref: conformance/decision_record.schema.json
     causal_validator: scripts/validate_conformance.py
     physical_validator: scripts/validate_physical_continuity.py
-    folk_behavior_validator: scripts/validate_folk_behavior.py
+    target_identity_validator: scripts/validate_target_identity.py
     adoption_validator: scripts/validate_adoption.py
     requirements:
       - every critical generic and active-cartridge fixture passes
       - narrative-only mutations preserve causal closure physical-chain and metabolic-binding results
       - data mutations change results when the causal burden changes
+      - target-identity fixtures separate exact measured relations from broader named targets
       - every biological or behavioral answer exposes a physical chain or explicit open chain slots
       - biological scope binds through metabolically maintained state
       - metabolism energy activation signaling and named components cannot act as replacement operators
-      - familiar folk behavior labels are reconstructed before evidence review or causal weighting
-      - construct rejection preserves exact independently measured behavior at its measured scope
-      - exact measured behavior does not validate or receive automatic transfer to a unitary folk construct
-      - ordinary-life task content does not establish real-world efficacy without ecological transport evidence
-      - randomization attaches to the object actually assigned rather than every named active component
-      - exact intervention causality remains separate from etiology endogenous mechanism and route closure
+      - exact intervention causality remains separate from target identity transport etiology endogenous mechanism and route closure
       - a decisive intervention may retain exact causality while intermediate physical mechanics remain partial
       - mechanistic language requires closed physical and metabolic routes
       - decisive-intervention positive controls receive causal admission at exact scope
@@ -78,12 +95,13 @@ candidate_adoption_gate:
     adoption_requires_fresh_provider_results: true
     critical_semantic_failure_tolerance: zero
     reject_everything_is_not_conformance: true
+    target_identity_is_generated_not_named: true
+    speaker_intent_is_not_construct_identity: true
+    corpus_agreement_is_not_construct_identity: true
+    heterogeneity_must_be_generated: true
     biology_has_no_separate_causal_currency: true
     metabolism_is_not_a_magic_operator: true
     open_physical_segments_remain_visible: true
-    folk_behavior_label_is_not_a_unitary_target: true
-    exact_observation_survives_construct_rejection: true
-    protocol_bound_measurement_is_not_real_world_transport: true
 
   required_output:
     - verdict
@@ -93,10 +111,11 @@ candidate_adoption_gate:
     - risks
     - redundancy
     - minimal_safe_form
+    - target_identity_status
+    - speaker_corpus_separation_status
+    - heterogeneity_generation_status
     - semantic_conformance_status
     - physical_continuity_status
     - metabolic_binding_status
-    - folk_behavior_construct_status
-    - ecological_transport_status
     - provider_result_freshness
     - adoption_status
