@@ -1,0 +1,1 @@
+- **[adopted]** Added reproducible frozen single-file runtime packet publication for v0.05-v5 so browser LLMs can receive the question or ingest runtime without a repository checkout (OpenAI, 2026-07-11)
