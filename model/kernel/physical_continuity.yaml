@@ -1,0 +1,114 @@
+physical_continuity:
+  status: candidate
+  layer: shared_kernel
+  purpose: >
+    Keep every explanation on one continuous physical surface. Physics, chemistry, biology, and behavior
+    are scale-bound descriptions of the same physically generated process. No causal effect may jump
+    between named pieces, and no scale receives a separate force, agent, or explanatory substance.
+
+  universal_physical_floor:
+    rule: >
+      Every admitted cause, operation, state, constraint, and transition is physical. Chemistry is
+      organized physical interaction. Biology is chemically and energetically maintained physical
+      organization. Behavior is organism-state change produced through that maintained organization.
+    continuity: >
+      The forces and constraints acting in organisms belong to the same physical world that forms stars,
+      drives fusion, moves matter, and constrains every other system. Scale changes the organization,
+      available states, and useful description. It does not introduce a new causal category.
+    decomposition_rule: >
+      An explanation may stop at the shortest sufficient scale for the question, but every stated segment
+      must remain decomposable downward and compatible upward through the chain.
+    no_extra_force_class_for_biology: true
+    no_extra_force_class_for_behavior: true
+
+  biological_metabolic_binding:
+    rule: >
+      At biological scope, metabolically maintained state is the obligatory binding layer between
+      physical or chemical change and biological operation. The explanation must identify how material,
+      energetic, electrical, chemical, mechanical, or thermal conditions alter what the organism can
+      maintain, make available, weight, stabilize, block, release, repair, or transition into.
+    driver_statement: >
+      Metabolics drives biology in the precise sense that biological organization persists and changes
+      only through ongoing energy and material throughput under physical constraint.
+    required_fields:
+      - physical_or_chemical_input
+      - energetic_or_material_carrier
+      - metabolic_state_change
+      - biological_operation
+      - organism_state_or_behavior
+    missing_field_rule: >
+      Missing metabolic or physical segments remain explicit unresolved slots. Do not invent a pathway
+      merely to make the answer complete.
+    anti_magic_rule: >
+      Metabolism, energy, activation, signaling, regulation, information, and network change are not
+      operators by name. Each must resolve into a specified physical variable, carrier, constraint,
+      state change, and downstream dependency.
+
+  shortest_sufficient_chain:
+    required_order:
+      - physical_perturbation_or_constraint
+      - chemical_or_energetic_change
+      - metabolically_maintained_state_change
+      - biological_operation
+      - organism_state_transition_or_behavior
+    rule: >
+      Runtime answers expose the shortest chain sufficient for the target. They may compress well-closed
+      lower-level detail, but may not skip an open join or hide it inside a named component, faculty,
+      process, or metabolic noun.
+    relation_specific: true
+    causal_admission_distinct_from_mechanistic_closure: true
+    decisive_intervention_rule: >
+      A decisive controlled intervention may establish the exact intervention-to-outcome relation even
+      when intermediate metabolic mechanics remain partial. The answer must state the physical
+      intervention, the measured organism-state change, and the unresolved metabolic route rather than
+      presenting the effect as action at a distance.
+    mechanism_rule: >
+      A mechanism or route claim closes only when the physical carrier, chemical or energetic change,
+      metabolic state relation, biological operation, and target transition close under the stated
+      conditions.
+
+  chain_segment_extension:
+    universal_fields:
+      - source_state
+      - physical_change
+      - carrier_or_constraint
+      - target_state
+      - timing
+      - conditions
+    biological_scope_fields:
+      - physical_or_chemical_input
+      - energetic_or_material_carrier
+      - metabolic_state_change
+      - biological_operation
+      - organism_state_or_behavior
+    join_rule: >
+      The output of each segment must be a physically admissible input to the next. A region name,
+      intervention label, construct, faculty, or process noun cannot supply the missing join.
+
+  answer_obligation:
+    applies_to:
+      - biological_explanation
+      - behavioral_explanation
+      - causal_claim_at_biological_or_behavioral_scope
+      - mechanism_or_route_claim
+      - cross_scale_translation
+    required:
+      - direct_answer_at_the_exact_supported_scope
+      - explicit_physical_chain_or_explicit_open_chain_slots
+      - metabolic_binding_at_biological_scope
+      - organism_state_transition_when_behavior_is_claimed
+      - no_magic_effect_between_named_pieces
+    prose_rule: >
+      The answer should make the continuity legible without reciting a philosophy slogan. Name the
+      perturbation, carrier, metabolic consequence, operation, and state transition at the resolution
+      supported by the evidence.
+
+  guards:
+    - no_action_at_a_distance_between_components
+    - no_metabolism_as_magic_noun
+    - no_energy_as_untyped_explanation
+    - no_region_activity_to_behavior_jump
+    - no_signal_to_effect_jump_without_carrier_and_target_state
+    - no_named_process_as_physical_segment
+    - no_mechanism_claim_with_open_metabolic_binding
+    - no_fabricated_path_to_avoid_an_unresolved_slot
