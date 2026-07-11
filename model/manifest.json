@@ -1,5 +1,7 @@
 {
   "default_manifest": "manifests/runtime.json",
-  "status": "candidate",
+  "version": "v0.05-v5",
+  "status": "adopted",
+  "adopted_at": "2026-07-11",
   "note": "Selector only. The authoritative default load graph is model/manifests/runtime.json."
 }
