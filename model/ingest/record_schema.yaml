@@ -1,10 +1,11 @@
 ingest_record_schema:
   status: candidate
-  schema_version: v3
+  schema_version: v4
   layer: support_layer
   closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
   construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
   causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
+  evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission
   evidence_role_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.evidence_role_classes
   support_channel_crosswalk_ref: model/ingest/failure_routing.yaml#ingest_failure_routing.closure_state_crosswalk
 
@@ -26,6 +27,50 @@ ingest_record_schema:
       path_component: false
     timestamp:
       required: true
+
+  source_ingress:
+    required_fields:
+      - source_claim_status
+      - direct_observations
+      - author_interpretations
+      - sampling_and_grouping_operations
+      - measurement_operations
+      - analytical_transformations
+      - stripped_assertions
+    source_claim_status_default: unadmitted_assertion
+    causal_weight_default: zero
+
+  inference_audit:
+    required: true
+    bridge_status_enum:
+      - unadmitted_assertion
+      - observation_admitted
+      - bridge_partially_closed
+      - bridge_closed
+      - causal_admitted
+      - causal_rejected
+      - non_probative
+    per_bridge_required_fields:
+      - bridge_id
+      - source_statement
+      - source_observation
+      - target_claim
+      - bridge_type
+      - required_dependencies
+      - direct_support
+      - contrary_evidence
+      - hidden_assumptions
+      - shared_assumption_family
+      - status
+    output_fields:
+      - admitted_observations
+      - bridge_ledger
+      - shared_assumption_families
+      - non_probative_claims
+      - strongest_surviving_claim
+    rule: >
+      A source conclusion cannot bind directly. Only admitted observations and bridges marked bridge_closed
+      may contribute beyond their measured scope.
 
   extraction:
     required_fields:
@@ -75,10 +120,12 @@ ingest_record_schema:
         - practical_magnitude
         - scale_translation
         - independent_convergence
+        - inferential_bridge_closure
         - disconfirmation_survival
       output_fields:
         - causal_disposition
         - failed_causal_tests
+        - failed_inferential_bridges
         - passed_causal_tests
     evidence_role:
       required: true
@@ -101,6 +148,7 @@ ingest_record_schema:
 
   body_weight_inputs:
     required_fields:
+      - admission_status
       - claim_directness
       - construct_dependency
       - causal_disposition
@@ -121,11 +169,12 @@ ingest_record_schema:
       - replication_status
       - independence_status
       - evidence_family_id
+      - shared_assumption_family_id
       - disconfirmation_target
     rule: >
-      These fields describe chain contribution, causal admissibility, and family independence. They are not
-      combined into a numerical quality score and cannot be overridden by publication count, prestige, recency,
-      citation volume, or familiar causal wording.
+      These fields describe admission, chain contribution, causal admissibility, and family independence. They are
+      not combined into a numerical quality score and cannot be overridden by publication count, prestige, peer
+      review, consensus, recency, citation volume, or familiar causal wording.
 
   provenance:
     required_fields:
@@ -136,6 +185,7 @@ ingest_record_schema:
     independence_fields:
       - independence_status
       - evidence_family_id
+      - shared_assumption_family_id
       - shared_pipeline_id
       - shared_cohort_id
       - shared_dataset_id
@@ -145,12 +195,18 @@ ingest_record_schema:
 
   outputs:
     required_fields:
+      - admitted_observations
+      - stripped_assertions
+      - bridge_ledger
+      - shared_assumption_families
+      - strongest_surviving_claim
       - support_channels
       - blocked_roles
       - translation_limits
       - construct_disposition
       - causal_disposition
       - failed_causal_tests
+      - failed_inferential_bridges
       - evidence_role_class
       - non_probative_for
       - visibility_status
@@ -171,6 +227,12 @@ ingest_record_schema:
   invariants:
     support_layer_only: true
     no_unilateral_claim_write: true
+    source_conclusion_never_binds_directly: true
+    causal_weight_defaults_to_zero: true
+    peer_review_is_not_admission: true
+    consensus_is_not_weight: true
+    meta_analysis_does_not_repair_invalid_inputs: true
+    repeated_bridge_is_not_independent_convergence: true
     recency_is_not_weight: true
     publication_count_is_not_weight: true
     identity_resolved_before_canonical_write: true
