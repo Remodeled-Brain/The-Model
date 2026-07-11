@@ -1,0 +1,1 @@
+- **[candidate]** Replaced the folklore-specific behavior filter with a domain-neutral target-identity kernel that separates speaker intent from corpus operations, permits recoverable scientific shortcuts, requires generated heterogeneity, and binds evidence to exact measured or constructed relations before shared names. (openai, 2026-07-11)
