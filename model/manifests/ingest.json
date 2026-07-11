@@ -1,6 +1,7 @@
 {
   "name": "ingest-support-runtime",
-  "status": "candidate",
+  "version": "v0.05-v5",
+  "status": "adopted",
   "role": "adaptive evidence maintenance",
   "source_files": [
     "00_purpose_and_scope.md",
@@ -39,5 +40,5 @@
   "build": {
     "dist/ingest_support_runtime.txt": "scripts/build_master_prompt.py model/manifests/ingest.json"
   },
-  "note": "Adaptive evidence maintenance for the primary question runtime."
+  "note": "Adopted v0.05 v5 adaptive evidence-maintenance runtime."
 }
