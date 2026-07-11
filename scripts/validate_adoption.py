@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run structural, causal, physical, and folk-behavior adoption gates."""
+"""Run structural, target-identity, causal, and physical adoption gates."""
 from __future__ import annotations
 
 import pathlib
@@ -14,7 +14,7 @@ def main() -> int:
     commands = [
         [sys.executable, str(ROOT / "scripts/validate_repo.py")],
         [sys.executable, str(ROOT / "scripts/validate_model_policy.py")],
-        [sys.executable, str(ROOT / "scripts/validate_folk_behavior.py")],
+        [sys.executable, str(ROOT / "scripts/validate_target_identity.py")],
         [sys.executable, str(ROOT / "scripts/validate_conformance.py"), *results, "--adoption"],
         [sys.executable, str(ROOT / "scripts/validate_physical_continuity.py"), *results, "--adoption"],
     ]
