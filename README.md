@@ -4,25 +4,38 @@ A platform-agnostic scaffold developed collaboratively across multiple LLMs. The
 
 ## Purpose
 
-The Model rejects invalid constructs and failed causal propositions before reconstruction. Questions expressed through folklore, reified categories, hidden operators, or incomplete causal language enter a construct-admission gate. Hard causality questions also enter a causal-admission gate.
+The Model evaluates constructs, causal targets, evidence designs, and physical-chain closure before producing an explanatory answer. Published narrative does not enter as evidence by default. The admissible claim is generated from the actual observations, comparator, effect distribution, heterogeneity, attrition, durability, measurement validity, and inferential bridges.
 
-The evidence burden is deliberately inverted. Scientific records do not enter as neutral evidence. Construct-indexed work starts `label_dependent`, proxy work starts `proxy_limited`, and treatment-response records are limited to the measured intervention-outcome relation. A record can receive a stronger role only after it affirmatively escapes its presumption and closes the exact inferential bridge and chain segment. Publication count, consensus, peer review, or meta-analysis cannot supply that escape.
+Purely observational evidence begins descriptive or more restricted. It earns causal scope only by affirmatively closing the burden appropriate to the exact target relation. Adjustment, recurrence, sample size, peer review, consensus, and meta-analysis do not create a counterfactual or physical dependency path.
 
-Causal admission requires construct coherence, temporal direction, dependency or intervention evidence, route-specific out-of-sample prediction, realistic baseline and comparator performance, bounded heterogeneity, practical magnitude, physical scale translation, independent convergence, and survival of disconfirmation. Failure of any necessary test rejects the requested causal proposition. Heterogeneous, poorly predictive, postdictive, label-selected, proxy-limited, broad-overlap, treatment-response, or practically trivial work cannot be restated as causal contribution, mechanism, defect, dysfunction, or biological basis.
+Intervention evidence is neither automatically causal nor automatically non-causal. A strong controlled manipulation may establish causality for the exact intervention-to-outcome relation when manipulation integrity, comparison, timing, effect magnitude, response consistency, specificity, durability, missingness, replication, and disconfirmation requirements close. That result does not automatically establish etiology, endogenous mechanism, construct validity, or cross-scale explanation.
 
-Only admitted questions proceed to physical-chain reconstruction. The runtime binds construct-independent admitted observations and closed inferential bridges to the required path and returns a bounded answer with explicit construct, causal, evidence-admission, closure, and translation status.
+Construct-indexed work begins `label_dependent`. Proxy or surrogate work begins `proxy_limited`. These restrictions are independent of study design and remain until the exact construct or translation burden closes.
 
-Paper ingest is the adaptive evidence-maintenance subsystem under that runtime. It keeps a recency-sensitive corpus current without making live ingest a prerequisite for operation or allowing recency, publication volume, correlated evidence families, proxies, or treatment indication to become causal weight.
+## Generic kernel and domain cartridges
+
+The shared kernel owns domain-neutral mechanics:
+
+- construct admission
+- target-specific causal admission
+- design and counterfactual classification
+- data-first evidence admission
+- observational and interventional burdens
+- inferential-bridge auditing
+- relation-specific closure and confidence
+- evidence-family weighting
+
+Domain cartridges own specialized handles, failure patterns, translation burdens, and regression fixtures. The neuroscience cartridge contains diagnostic folklore, region-as-agent, psychiatric treatment, rating-scale, imaging, biomarker, stimulation, and named-process examples such as “neuroplasticity.” Those cases are not hard-coded into the generic runtime fixtures.
 
 ## Active structure
 
 | Path | Role |
 |------|------|
 | `model/00_purpose_and_scope.md` | Candidate purpose and operating boundary |
-| `model/kernel/` | Shared physical-chain invariants, construct admission, causal admission, restrictive evidence presumptions, and canonical closure vocabulary |
-| `model/runtime/` | Question compiler, answerability planner, evidence binder, answer contract, and machine-readable conformance contracts |
-| `model/ingest/` | Adaptive evidence-maintenance architecture, presumptions, gates, routing, records, and fixtures |
-| `model/cartridges/` | Domain-specific handle instances and translation vocabulary |
+| `model/kernel/` | Shared physical-chain, construct, causal, and evidence-admission invariants |
+| `model/runtime/` | Question compiler, answerability planner, evidence binder, answer contract, and domain-neutral fixtures |
+| `model/ingest/` | Data-first evidence maintenance, design gates, routing, record schema, and domain-neutral fixtures |
+| `model/cartridges/` | Domain-specific rules, handles, translation vocabulary, and fixtures |
 | `model/manifests/runtime.json` | Authoritative candidate question-runtime load graph |
 | `model/manifests/ingest.json` | Authoritative candidate ingest load graph |
 | `model/manifest.json` | Default-manifest selector only |
@@ -48,19 +61,19 @@ python scripts/build_master_prompt.py model/manifests/ingest.json
 
 Generated artifacts are written under `model/dist/` and are not committed.
 
-Validate manifest authority, shared closure vocabulary, ingest-to-kernel crosswalks, cartridge inclusion, capability reach, fixture structure, stale references, and generated outputs:
+Validate repository structure and builds:
 
 ```bash
 python scripts/validate_repo.py
 ```
 
-Validate the policy invariants that prevent folklore rescue, hard-causality laundering, neutral admission of construct-indexed evidence, proxy promotion, treatment-response inference, and publication-count weighting:
+Validate evidence policy, relation-specific causality, generic/domain separation, and required regression fixtures:
 
 ```bash
 python scripts/validate_model_policy.py
 ```
 
-CI validates repository structure, load graphs, vocabulary alignment, fixture shape, generated-artifact integrity, construct rejection, causal rejection, restrictive evidence presumptions, and evidence-weighting policy presence. No provider execution harness exists in this PR. Scientific semantic behavior is therefore not tested by CI. Provider runs must execute the fixture questions separately and record their results under `conformance/results/`.
+CI validates the contracts and policy invariants. It does not execute provider answers semantically. Provider runs must execute the generic and cartridge fixtures separately and record results under `conformance/results/`.
 
 ## Candidate status
 
