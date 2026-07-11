@@ -10,22 +10,66 @@ ingest_rules:
     default_status: unadmitted_assertion
     default_causal_weight: zero
     rule: >
-      Publication, peer review, author confidence, disciplinary consensus, statistical significance, and review
-      status do not admit a source conclusion. Every source must be decomposed under evidence_admission_ref before
-      any claim can enter the support layer.
+      A source enters as data, operations, and assertions. Publication, peer review, disciplinary consensus,
+      statistical significance, intervention naming, and author confidence do not admit its conclusions.
     required_sequence:
-      - separate_direct_observations_from_author_interpretation
-      - expose_sampling_grouping_measurement_and_analysis_operations
-      - enumerate_every_inferential_bridge
-      - identify_hidden_construct_direction_scale_and_causal_assumptions
-      - collapse_shared_assumption_families
+      - extract_actual_data_and_sample_flow
+      - separate_observations_from_narrative
+      - classify_design_construct_measurement_target_and_chain_exposure
+      - assign_the_most_restrictive_applicable_initial_state
+      - enumerate_inferential_bridges
+      - evaluate_each_target_relation_separately
       - admit_only_surviving_observations_and_closed_bridges
     forbidden_ingress:
       - abstract_or_discussion_conclusion_as_evidence
-      - review_article_synthesis_as_direct_support
+      - intervention_label_as_causal_admission
+      - named_process_as_measured_change
+      - review_synthesis_as_direct_support
       - meta_analysis_as_repair_for_invalid_inputs
-      - consensus_language_as_causal_weight
       - repeated_inference_as_independent_convergence
+
+  data_extraction:
+    phase: pre_admission
+    required_for: every_source
+    required_fields:
+      - exact_exposure_or_intervention
+      - exact_outcome_definition
+      - baseline_distribution
+      - comparator_or_counterfactual
+      - sample_and_exclusion_flow
+      - effect_distribution
+      - effect_magnitude
+      - uncertainty
+      - overlap_and_response_heterogeneity
+      - missingness_attrition_and_crossover
+      - timing_and_durability
+      - dose_or_exposure_relation
+      - adverse_or_opposing_outcomes
+      - measurement_validity_and_noise
+      - preregistration_and_outcome_switching
+      - analysis_multiplicity
+      - replication_and_condition_stability
+    rule: >
+      Record unavailable fields as missing. Do not replace missing data with author adjectives such as effective,
+      robust, normalized, clinically meaningful, mechanistic, or biologically plausible.
+    narrative_data_conflict:
+      resolution: data_controls
+      output: stripped_assertion
+
+  evidence_axis_classification:
+    required_outputs:
+      - design_mode
+      - construct_relation
+      - measurement_relation
+      - target_relation
+      - chain_exposure
+      - presumptive_class
+      - presumed_closure_state
+      - eligible_causal_target
+    rule: >
+      Evidence category and causal target are orthogonal. An intervention may expose one causal relation while
+      remaining silent about etiology or endogenous mechanism. An observational study may provide strong descriptive
+      evidence while remaining non-causal.
 
   inference_audit:
     phase: pre_admission
@@ -38,305 +82,188 @@ ingest_rules:
       - non_probative_claims
       - strongest_surviving_claim
     bridge_rule: >
-      Each transition from observation to construct, individual state, direction, source, control, mechanism,
-      scale, prediction, practical importance, defect, dysfunction, or biological meaning is a distinct bridge.
-      The bridge receives zero support unless its required physical dependency is independently closed.
+      Each transition from observation to construct, individual state, direction, source, control, prediction,
+      mechanism, scale, effectiveness, named biological process, defect, dysfunction, or practical importance is a
+      distinct bridge. The bridge receives zero support until its required dependency closes.
     hostile_reading_questions:
-      - What was directly measured before the author named it?
-      - What result was produced by labels, thresholds, tasks, instruments, models, or selection rules?
+      - What was measured before the author named it?
+      - What are the full outcome and response distributions?
+      - What counterfactual was actually observed?
+      - Which effects are practically large stable durable and specific?
+      - Which results depend on attrition thresholding task choice instrument choice or analysis flexibility?
       - Which causal direction was observed and which was inferred?
-      - Which claimed scale transition lacks a physical carrier?
-      - Which conclusion assumes the construct it claims to validate?
-      - Which nulls, reversals, overlaps, failed predictions, or unstable conditions are compressed out of the narrative?
+      - Which claim exceeds the manipulated relation?
+      - Which measured change is being renamed as a generic biological process?
+      - Which nulls reversals overlaps and failed predictions are compressed out of the narrative?
       - Which papers repeat one assumption family rather than test it independently?
-    positive_failure_rules:
-      - Poor prediction counts against a proposed unitary causal relation when that relation should predict the target.
-      - Broad overlap counts against defect, dysfunction, or individual-state assignment from group means.
-      - Unbounded heterogeneity counts against a unitary route rather than becoming generic complexity.
-      - Selective reporting and missing nulls reduce admissible support rather than preserving a causal story under uncertainty.
-
-  strip_and_extract:
-    phase: admissibility
-    trigger: every_source
-    purpose: Remove causal work assigned to author handles while preserving only measured observations.
-    required_questions:
-      - What substrate was measured?
-      - What variable changed?
-      - What grouped or selected the samples?
-      - What physical or descriptive claim remains after handles are removed?
-      - Which parts of the claim still depend on a removed handle?
-      - Does any claimed entity or defect exist independently of the grouping label?
-    outputs:
-      - measured_substrate
-      - measured_variable
-      - grouping_variable
-      - explicit_observations
-      - post_strip_claim
-      - construct_disposition
-      - causal_disposition
-      - rejected_entity_claims
-      - rejected_causal_claims
-      - handle_dependencies
-      - handle_flags
-    handle_categories:
-      diagnostic_label:
-        allowed_role: administrative_sampling_or_descriptive_grouping
-        blocked_roles:
-          - causal_object
-          - biological_entity
-          - unitary_route
-          - defect_target
-      spectrum_label:
-        allowed_role: cohort_description
-        blocked_roles:
-          - unified_causal_route
-          - scalar_biological_object
-      controller_or_decision_language:
-        rewrite_to: measured interaction, dependency, route, balance, gating, release, or stabilization
-      biomarker_status:
-        allowed_role: measured_variable_or_proxy
-        blocked_role: mechanism
-      region_label:
-        allowed_role: implementation_site
-        blocked_roles:
-          - causal_origin_without_route
-          - defect_explanation_by_location
-      conservation_label:
-        allowed_role: search_priority_handle
-        blocked_role: causal_weight_or_origin
-      clinical_promise_language:
-        allowed_role: stated_application
-        blocked_role: biological_or_clinical_weight
-    admissible_if: a sound physical or descriptive post_strip_claim survives independently of a rejected construct
-    inadmissible_for_entity_mechanism_if: no entity-level claim survives handle removal
 
   construct_admission:
     phase: admissibility
     rule: >
-      A diagnostic, taxonomic, spectrum, faculty, or controller handle cannot enter the support layer as a
-      biological entity. When the source's mechanism or defect claim disappears after handle removal, assign
-      premise_rejected for that claim and block all entity-level grounding roles.
-    premise_rejection_triggers:
-      - diagnosis_supplies_biological_unity
-      - diagnosis_supplies_defect_status
-      - region_name_supplies_defect_location
-      - faculty_noun_supplies_the_operation
-      - no_explicit_observation_survives_label_removal
-    preserves:
-      - source_record
-      - provenance
-      - explicitly_measured_relations
-      - grouping_metadata
-      - construct_failure_note
-    blocks:
+      Any category or construct used as an entity, defect, source, or unitary route must be specified independently
+      of the label. Construct-indexed evidence begins label_dependent and must affirmatively escape the construct.
+    blocks_when_unescaped:
       - entity_level_mechanism
       - unitary_defect_claim
-      - regional_localization_of_diagnosis
-      - evidence_weight_for_construct_validity
+      - construct_validity
+      - causal_weight_for_the_construct
+
+  design_admission:
+    observational:
+      starting_role: descriptive_only
+      rule: >
+        Admit measured distributions and relations at their observed scope. Causal promotion requires affirmative
+        closure of temporal order, target specificity, alternative routes, practical magnitude, condition stability,
+        negative controls, independent replication, and every required mechanism or scale bridge.
+      failed_or_missing_burden: descriptive_or_more_restricted
+    longitudinal_observational:
+      starting_role: descriptive_only
+      rule: >
+        Temporal order improves direction evidence but does not by itself close confounding, construct, dependency,
+        practical magnitude, or mechanism bridges.
+    natural_or_quasi_experimental:
+      starting_role: unresolved
+      rule: >
+        Evaluate assignment, counterfactual validity, exclusion restrictions, spillover, temporal order, and alternative
+        routes. The design name supplies no automatic causal status.
+    interventional:
+      starting_role: unresolved
+      eligible_target: intervention_to_outcome
+      required_tests:
+        - manipulation_integrity
+        - valid_comparator_or_counterfactual
+        - temporal_precedence
+        - measurement_validity
+        - effect_magnitude_and_full_response_distribution
+        - bounded_or_generated_heterogeneity
+        - specificity_against_relevant_alternative_routes
+        - durability_appropriate_to_claim
+        - attrition_missingness_and_crossover_bounded
+        - replication_or_internal_strength_proportionate_to_claim_scope
+        - survival_of_disconfirmation
+      pass_rule: >
+        A passing intervention can receive causal support for the exact manipulated relation under the tested
+        conditions. Very large, consistent, specific, durable effects may be strongly load-bearing.
+      scope_rule: >
+        Intervention-to-outcome causality does not establish etiology, endogenous mechanism, construct validity,
+        or cross-scale explanation without separate closed bridges.
+    synthesis:
+      starting_role: provenance_only
+      rule: >
+        Inherit the design, construct, measurement, selection, missing-data, and bridge states of every input.
+        Pooling can refine an admissible estimate but cannot repair invalid or incommensurate inputs.
+
+  measurement_admission:
+    direct_measurement:
+      rule: Directness removes proxy limitation only for the exact variable and scale measured.
+    proxy_or_surrogate:
+      starting_role: proxy_only
+      rule: >
+        Preserve the measured proxy relation. Mechanism or causal binding requires a closed physical translation
+        path or a distinct direct-dependency record.
+    composite_scale_or_self_report:
+      rule: >
+        Treat the score as the measured variable. Claims about latent state, disorder severity, recovery, or biological
+        change require independent measurement and translation.
+    named_process_claim:
+      rule: >
+        A claim that an intervention induces plasticity, normalization, regulation, inflammation reduction, or another
+        named process must specify the substrate, variable, direction, timing, persistence, comparator, and dependency
+        connecting that change to the target outcome.
+      failure_cap: proxy_or_source_scale_only
 
   causal_admission:
     phase: validation
-    trigger: any_source_claiming_cause_defect_dysfunction_control_mechanism_or_biological_basis
+    trigger: any_source_claiming_cause_control_mechanism_effectiveness_defect_dysfunction_or_biological_change
     rule: >
-      Causal weight requires an admitted construct, temporal direction, dependency or intervention leverage,
-      route-specific out-of-sample prediction, bounded heterogeneity, practical magnitude, scale translation,
-      independent convergence, and survival of disconfirmation. Failure of any necessary test blocks causal language.
-    required_tests:
-      - construct_coherence
-      - temporal_direction
-      - dependency_or_intervention
-      - out_of_sample_prediction
-      - realistic_baseline_and_comparator_performance
-      - route_bounded_heterogeneity
-      - practical_magnitude
-      - scale_translation
-      - independent_convergence
-      - disconfirmation_survival
+      Causal weight attaches only to the exact target relation whose design, data, counterfactual, dependency, effect
+      distribution, heterogeneity, magnitude, translation, independence, bridges, and disconfirmation checks close.
     hard_failure_conditions:
-      - rejected_construct
-      - highly_heterogeneous_unbounded_results
-      - poor_or_postdictive_prediction
-      - broad_overlap_with_small_group_mean_difference
-      - region_localization_without_source_dependency
+      - narrative_exceeds_data
+      - invalid_or_missing_counterfactual
+      - construct_indexed_without_escape
+      - proxy_offered_as_untranslated_mechanism
+      - pre_post_change_without_valid_comparator
+      - intervention_effect_generalized_beyond_manipulated_relation
+      - heterogeneous_unbounded_results
+      - practically_trivial_or_broadly_overlapping_effect
+      - poor_prediction_when_prediction_is_required
       - failed_cross_scale_translation
       - unsupported_inferential_bridge
-    hard_failure_output: causal_rejected
-    blocked_roles_after_failure:
-      - causal_support
-      - mechanism_support
-      - contribution_language
-      - dysfunction_or_defect_language
-      - biological_basis_language
+    hard_failure_output: causal_rejected_for_the_named_relation
+
+  validation_gates:
+    practical_significance:
+      rule: >
+        Statistical separability does not establish effectiveness or functional importance. Evaluate magnitude,
+        response distribution, comparator, overlap, noise, threshold, durability, and adverse outcomes.
+      failure_cap: descriptive_only
+    heterogeneity_control:
+      rule: >
+        Heterogeneity supports a general claim only when explicit conditions or generated routes account for it.
+        Unstable directions and broad overlap defeat unitary or individual-level claims.
+      failure_cap: relation_specific_causal_rejection
+    comparator_integrity:
+      rule: >
+        Pre-post change, wait-list comparison, treatment-as-usual, sham, active control, and natural history answer
+        different counterfactuals. Bind only the contrast the comparator supports.
+      failure_cap: descriptive_only
+    durability:
+      rule: The time horizon of the claim cannot exceed the observed persistence of the effect.
+      failure_cap: short_horizon_only
+    proxy_translation:
+      rule: Shared terminology and correlated change do not close proxy-to-mechanism translation.
+      failure_cap: proxy_only
+    scale_translation:
+      rule: Evidence crosses scales only through an explicit carried variable and intermediate dependency path.
+      failure_cap: source_scale_only
+    temporality:
+      rule: Concurrent retrospective or postdictive separation cannot supply generative direction by itself.
+      postdictive_caps:
+        - no_prediction_weight
+        - no_direct_generative_grounding
+    prediction:
+      rule: >
+        When a proposed causal relation should predict outcomes, it must outperform realistic baselines and survive
+        independent operationalizations and condition changes.
+      failure_cap: causal_rejected_for_predictive_claim
+    independence:
+      rule: >
+        Shared cohorts pipelines interventions comparators instruments tasks models or bridges do not count as
+        independent closure.
+      required_outputs:
+        - independence_status
+        - evidence_family_id
+        - shared_assumption_family_id
 
   evidence_role_classification:
-    rule: >
-      Classify each surviving admitted claim by its actual contribution to a required premise, segment, join,
-      prediction, or descriptive relation. Source language and unclosed bridges supply no role.
     roles:
-      premise_breaking: Breaks a required entity, unity, defect, direction, predictive, or translation premise.
+      premise_breaking: Breaks a required construct counterfactual direction prediction bridge or translation premise.
       route_closing: Directly closes a required dependency segment or join under stated conditions.
       route_discriminating: Produces observations that separate surviving routes.
-      segment_supporting: Supports one bounded segment without closing the route.
-      descriptive_only: Supports only a measured descriptive relation.
-      non_probative: Cannot bear on the requested conclusion after applicable gates.
+      segment_supporting: Supports one bounded relation without closing the route.
+      descriptive_only: Supports only a measured distribution or relation.
+      non_probative: Cannot bear on the named conclusion after applicable gates.
     required_outputs:
       - evidence_role_class
       - role_target
       - non_probative_for
       - evidence_family_keys
 
-  validation_gates:
-    controlled_sameness_missing_differentiator:
-      trigger:
-        - nominally_same_input_with_divergent_output
-        - matched_or_controlled_conditions_with_divergent_output
-      rule: >
-        Divergent outputs under claimed sameness identify an incomplete input set. The missing
-        differentiating variable or route must be opened rather than absorbed into a label.
-      outputs:
-        - missing_differentiator_slot
-        - incomplete_causal_frame
-        - intensified_route_burden
-
-    region_source_closure:
-      rule: >
-        Activity, perturbability, or localization identifies an implementation site unless timing,
-        dependency position, causal direction, and upstream controls establish source status.
-      required_for_source:
-        - temporal_precedence
-        - dependency_position
-        - causal_direction
-        - competing_route_control
-      failure_cap: implementation_site_observation
-
-    conservation_dependency:
-      rule: >
-        Conservation raises retrieval priority only when tied to a conserved operation, dependency,
-        or maintenance route. Anatomical age does not establish origin or weight.
-      causal_weight_from_conservation: false
-      source_status_from_conservation: false
-
-    proxy_promotion:
-      rule: >
-        A proxy, biomarker, assay output, or correlate cannot bind to mechanism without a demonstrated
-        translation route from measured substrate and variable to the requested outcome.
-      required_for_translation:
-        - measured_substrate
-        - measured_variable
-        - direction
-        - timing
-        - intermediate_dependency
-        - outcome_relation
-      failure_cap: proxy_only
-
-    scale_translation:
-      rule: >
-        Evidence crosses scales only through an explicit physical dependency that carries the measured
-        change from the source scale to the requested scale. Shared vocabulary does not close translation.
-      outputs:
-        - source_scale
-        - target_scale
-        - translation_steps
-        - translation_limit
-      failure_cap: source_scale_only
-
-    temporality:
-      rule: >
-        Concurrent or postdictive separation cannot supply predictive or generative weight. Temporal
-        order must match the claimed dependency.
-      states:
-        - predictive
-        - prospective
-        - concurrent
-        - retrospective
-        - postdictive
-      postdictive_caps:
-        - no_prediction_weight
-        - no_direct_generative_grounding
-
-    predictive_adequacy:
-      rule: >
-        A causal route must generate prospective or genuinely out-of-sample predictions that outperform realistic
-        baselines, survive relevant comparators, and recur under independent operationalizations.
-      required_fields:
-        - prediction_target
-        - train_test_separation
-        - baseline
-        - comparator_routes
-        - calibration
-        - external_validation
-        - condition_stability
-      failure_cap: descriptive_or_non_probative_for_causality
-
-    heterogeneity_control:
-      rule: >
-        Heterogeneity supports a causal relation only when explicit conditions or generated routes account for it.
-        Unstable directions, unexplained subgroup shifts, and broad overlap defeat a unitary defect or mechanism claim.
-      required_fields:
-        - effect_direction_by_condition
-        - magnitude_by_condition
-        - overlap_by_condition
-        - generated_route_for_variation
-      failure_cap: causal_rejected_for_unitary_claim
-
-    practical_significance:
-      rule: >
-        Analytical separability does not establish biological, behavioral, or clinical importance.
-      required_when_practical_weight_is_claimed:
-        - effect_magnitude
-        - variance_envelope
-        - group_overlap
-        - noise_floor
-        - biological_range
-        - functional_threshold
-        - replication
-      broad_overlap_rule: >
-        A small group-average difference with broad overlap cannot support a unitary defect, biological entity,
-        individual-level state assignment, or causal proposition.
-      failure_cap: assay_or_measurement_level_only
-
-    instrument_and_task_dependency:
-      rule: >
-        A relation generated by one diagnostic instrument, selection rule, task, threshold, or analysis pipeline
-        remains dependent on that construction until it recurs under independent operationalizations.
-      failure_cap: label_dependent_observation
-      required_outputs:
-        - diagnostic_instrument_id
-        - task_id
-        - selection_rule
-        - threshold_dependency
-
-    independence:
-      rule: >
-        Shared cohorts, pipelines, labs, model families, instruments, tasks, inherited datasets, or inferential
-        bridges do not count as independent route closure. Correlated records remain visible but cannot accumulate weight.
-      outputs:
-        - independence_status
-        - evidence_family_id
-        - shared_assumption_family_id
-        - shared_pipeline_id
-        - shared_cohort_id
-        - shared_dataset_id
-        - shared_instrument_id
-        - shared_task_id
-
   common_invariants:
     sources_enter_as_unadmitted_assertions: true
+    actual_data_outranks_source_narrative: true
     causal_weight_defaults_to_zero: true
+    observational_evidence_defaults_to_noncausal: true
+    intervention_evidence_is_target_specific: true
+    intervention_label_neither_grants_nor_denies_causality: true
+    treatment_effect_does_not_automatically_establish_etiology_or_endogenous_mechanism: true
+    statistical_significance_does_not_establish_effectiveness: true
+    named_process_language_does_not_establish_measured_process: true
     author_conclusions_never_bind_directly: true
     peer_review_never_supplies_admission: true
     consensus_never_supplies_causal_weight: true
     meta_analysis_never_repairs_invalid_inputs: true
     shared_inferential_bridges_never_count_as_independent_convergence: true
-    handles_never_generate: true
-    rejected_constructs_never_receive_entity_level_support: true
-    downstream_records_cannot_rescue_failed_construct_admission: true
-    failed_causal_tests_never_receive_causal_language: true
-    heterogeneous_poorly_predictive_work_never_receives_causal_weight: true
-    descriptive_claims_are_positive_support: true
-    failed_mechanism_gate_does_not_discard_source: true
-    each_gate_caps_only_the_role_it_tests: true
     recency_never_supplies_causal_weight: true
-    framework_fit_never_supplies_weight: true
     publication_volume_never_supplies_weight: true
-    correlated_low_grade_evidence_cannot_accumulate_into_mechanism: true
