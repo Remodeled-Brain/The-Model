@@ -3,6 +3,8 @@ ingest_failure_routing:
   layer: evidence_maintenance
   purpose: Preserve useful evidence while preventing failed roles from entering chain closure.
 
+  closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+
   default:
     source_record: keep
     provenance: keep
@@ -28,9 +30,25 @@ ingest_failure_routing:
     proxy_only: The measured variable correlates with the target but the translation route is open.
     descriptive_support: A sound descriptive, epidemiological, phenomenological, association, or first-report claim.
     label_dependent_observation: The observation survives only as a relation among pre-labeled groups.
-    method_support: The source constrains measurement, assay, perturbation, or analysis behavior.
+    method_support: The source constrains measurement, assay, perturbation, or analysis behavior without closing the target segment.
     disconfirmation: The source breaks an asserted segment or exposes a missing differentiator.
     provenance_only: The source remains in the record without a support role.
+
+  closure_state_crosswalk:
+    mechanistic_grounded: closed
+    route_partial: partial
+    source_scale_only: source_scale_only
+    proxy_only: proxy_limited
+    descriptive_support: descriptive_only
+    label_dependent_observation: label_dependent
+    method_support: unresolved
+    disconfirmation: contradicted
+    provenance_only: unresolved
+    rule: >
+      Support channels describe the evidentiary role retained by an ingest record. When a channel is
+      bound to a chain segment, its closure state must come from this crosswalk and the kernel-owned
+      closure vocabulary. Contested is assigned by the evidence binder after cross-record conflict review,
+      not by a single ingest record.
 
   gate_intersection:
     notes: union
@@ -81,6 +99,7 @@ ingest_failure_routing:
 
   output_required:
     - support_channels
+    - closure_state
     - blocked_roles
     - translation_limits
     - unresolved_slots
