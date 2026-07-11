@@ -100,9 +100,16 @@ question_compiler:
     pending_causal_review_when:
       - construct_is_admitted
       - target_relation_is_independently_measurable
+    hard_evidence_failure_when:
+      - highly_heterogeneous_effects_lack_generated_conditions_or_routes
+      - out_of_sample_prediction_is_poor_or_absent
+      - evidence_is_postdictive_label_separation
+      - group_mean_effects_are_small_with_broad_overlap
+      - no_stable_route_specific_dependency_survives
+    hard_evidence_failure_result: causal_rejected
     rule: >
-      Highly heterogeneous or poorly predictive literature cannot be converted into candidate causal paths.
-      Those properties are causal-admission failures to be evaluated by the planner and binder.
+      Highly heterogeneous or poorly predictive literature is a failed causal proposition, not an open causal
+      possibility and not material for a softened causal summary. It cannot be converted into candidate causal paths.
 
   observation_admission_rule: >
     Preserve only observations, measured differences, behaviors, transitions, or practical constraints explicitly
@@ -184,6 +191,7 @@ question_compiler:
     - charitable_substitution_for_rejected_entity
     - causal_question_downgraded_to_association
     - heterogeneous_associations_rephrased_as_causal_contribution
+    - failed_causal_claim_recast_as_causal_uncertainty
     - observation_erasure
     - unsupported_single_route
     - hidden_change_of_question_scope
