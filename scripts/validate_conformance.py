@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate semantic causal decision records and mutation fixtures."""
+"""Validate semantic target-identity and causal decision records plus mutation fixtures."""
 from __future__ import annotations
 import argparse, copy, hashlib, json, pathlib, re, subprocess, sys
 from typing import Any
@@ -17,9 +17,13 @@ CLOSURE={"closed","partial","descriptive_only","source_scale_only","proxy_limite
 DESIGN={"observational","longitudinal_observational","natural_experiment","quasi_experimental","interventional","simulation_or_model","synthesis"}
 TARGET={"descriptive_distribution","predictive_relation","intervention_to_outcome","endogenous_dependency","etiology_or_origin","mechanism_or_route","cross_scale_translation"}
 CONSTRUCT={"construct_independent","construct_indexed","construct_internal"}
+CONSTRUCT_DISPOSITION={"admitted","grouping_handle_only","underspecified","premise_rejected"}
 MEASURE={"direct_target_measurement","direct_dependency_measurement","proxy","surrogate","composite_or_scale","self_report","model_derived"}
 EXPOSURE={"observation_only","dependency_partially_exposed","dependency_directly_exposed"}
 LANG={"descriptive","causal","mechanistic","predictive","causal_rejection"}
+IDENTITY={"generated_identity_closed","generated_identity_conditional","constructed_measurement_identity","grouping_handle_only","identity_unresolved","premise_rejected"}
+IDENTITY_CAUSAL_ELIGIBLE={"generated_identity_closed","generated_identity_conditional","constructed_measurement_identity"}
+GENERATOR={"physical_invariant_or_stable_interaction_structure","equation_or_model_defined_state","algorithmic_reconstruction","measurement_or_realization_standard","demonstrated_organism_state_relation","explicit_conditional_construction","none_or_unresolved"}
 DATA={"exact_outcome_definition","exact_exposure_or_intervention","baseline_distribution","comparator_or_counterfactual","sample_and_exclusion_flow","effect_distribution","effect_magnitude","uncertainty","overlap_and_response_heterogeneity","missingness_attrition_and_crossover","timing_and_durability","dose_or_exposure_relation","adverse_or_opposing_outcomes","measurement_validity_and_noise","preregistration_outcome_switching_and_analysis_multiplicity","replication_and_condition_stability"}
 INTERVENTION={"manipulation_integrity","valid_comparator_or_counterfactual","temporal_precedence","measurement_validity","effect_magnitude_and_full_response_distribution","bounded_or_generated_heterogeneity","specificity_against_relevant_alternative_routes","durability_appropriate_to_claim","attrition_missingness_and_crossover_bounded","replication_or_internal_strength_proportionate_to_claim_scope","no_stronger_disconfirmation"}
 OBSERVATIONAL={"construct_independent_target_and_measurement","temporal_order_appropriate_to_claim","relation_discriminates_proposed_dependency","stable_direction_and_magnitude","alternative_routes_and_confounding_tested","negative_controls_or_equivalent_failure_probes","practical_magnitude_relative_to_variance_overlap_and_noise","independent_replication_with_distinct_operationalization","required_scale_and_mechanism_bridges_closed"}
@@ -43,7 +47,10 @@ def sha(path:pathlib.Path)->str: return hashlib.sha256(path.read_bytes()).hexdig
 
 def validate_policy():
     schema=load(SCHEMA); req(schema.get("type")=="object","DECISION_SCHEMA_INVALID","schema type")
-    req({"schema_version","relations","claims","answer_claim_order"}<=set(schema.get("required",[])),"DECISION_SCHEMA_INVALID","required fields")
+    required={"schema_version","speaker_intent","target_identities","relations","claims","answer_claim_order"}
+    req(required<=set(schema.get("required",[])),"DECISION_SCHEMA_INVALID","required target-identity fields")
+    relation_required=set(schema.get("properties",{}).get("relations",{}).get("items",{}).get("required",[]))
+    req("target_identity_id" in relation_required,"DECISION_SCHEMA_INVALID","relation target_identity_id")
     policy=load(POLICY).get("policy"); req(isinstance(policy,dict),"ADOPTION_POLICY_REQUIRED","policy")
     req(policy.get("semantic_results_required_for_adoption") is True,"ADOPTION_POLICY_INVALID","semantic results")
     req(set(policy.get("required_fixture_sets",[]))=={"generic","neuroscience"},"ADOPTION_POLICY_INVALID","fixture sets")
@@ -58,6 +65,47 @@ def current_hashes():
     finally:
         RUNTIME.unlink(missing_ok=True)
         if RUNTIME.parent.exists() and not any(RUNTIME.parent.iterdir()): RUNTIME.parent.rmdir()
+
+def validate_speaker_intent(record:dict[str,Any]):
+    intent=record.get("speaker_intent")
+    req(isinstance(intent,dict),"SPEAKER_INTENT_REQUIRED","speaker_intent")
+    for field in ("source_wording","selected_or_inferred_referent","requested_scope"):
+        req(string(intent.get(field)),"SPEAKER_INTENT_FIELD_REQUIRED",field)
+    for field in ("intended_referent_candidates","distinctions_that_change_answer","unresolved_material_ambiguity"):
+        req(strings(intent.get(field)),"SPEAKER_INTENT_LIST_REQUIRED",field)
+
+def target_identities(record:dict[str,Any])->dict[str,dict[str,Any]]:
+    rows=record.get("target_identities")
+    req(isinstance(rows,list) and rows,"TARGET_IDENTITIES_REQUIRED","target_identities")
+    out={}
+    expected_map={
+        "generated_identity_closed":"admitted",
+        "generated_identity_conditional":"admitted",
+        "constructed_measurement_identity":"admitted",
+        "grouping_handle_only":"grouping_handle_only",
+        "identity_unresolved":"underspecified",
+        "premise_rejected":"premise_rejected",
+    }
+    for row in rows:
+        req(isinstance(row,dict),"TARGET_IDENTITY_OBJECT_REQUIRED","target identity")
+        iid=row.get("id"); req(string(iid),"TARGET_IDENTITY_ID_REQUIRED","id"); req(iid not in out,"DUPLICATE_TARGET_IDENTITY_ID",iid)
+        for field in ("source_label","speaker_intended_referent","source_defined_target","generator_pointer","boundary_conditions_and_regime","operational_equivalence_evidence","heterogeneity_generator","transport_status"):
+            req(string(row.get(field)),"TARGET_IDENTITY_FIELD_REQUIRED",f"{iid}.{field}")
+        for field in ("exact_relations_after_label_removal","measurement_or_construction_operations","identity_breaking_evidence","unresolved_identity_slots"):
+            req(strings(row.get(field)),"TARGET_IDENTITY_LIST_REQUIRED",f"{iid}.{field}")
+        disposition=row.get("identity_disposition")
+        req(disposition in IDENTITY,"INVALID_IDENTITY_DISPOSITION",f"{iid}.{disposition}")
+        generator=row.get("generator_type")
+        req(generator in GENERATOR,"INVALID_IDENTITY_GENERATOR",f"{iid}.{generator}")
+        mapped=row.get("mapped_construct_disposition")
+        req(mapped in CONSTRUCT_DISPOSITION,"INVALID_MAPPED_CONSTRUCT_DISPOSITION",f"{iid}.{mapped}")
+        req(mapped==expected_map[disposition],"IDENTITY_CONSTRUCT_MAPPING_MISMATCH",iid)
+        if disposition in IDENTITY_CAUSAL_ELIGIBLE:
+            req(generator!="none_or_unresolved","ADMITTED_IDENTITY_WITHOUT_GENERATOR",iid)
+        if disposition=="generated_identity_closed":
+            req(not row["unresolved_identity_slots"],"CLOSED_IDENTITY_WITH_OPEN_SLOTS",iid)
+        out[iid]=row
+    return out
 
 def relations(record:dict[str,Any])->dict[str,dict[str,Any]]:
     rows=record.get("relations"); req(isinstance(rows,list) and rows,"RELATIONS_REQUIRED","relations")
@@ -77,8 +125,12 @@ def claims(record:dict[str,Any])->dict[str,dict[str,Any]]:
         out[cid]=row
     return out
 
-def validate_relation(r:dict[str,Any]):
+def validate_relation(r:dict[str,Any],identities:dict[str,dict[str,Any]]):
     rid=r["id"]
+    iid=r.get("target_identity_id")
+    req(string(iid),"RELATION_TARGET_IDENTITY_REQUIRED",rid)
+    req(iid in identities,"RELATION_TARGET_IDENTITY_UNKNOWN",f"{rid}: {iid}")
+    identity=identities[iid]
     for field,allowed in (("design_mode",DESIGN),("target_relation",TARGET),("construct_relation",CONSTRUCT),("measurement_relation",MEASURE),("chain_exposure",EXPOSURE),("causal_disposition",CAUSAL),("closure_state",CLOSURE)):
         req(r.get(field) in allowed,"INVALID_RELATION_ENUM",f"{rid}.{field}")
     req(string(r.get("scope")),"RELATION_SCOPE_REQUIRED",rid)
@@ -90,6 +142,7 @@ def validate_relation(r:dict[str,Any]):
     req(all(string(data[f]) for f in DATA),"RELATION_DATA_VALUE_MISSING",rid)
     d=r["causal_disposition"]
     if d=="causal_admitted":
+        req(identity["identity_disposition"] in IDENTITY_CAUSAL_ELIGIBLE,"CAUSAL_ADMISSION_WITH_UNRESOLVED_IDENTITY",rid)
         req(not failed,"CAUSAL_ADMISSION_WITH_FAILED_CHECKS",rid); req(needed<=passed,"CAUSAL_ADMISSION_WITH_OPEN_CHECKS",rid)
     elif d=="causal_rejected": req(bool(failed),"CAUSAL_REJECTION_WITHOUT_FAILURE",rid)
     elif d=="causal_unresolved":
@@ -124,9 +177,11 @@ def render_answer(record:dict[str,Any])->str:
 
 def validate_decision_record(record:dict[str,Any]):
     req(record.get("schema_version")=="v1","DECISION_SCHEMA_VERSION","v1 required"); req(string(record.get("query")),"QUERY_REQUIRED","query")
+    validate_speaker_intent(record)
+    identities=target_identities(record)
     for f in ("admitted_observations","stripped_assertions"): req(isinstance(record.get(f),list) and all(string(x) for x in record[f]),"AUDIT_LIST_REQUIRED",f)
     rels=relations(record)
-    for r in rels.values(): validate_relation(r)
+    for r in rels.values(): validate_relation(r,identities)
     validate_claims(record,rels)
 
 def catalog():
