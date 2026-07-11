@@ -1,0 +1,46 @@
+{
+  "schema_version": "v1",
+  "status": "candidate",
+  "domain": "neuroscience and clinical neurobehavioral claims",
+  "purpose": "Neuroscience regressions for folk-behavior targets, regional smuggling, stimulation identity, mediation, and ecological overreach.",
+  "fixtures": [
+    {
+      "id": "neuro-stimulation-procrastination",
+      "mode": "question",
+      "source_question": "Does DLPFC stimulation reduce real-world procrastination by increasing task outcome value?",
+      "required": [
+        "classify procrastination as grouping_handle_only before evaluating the randomized design",
+        "translate the target into only the explicitly measured task initiation completion deadline report or verification relations",
+        "separate assignment to the complete protocol from delivered current as the named active component",
+        "require measured target engagement before DLPFC can receive regional causal status",
+        "classify task outcome value as a report or construct rather than a physical causal carrier",
+        "reject real-world scope when ordinary-life task content remains embedded in researcher contact prompting reporting verification and scoring",
+        "withhold actual causality when manipulation identity attrition analysis integrity replication or transportability remain open"
+      ],
+      "forbidden": [
+        "state that stimulation reduced procrastination",
+        "state that DLPFC enhancement caused the behavior",
+        "treat statistical mediation as a demonstrated mechanism",
+        "treat a 2 mA device setting as proof of effective regional tissue manipulation",
+        "treat ordinary-life task content as proof of portable real-world efficacy",
+        "let a dramatic endpoint repair construct target or route identity"
+      ]
+    },
+    {
+      "id": "neuro-folk-target-does-not-block-exact-effect",
+      "mode": "condition",
+      "condition": "A large independently replicated neural intervention changes one directly measured task-transition relation with verified physical delivery and target engagement, while authors apply a broader folk behavior label.",
+      "required": [
+        "admit the exact intervention to measured task-transition relation when every burden closes",
+        "retain the folk label as grouping_handle_only",
+        "keep the regional mechanism separate unless the physical and metabolic route closes",
+        "reject construct-level and ecological transfer beyond the tested relation"
+      ],
+      "forbidden": [
+        "reject the exact effect solely because the authors used a folk label",
+        "convert exact task-transition causality into treatment of a unitary folk construct",
+        "infer untreated endogenous regional control from intervention leverage"
+      ]
+    }
+  ]
+}
