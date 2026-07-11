@@ -1,0 +1,79 @@
+{
+  "schema_version": "v1",
+  "status": "candidate",
+  "purpose": "Shared regressions for hostile source reading and inferential-bridge admission.",
+  "fixtures": [
+    {
+      "id": "author-conclusion-is-assertion",
+      "source_pattern": "A paper directly measures a group-average association and concludes that the measured region, biomarker, or process causes or underlies the labeled condition.",
+      "required": [
+        "set the source conclusion status to unadmitted_assertion",
+        "preserve only the direct measurement at its measured scope",
+        "create separate bridges for group difference to individual state, correlation to direction, and observation to mechanism",
+        "assign zero causal weight until every required bridge closes"
+      ],
+      "forbidden": [
+        "bind the abstract or discussion conclusion directly",
+        "treat hedged causal wording as descriptive neutrality",
+        "repeat the author's causal verb in the answer"
+      ]
+    },
+    {
+      "id": "consensus-repeats-one-bridge",
+      "source_pattern": "Many papers and reviews repeat the same construct assignment or causal bridge using shared diagnostic assumptions, tasks, instruments, and analysis conventions.",
+      "required": [
+        "collapse the repeated bridge into one shared assumption family",
+        "count no independent convergence unless distinct methods independently close the same bridge",
+        "retain direct observations separately from the repeated interpretation"
+      ],
+      "forbidden": [
+        "treat consensus as evidence",
+        "treat publication count as bridge closure",
+        "call recurring terminology convergent mechanism evidence"
+      ]
+    },
+    {
+      "id": "meta-analysis-inherits-input-failure",
+      "source_pattern": "A meta-analysis pools studies that share construct dependence, broad group overlap, task dependence, postdictive classification, or unsupported cross-scale inference.",
+      "required": [
+        "inherit every construct measurement direction task and bridge failure from the inputs",
+        "preserve any pooled descriptive estimate only at the admissible source scope",
+        "block meta-analytic pooling from repairing invalid inputs"
+      ],
+      "forbidden": [
+        "promote the pooled result to causal support",
+        "treat narrower confidence intervals as mechanism closure",
+        "use review status as admission"
+      ]
+    },
+    {
+      "id": "prediction-failure-breaks-causal-story",
+      "source_pattern": "A proposed unitary causal relation is accompanied by heterogeneous effects and poor out-of-sample prediction despite claims that the literature is complex or multifactorial.",
+      "required": [
+        "treat poor prediction as positive evidence against the proposed unitary causal relation",
+        "treat unbounded heterogeneity as failure of the unitary route",
+        "assign causal_rejected rather than causal_unresolved",
+        "strip complex multifactorial and may-contribute language"
+      ],
+      "forbidden": [
+        "preserve the causal story under generic uncertainty",
+        "restate weak prediction as partial causal contribution",
+        "describe the evidence as mixed after the failure path is established"
+      ]
+    },
+    {
+      "id": "sparse-observation-over-rich-story",
+      "source_pattern": "After unsupported constructs and bridges are removed, only a narrow assay, task, or group-level observation survives.",
+      "required": [
+        "return the sparse surviving observation at its exact scope",
+        "list the bridges that failed",
+        "withhold causal mechanism defect dysfunction and biological-basis language"
+      ],
+      "forbidden": [
+        "reconstruct a richer causal narrative from surrounding literature",
+        "treat loss of the story as loss of the observation",
+        "fill missing bridges with disciplinary convention"
+      ]
+    }
+  ]
+}
