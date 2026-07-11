@@ -2,13 +2,13 @@ evidence_binding_contract:
   status: candidate
   layer: primary_runtime
   purpose: >
-    Bind reviewed corpus records to exact chain segments, evaluate hard causal claims, and weight the body of
-    evidence without allowing rejected constructs, heterogeneity, poor prediction, paper framing, publication
-    volume, recency, model agreement, or shared vocabulary to substitute for physical closure.
+    Bind only admitted observations and closed inferential bridges to exact chain segments. Treat the corpus as
+    a collection of assertions requiring adversarial audit, not as a trusted body of conclusions.
 
   closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
   construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
   causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
+  evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission
   ingest_crosswalk_ref: model/ingest/failure_routing.yaml#ingest_failure_routing.closure_state_crosswalk
 
   required_inputs:
@@ -17,7 +17,38 @@ evidence_binding_contract:
     - initial_causal_disposition
     - rejected_premises
     - answerability_plan
-    - reviewed_corpus
+    - audited_corpus_records
+
+  corpus_boundary:
+    default_source_status: unadmitted_assertion
+    rule: >
+      A paper, review, meta-analysis, consensus statement, or replicated phrase cannot bind directly. A record
+      becomes eligible only after direct observations are separated from interpretation and every inferential bridge
+      is entered in the bridge ledger.
+    reviewed_does_not_mean_admitted: true
+    peer_review_supplies_weight: false
+    author_conclusion_supplies_weight: false
+    consensus_supplies_weight: false
+    meta_analysis_repairs_invalid_inputs: false
+
+  inference_boundary:
+    required_record_fields:
+      - admitted_observations
+      - stripped_assertions
+      - bridge_ledger
+      - shared_assumption_families
+      - non_probative_claims
+      - strongest_surviving_claim
+    binding_eligibility:
+      direct_observation: eligible_at_measured_scope
+      bridge_closed: eligible_for_the_exact_target_relation
+      bridge_partially_closed: capped_at_the_closed_source_side
+      unadmitted_assertion: ineligible
+      causal_rejected: ineligible_for_causal_or_mechanistic_support
+      non_probative: ineligible_for_the_named_conclusion
+    rule: >
+      Bind the observation or closed bridge, never the paper's prose conclusion. Each unsupported bridge is removed
+      before evidence-family weighting. A bridge repeated across papers remains one shared assumption family.
 
   premise_boundary:
     rule: >
@@ -31,9 +62,9 @@ evidence_binding_contract:
   causal_boundary:
     applies_when: hard_causality_request_is_true
     rule: >
-      Evidence may receive causal weight only when the construct, direction, dependency, prediction,
-      heterogeneity, practical magnitude, scale translation, independence, and disconfirmation checks all pass
-      for the exact requested relation. Failure of any necessary test produces causal_rejected for that proposition.
+      Evidence may receive causal weight only when construct, direction, dependency, prediction, heterogeneity,
+      practical magnitude, scale translation, independence, disconfirmation, and every required inferential bridge
+      close for the exact requested relation.
     necessary_checks:
       - construct_coherence
       - temporal_direction
@@ -44,9 +75,11 @@ evidence_binding_contract:
       - practical_magnitude_relative_to_overlap_variance_and_noise
       - physical_scale_translation
       - independent_evidence_family_convergence
+      - inferential_bridge_closure
       - survival_of_relevant_disconfirmation
     hard_failures:
       - rejected_construct
+      - unsupported_inferential_bridge
       - heterogeneous_effects_without_generated_conditions_or_routes
       - poor_out_of_sample_prediction
       - postdictive_only_separation
@@ -58,11 +91,15 @@ evidence_binding_contract:
 
   corpus_modes:
     frozen:
-      rule: The runtime remains operable against a fixed reviewed corpus.
+      rule: The runtime remains operable against a fixed audited corpus.
     adaptive:
-      rule: Ingest may add, supersede, attenuate, or disconfirm support records.
+      rule: Ingest may add, supersede, attenuate, or disconfirm audited records.
 
   retrieval_keys:
+    - admitted_observation
+    - bridge_type
+    - bridge_status
+    - shared_assumption_family
     - source_substrate
     - measured_variable
     - operation
@@ -84,17 +121,20 @@ evidence_binding_contract:
     - rejected_premise
 
   evidence_role_classes:
-    premise_breaking: Evidence that invalidates a required entity, unity, defect, direction, predictive, or translation premise.
+    premise_breaking: Evidence that invalidates a required entity, unity, defect, direction, predictive, bridge, or translation premise.
     route_closing: Evidence that directly closes a required dependency segment or join under stated conditions.
     route_discriminating: Evidence that distinguishes surviving routes through different predicted consequences.
     segment_supporting: Evidence that supports one bounded segment without closing the full route.
     descriptive_only: Evidence that closes only a measured descriptive relation.
-    non_probative: Evidence that cannot bear on the requested conclusion after construct, causal, scale, timing, magnitude, or independence checks.
+    non_probative: Evidence that cannot bear on the requested conclusion after admission and causal checks.
 
   binding_unit:
-    definition: One reviewed evidence record bound to one or more named chain segments.
+    definition: One admitted observation or closed bridge bound to one or more named chain segments.
     required_fields:
       - provenance
+      - admitted_observation_or_bridge
+      - bridge_status
+      - shared_assumption_family
       - supported_segment
       - support_role
       - evidence_role_class
@@ -112,29 +152,32 @@ evidence_binding_contract:
       binder-derived contested status is assigned only through conflict_handling.
 
   binding_rules:
+    - Bind only admitted observations or closed bridges.
     - Support attaches only to the segment and conditions actually measured.
+    - Author conclusions, abstracts, discussions, reviews, and consensus statements do not bind directly.
     - Evidence depending on a rejected construct cannot support that construct's biological unity or mechanism.
     - Evidence failing a necessary causal test cannot support a causal verb for the requested proposition.
     - Proxy evidence requires translation closure before binding to mechanism.
     - Implementation-site evidence requires timing and dependency closure before binding to source.
     - Scale crossing requires an explicit carried variable and intermediate dependency path.
     - A route-closing intervention may bind more strongly than a descriptive association only for the segment it tests.
-    - Disconfirming or premise-breaking evidence binds to the exact premise, segment, prediction, or join it breaks.
+    - Disconfirming or premise-breaking evidence binds to the exact premise, bridge, segment, prediction, or join it breaks.
     - Unresolved evidence remains visible without granting closure.
-    - Correlated reports remain grouped and cannot create independent weight by count.
+    - Correlated reports and shared inferential bridges remain grouped and cannot create independent weight by count.
 
   causal_assessment:
     dispositions_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
     required_outputs:
       - causal_disposition
       - failed_causal_tests
+      - failed_inferential_bridges
       - passed_causal_tests
       - strongest_causal_support_path
       - strongest_causal_failure_path
     disposition_rules:
-      causal_admitted: Every necessary causal test passes for the exact requested relation.
-      causal_rejected: At least one necessary causal premise fails, including construct rejection, unbounded heterogeneity, or poor prediction.
-      causal_unresolved: The construct and target are admissible but the route remains open without a hard failure.
+      causal_admitted: Every necessary causal test and inferential bridge closes for the exact requested relation.
+      causal_rejected: At least one necessary causal premise or bridge fails.
+      causal_unresolved: The construct and target are admissible but the route remains open without a positive failure.
       not_a_causal_question: The source asks only for description or interpretation.
     prediction_rule: >
       Statistical group separation, in-sample classification, or postdictive discrimination is not predictive
@@ -145,7 +188,7 @@ evidence_binding_contract:
       Unbounded variation, unstable directions, and broad overlap defeat a unitary defect or mechanism claim.
 
   body_of_evidence_assessment:
-    unit_of_counting: independent_evidence_family
+    unit_of_counting: independent_evidence_family_after_bridge_audit
     family_grouping_keys:
       - cohort
       - dataset
@@ -155,16 +198,19 @@ evidence_binding_contract:
       - diagnostic_instrument
       - laboratory_lineage
       - model_lineage
+      - shared_assumption_family
     required_dimensions:
+      admission_status: Is the item an admitted observation or closed bridge?
       construct_admission: Does the evidence require the questioned entity to exist before measurement?
       claim_directness: Does it measure the exact premise, segment, join, prediction, or outcome claimed?
+      bridge_integrity: Which inferential transitions remain unsupported?
       measurement_validity: Is the measured variable physically interpretable under the stated conditions?
       causal_leverage: Does timing, perturbation, dependency position, or prospective design bear on direction?
       predictive_adequacy: Does the route predict out of sample beyond realistic baselines and comparators?
       heterogeneity_control: Are effect variation and direction generated by explicit conditions or routes?
       scale_translation: Does a demonstrated dependency carry the result to the requested scale?
       practical_magnitude: Is the effect large relative to overlap, variance, noise, range, and functional threshold?
-      independence: Does the record add a distinct failure mode rather than repeat a family?
+      independence: Does the record add a distinct failure mode rather than repeat a family or bridge?
       route_discrimination: Does it separate candidate routes rather than merely recur under one framing?
       disconfirmation_power: Does it break a required premise or necessary segment?
     priority_order:
@@ -175,31 +221,33 @@ evidence_binding_contract:
       - descriptive_only
       - non_probative
     dominance_rules:
-      - Failure of a necessary construct or causal premise defeats any number of downstream records that assume it.
+      - Failure of a necessary construct, bridge, or causal premise defeats any number of downstream records that assume it.
       - Direct route-closing or route-breaking evidence outranks association for the same claimed relation.
       - Independent convergence gains weight only when distinct methods close the same relation through different failure modes.
-      - Repeated use of one cohort, dataset, task, diagnostic instrument, assay, or pipeline counts as one evidence family.
+      - Repeated use of one cohort, dataset, task, diagnostic instrument, assay, pipeline, or inferential bridge counts as one family.
+      - A meta-analysis inherits construct, measurement, direction, task, and bridge failures from its inputs.
       - Small group-average differences with broad overlap cannot establish a unitary defect, entity, or individual-level state.
       - Poorly predictive or postdictive work cannot be restated as causal contribution, mechanism, role, or biological basis.
       - Label-dependent, proxy-limited, source-scale-only, or practically trivial results cannot accumulate into mechanism by volume.
-      - Publication prestige and citation count do not alter chain contribution.
+      - Publication prestige, peer review, consensus, and citation count do not alter chain contribution.
     body_verdicts:
       premise_rejected: A required construct or entity premise fails admission.
-      causal_claim_rejected: A hard causal proposition fails one or more necessary causal tests.
+      causal_claim_rejected: A hard causal proposition fails one or more necessary tests or bridges.
       disconfirmed: Admissible evidence breaks the claimed route or necessary segment under the stated conditions.
-      unsupported: No admissible evidence closes the requested relation.
+      unsupported: No admitted evidence closes the requested relation.
       bounded_support: One or more bounded segments close, but the full requested relation does not.
-      supported: Independent evidence closes the required path and survives relevant disconfirmation.
-      contested: Compatible admissible evidence remains in conflict after all required checks.
+      supported: Independent admitted evidence closes the required path and survives relevant disconfirmation.
+      contested: Compatible admitted evidence remains in conflict after all required checks.
     no_numeric_average: true
 
   recency_policy:
     rule: >
-      Recent evidence receives retrieval and supersession-review priority. Older evidence remains
-      load-bearing when later work does not retest the same variable, dependency, conditions, or scale translation.
+      Recent evidence receives retrieval and supersession-review priority. Older evidence remains load-bearing
+      when later work does not retest the same admitted observation, bridge, dependency, conditions, or translation.
     required_checks:
       - same_variable
       - same_segment_or_join
+      - same_bridge
       - compatible_conditions
       - stronger_or_disconfirming_design
       - independence
@@ -209,30 +257,33 @@ evidence_binding_contract:
   supersession:
     candidate_if:
       - a newer record measures the same segment under compatible conditions
-      - the newer design closes a route left open by the older record
+      - the newer design closes a route or bridge left open by the older record
       - the newer result disconfirms the older segment with stronger controls
     not_superseded_if:
       - only terminology changed
       - the measured scale or variable differs
-      - the newer work inherits the same cohort, pipeline, or unresolved proxy
+      - the newer work inherits the same cohort, pipeline, bridge, or unresolved proxy
       - the apparent conflict disappears after condition or scope separation
     result: preserve both records until a reviewed supersession decision is made
 
   conflict_handling:
     required_checks:
       - verify_segment_identity
+      - verify_bridge_identity
       - separate_condition_or_scale_differences
-      - check_independence_and_shared_pipeline
+      - check_independence_shared_pipeline_and_shared_assumption_family
       - inspect_measurement_and_translation_limits
     surviving_conflict_state: contested
     rule: >
-      Assign contested only when evidence binds to the same segment under compatible conditions and
-      the conflict survives every required check. Condition-separated or scale-separated results retain
-      their own kernel states and are not merged into a contested bucket.
+      Assign contested only when admitted evidence binds to the same segment under compatible conditions and
+      the conflict survives every required check. Condition-separated or scale-separated results retain their own states.
     majority_vote_closes_conflict: false
 
   output_schema:
-    bindings: list
+    admitted_bindings: list
+    rejected_assertions: list
+    bridge_ledger: list
+    shared_assumption_families: list
     evidence_families: list
     excluded_or_capped_records: list
     strongest_admissible_support_path: list
@@ -242,6 +293,7 @@ evidence_binding_contract:
       disposition: string
       passed_tests: list
       failed_tests: list
+      failed_bridges: list
       strongest_support_path: list
       strongest_failure_path: list
     body_of_evidence_verdict:
@@ -261,5 +313,5 @@ evidence_binding_contract:
     corpus_mode: [frozen, adaptive]
 
   ingest_boundary: >
-    Ingest produces reviewed support records for this binder. It does not define the source question,
-    compile the question, alter the chain kernel, or decide the final answer shape.
+    Ingest produces audited records containing admitted observations and bridge ledgers. It does not define the
+    source question, compile the question, alter the chain kernel, or decide the final answer shape.
