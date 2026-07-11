@@ -2,9 +2,9 @@ evidence_admission:
   status: candidate
   layer: shared_kernel
   purpose: >
-    Prevent scientific prose from entering the model as evidence merely because it is published, repeated,
-    reviewed, statistically significant, or expressed in causal language. Every source enters as a set of
-    assertions whose observational content and inferential bridges must be separated and independently audited.
+    Admit evidence from the measured data rather than the source narrative. Observational, interventional,
+    synthetic, and review records receive only the causal scope earned by their design, measurements,
+    effect distribution, inferential bridges, and exposed dependency path.
 
   default_posture:
     source_claim_status: unadmitted_assertion
@@ -18,35 +18,95 @@ evidence_admission:
     meta_analysis_repairs_invalid_inputs: false
     local_guard_passes_create_causal_eligibility: false
 
+  evidence_axes:
+    design_mode:
+      - observational
+      - longitudinal_observational
+      - natural_experiment
+      - quasi_experimental
+      - interventional
+      - simulation_or_model
+      - synthesis
+    construct_relation:
+      - construct_independent
+      - construct_indexed
+      - construct_internal
+    measurement_relation:
+      - direct_target_measurement
+      - direct_dependency_measurement
+      - proxy
+      - surrogate
+      - composite_or_scale
+      - self_report
+      - model_derived
+    target_relation:
+      - descriptive_distribution
+      - predictive_relation
+      - intervention_to_outcome
+      - endogenous_dependency
+      - etiology_or_origin
+      - mechanism_or_route
+      - cross_scale_translation
+    chain_exposure:
+      - observation_only
+      - dependency_partially_exposed
+      - dependency_directly_exposed
+
+  data_first_admission:
+    rule: >
+      The admissible claim is generated from the actual observations and design. The abstract, conclusion,
+      intervention label, diagnostic label, theoretical vocabulary, and author interpretation cannot increase
+      causal scope beyond the data.
+    required_data_fields:
+      - exact_outcome_definition
+      - exact_exposure_or_intervention
+      - baseline_distribution
+      - comparator_or_counterfactual
+      - sample_and_exclusion_flow
+      - effect_distribution_not_only_group_mean
+      - effect_magnitude
+      - uncertainty
+      - overlap_and_response_heterogeneity
+      - missingness_attrition_and_crossover
+      - timing_and_durability
+      - dose_or_exposure_relation_when_applicable
+      - adverse_or_opposing_outcomes
+      - measurement_validity_and_noise
+      - preregistration_outcome_switching_and_analysis_multiplicity
+      - replication_and_condition_stability
+    narrative_conflict_rule: >
+      When the narrative is stronger than the measured effect, the data control and the stronger narrative is
+      recorded as a stripped assertion. Statistical significance, a named therapy, or a named biological process
+      never supplies practical magnitude, consistency, specificity, durability, or mechanism.
+    claim_language_requirements:
+      effective: Requires a stated target, comparator, practical threshold, response distribution, durability, and adverse-outcome scope.
+      induces: Requires temporal precedence, direct measurement of the induced change, comparator control, persistence, and specificity.
+      mechanism: Requires the dependency path that carries the intervention or exposure into the measured outcome.
+      biological_change: Requires a directly interpretable substrate and variable rather than a proxy label or generic process noun.
+
   presumptive_classification:
     rule: >
-      Evidence classes with known construct dependence or inferential distance enter with a restrictive kernel
-      closure state. The presumption is the starting classification, not a penalty applied after a neutral record
-      is admitted. It remains until every escape condition is affirmatively demonstrated.
+      Classification occurs before local gates. The starting state is determined by construct dependence,
+      measurement distance, design mode, and target relation. Stronger binding is affirmatively earned for the
+      exact relation rather than granted to a paper or evidence category as a whole.
     classes:
       construct_indexed:
         triggers:
           - samples selected by diagnosis or theoretical category
-          - outcomes defined by the same diagnostic instrument or construct
-          - treatment-for records indexed by a diagnosis or syndrome label
-          - response-rate records reported within a labeled cohort
-          - task or assay selected because it is conventionally associated with the construct
-          - literature synthesis whose inputs share the construct assumption
+          - outcomes defined by the same instrument threshold or construct
+          - tasks or assays selected because they are conventionally associated with the construct
+          - synthesis whose inputs share the construct assumption
         presumed_closure_state: label_dependent
         presumed_support_role: label_dependent_observation
-        causal_segment_binding: forbidden
-        mechanism_segment_binding: forbidden
-        etiologic_binding: forbidden
         escape_requires:
           - target relation specified independently of the construct label
-          - sampling or replication outside construct-selected cohorts
-          - measurement operationalization independent of the diagnostic instrument or threshold
+          - operationalization independent of the construct-defining instrument or threshold
           - stability under relabeling threshold perturbation and alternative operationalization
-          - route-specific prospective prediction independent of group membership
-          - direct dependency evidence that does not presuppose the construct
+          - replication outside construct-selected sampling when the target claim exceeds that sampling frame
+          - direct prediction or dependency evidence independent of group membership
         count_can_escape: false
         meta_analysis_can_escape: false
-      proxy_record:
+      proxy_or_surrogate:
         triggers:
           - biomarker
           - imaging signal
@@ -54,54 +114,75 @@ evidence_admission:
           - classifier score
           - surrogate endpoint
           - downstream readout
+          - model-derived latent score
         presumed_closure_state: proxy_limited
         presumed_support_role: proxy_only
-        causal_segment_binding: forbidden
-        mechanism_segment_binding: forbidden
-        escape_rule: >
-          A proxy record cannot itself bind to a causal or mechanistic segment. A later record may bind only by
-          directly measuring the required dependency, at which point it is classified as direct dependency evidence
-          rather than upgraded proxy evidence.
-        count_can_escape: false
-        translation_language_can_escape: false
-      treatment_response:
-        triggers:
-          - treatment-for claim
-          - response rate
-          - symptom improvement after intervention
-          - medication class associated with a diagnosis
-          - intervention selected because of the labeled indication
-        presumed_closure_state: label_dependent
-        presumed_support_role: descriptive_support
-        may_bind:
-          - intervention_to_measured_outcome_under_stated_conditions
-          - adverse_effect_relation
-          - dose_timing_and_response_distribution
-        may_not_bind:
-          - etiology
-          - pathogenesis
-          - diagnostic_construct_validity
-          - endogenous_mechanism
-          - defect_or_dysfunction
-          - biological_basis
         rule: >
-          Treatment response identifies an intervention-outcome relation under the tested conditions. It cannot
-          identify what generated the treated condition, validate the diagnostic entity, or establish that the
-          intervention target is the endogenous causal route.
+          The record binds only the measured proxy relation until a physical translation path closes. If the
+          measurement directly exposes the required dependency, classify that relation as direct dependency
+          evidence rather than upgrading the proxy by language or recurrence.
+        count_can_escape: false
+      observational_record:
+        triggers:
+          - no controlled manipulation of the proposed source variable
+          - counterfactual supplied only by adjustment matching modeling or group comparison
+        presumed_closure_state: descriptive_only
+        presumed_support_role: descriptive_support
+        causal_upgrade_requires:
+          - construct-independent target and measurement
+          - temporal order appropriate to the claim
+          - a relation strong and specific enough to discriminate the proposed dependency
+          - stable direction and magnitude across relevant conditions
+          - realistic alternative routes and confounding paths tested rather than narrated away
+          - negative controls or equivalent failure probes
+          - practical magnitude relative to variance overlap and noise
+          - independent replication using distinct operationalizations
+          - every required scale and mechanism bridge closed for the target causal claim
+        rule: >
+          Observational evidence is not automatically causal. Exceptionally strong observations may earn causal
+          weight only when they affirmatively close the required dependency and alternative-route burden. Merely
+          recurring, adjusting covariates, or using causal vocabulary does not supply that closure.
+      intervention_record:
+        triggers:
+          - deliberate manipulation of a specified variable or route
+          - controlled exposure intended to change a measured outcome
+        presumed_closure_state: unresolved
+        presumed_support_role: provenance_only
+        eligible_target: intervention_to_outcome
+        admission_requires:
+          - manipulation_integrity
+          - valid comparator_or_counterfactual
+          - temporal_precedence
+          - measurement_validity
+          - effect_magnitude_and_full_response_distribution
+          - bounded_or_generated_heterogeneity
+          - specificity_against_relevant_alternative_routes
+          - durability_appropriate_to_the_claim
+          - attrition_missingness_and_crossover_bounded
+          - replication_or_internal_strength_proportionate_to_claim_scope
+          - no_stronger_disconfirmation
+        rule: >
+          An intervention can establish that the manipulated variable caused the measured outcome under the tested
+          conditions when the data close these requirements. High consistency, large magnitude, specificity, and
+          replication can make intervention evidence load-bearing. Treatment or intervention status neither grants
+          nor denies causality by itself.
+        scope_rule: >
+          Causal admission attaches to the exact manipulated relation. Etiology, endogenous mechanism, construct
+          validity, and cross-scale explanation require their own bridges. A treatment target does not identify the
+          untreated system's origin unless those additional dependencies close.
       direct_construct_independent:
         triggers:
           - variables specified independently of diagnosis theory or proxy status
           - sampling and measurement do not require the target construct
-          - dependency is directly measured or manipulated
+          - the required dependency is directly measured or manipulated
         presumed_closure_state: unresolved
         presumed_support_role: provenance_only
         rule: >
-          Construct independence removes the label-dependent presumption but does not grant support. The record
-          still begins unadmitted and must close the exact bridge and chain segment it claims.
+          Construct independence removes label dependence but grants no causal support by itself. The exact bridge,
+          segment, target relation, and applicable data requirements must still close.
     upgrade_rule: >
-      No record upgrades because one local guard passes. Upgrade requires affirmative satisfaction of every
-      applicable escape condition plus closure of the exact bridge and segment. Failure to demonstrate escape
-      preserves the presumed state without balancing language.
+      A stronger closure state is relation-specific. One local pass cannot upgrade the whole record. Missing data,
+      untested alternatives, or incomplete bridges preserve the restrictive state for the affected claim.
 
   claim_decomposition:
     required_parts:
@@ -109,23 +190,15 @@ evidence_admission:
       - sampling_and_grouping_operation
       - measurement_operation
       - analytical_transformation
+      - intervention_or_exposure_operation
       - construct_assignment
       - direction_inference
       - cross_scale_inference
       - causal_or_mechanistic_conclusion
     rule: >
       Preserve direct observations and explicit operations. Treat every transition from observation to construct,
-      direction, scale, mechanism, defect, dysfunction, or biological meaning as a separate inferential bridge.
-      No bridge inherits validity from the paper's conclusion or from another paper repeating the same bridge.
-
-  assertion_statuses:
-    - unadmitted_assertion
-    - observation_admitted
-    - bridge_partially_closed
-    - bridge_closed
-    - causal_admitted
-    - causal_rejected
-    - non_probative
+      individual state, direction, scale, mechanism, defect, dysfunction, treatment efficacy, or biological meaning
+      as a separate inferential bridge.
 
   bridge_audit:
     required_fields:
@@ -147,76 +220,78 @@ evidence_admission:
       - location_to_source
       - perturbability_to_control
       - proxy_to_mechanism
-      - treatment_response_to_etiology
-      - treatment_target_to_endogenous_route
+      - intervention_to_measured_outcome
+      - intervention_effect_to_treatment_effectiveness
+      - intervention_target_to_endogenous_route
+      - treatment_effect_to_etiology
+      - measured_change_to_named_process
       - source_scale_to_target_scale
       - retrospective_to_predictive
       - prediction_to_causation
       - statistical_to_practical_significance
-      - diagnostic_group_to_biological_entity
       - heterogeneity_to_unitary_route
     admission_rule: >
-      A bridge closes only when its required physical dependency is directly supported under the conditions
-      needed by the target claim. Familiar terminology, disciplinary convention, author confidence, citation
-      volume, or recurrence of the bridge cannot close it.
+      A bridge closes only when the required dependency is supported by the actual data under the conditions needed
+      by the target claim. Familiar terminology, author confidence, citation volume, recurrence, or field convention
+      cannot close it.
 
   hostile_reading_protocol:
     required_questions:
       - What was directly observed before interpretation?
-      - Which claim components were introduced by grouping, thresholds, instruments, models, or author language?
+      - What are the full outcome and response distributions rather than the headline mean?
+      - What comparator or counterfactual was actually observed?
+      - Which effects are practically large stable durable and specific?
+      - Which findings are driven by attrition missingness thresholding task choice or analysis flexibility?
+      - Which claim components were introduced by labels instruments models or author language?
       - Which causal direction was measured and which was inferred?
       - Which scale crossings lack an explicit physical carrier?
-      - Which conclusions depend on the diagnostic or theoretical construct being true in advance?
-      - Is a treatment-response relation being smuggled into etiology or endogenous mechanism?
-      - Is a proxy being described as the dependency it merely reads out?
-      - Which findings disappear or change under another task, threshold, cohort, comparator, or operationalization?
-      - Which nulls, reversals, overlaps, and failed predictions are hidden by summary language?
+      - Does an intervention close only the manipulated relation or also the claimed endogenous route?
+      - Which nulls reversals overlaps and failed predictions are compressed out of the narrative?
       - Which papers repeat the same assumption family rather than provide independent closure?
     rule: >
-      Read to locate inferential debt, not to preserve the paper's intended story. The record must retain the
-      strongest surviving observation after every unsupported bridge is removed.
+      Read to locate inferential debt. Retain the strongest claim generated by the data after unsupported bridges
+      are removed, even when that claim is much narrower than the published narrative.
 
   corpus_level_rules:
-    - The corpus is a collection of claims and measurements, not a trusted body of conclusions.
-    - Construct-indexed literature is presumed label-dependent until it affirmatively escapes the construct.
-    - Proxy literature is presumed proxy-limited and cannot itself bind to a causal segment.
-    - Treatment-response literature may bind intervention-outcome relations but never etiology or endogenous mechanism.
+    - The corpus is a collection of measurements and assertions, not a trusted body of conclusions.
+    - Purely observational evidence begins descriptive or more restricted and earns causal scope only by closing the full burden for the target relation.
+    - Intervention evidence is judged by manipulation integrity and the actual effect distribution, not by the word treatment.
+    - A decisive intervention may establish intervention-to-outcome causality even when ordinary treatment evidence does not.
+    - Intervention-to-outcome causality does not automatically establish etiology, endogenous mechanism, or construct validity.
+    - Construct-indexed literature remains label-dependent until it affirmatively escapes the construct.
+    - Proxy literature remains proxy-limited until the required physical translation closes.
     - Repetition of one inferential bridge across papers counts as one shared assumption family, not convergence.
-    - A meta-analysis inherits construct, measurement, task, selection, and direction failures from its inputs.
-    - Publication volume can increase confidence only after exact relation identity, bridge closure, and independence are established.
+    - A synthesis inherits construct, measurement, selection, design, and bridge failures from its inputs.
     - Heterogeneous effects cannot be averaged into a unitary mechanism when route-generating conditions remain unknown.
     - Predictive weakness is positive evidence against a proposed unitary causal relation when that relation should predict the target.
     - Broad overlap is positive evidence against defect, dysfunction, or individual-state assignment from group means.
-    - Missing null results and selective reporting reduce admissible weight; they do not create generic uncertainty around a causal story.
-    - The model must prefer a sparse surviving observation over a rich unsupported causal narrative.
-
-  causal_transfer_rule: >
-    No source conclusion, discussion claim, abstract framing, review synthesis, consensus statement, treatment
-    indication, response rate, or proxy association may transfer causal language into the runtime. Causal language
-    is regenerated only from construct-independent direct dependency evidence that closes timing, prediction,
-    heterogeneity, magnitude, translation, independence, and disconfirmation paths.
+    - The model must prefer a sparse data-supported result over a rich unsupported causal narrative.
 
   output_requirements:
+    - evidence_axes
     - presumptive_class
     - presumed_closure_state
-    - presumption_basis
-    - escape_conditions_tested
-    - escape_conditions_passed
+    - data_fields_available
+    - data_fields_missing
     - admitted_observations
     - stripped_assertions
     - bridge_ledger
     - shared_assumption_families
-    - non_probative_claims
     - strongest_surviving_claim
+    - eligible_causal_target
     - causal_weight
     - causal_rejection_basis
 
   forbidden_shortcuts:
-    - neutral_default_for_construct_indexed_evidence
+    - narrative_strength_as_data_strength
+    - intervention_label_as_causal_admission
+    - treatment_name_as_effectiveness
+    - statistically_significant_as_effective
+    - pre_post_change_without_counterfactual_as_treatment_effect
+    - measured_proxy_change_as_named_biological_process
+    - observational_recurrence_as_causal_closure
     - local_guard_pass_as_global_upgrade
-    - treatment_response_as_etiology
     - treatment_target_as_endogenous_mechanism
-    - proxy_record_as_causal_segment
     - publication_as_admission
     - author_conclusion_as_binding
     - peer_review_as_validation
@@ -224,4 +299,3 @@ evidence_admission:
     - meta_analysis_as_construct_repair
     - repeated_inference_as_independent_convergence
     - hedged_causal_language_as_descriptive_neutrality
-    - uncertainty_language_after_positive_causal_failure
