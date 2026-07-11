@@ -1,0 +1,14 @@
+{
+  "expected_error_code": "EFFECTIVENESS_LANGUAGE_OVERREACH",
+  "base": "../pass/decisive_intervention.json",
+  "mutations": [
+    {
+      "path": "decision_record.claims.0.text",
+      "value": "Intervention X was effective at treating outcome Y."
+    },
+    {
+      "path": "rendered_answer",
+      "value": "Intervention X was effective at treating outcome Y."
+    }
+  ]
+}
