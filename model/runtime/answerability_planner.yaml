@@ -2,20 +2,20 @@ answerability_planner:
   status: candidate
   layer: primary_runtime
   purpose: >
-    Determine what empirical work is required for admitted questions, apply the hard-causality gate,
-    and terminate questions whose causal proposition fails construct, prediction, heterogeneity, or route requirements.
+    Determine what empirical work is required for each admitted target relation. Apply relation-specific causal
+    admission rather than one universal causal checklist.
 
   construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
   causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
+  evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission
 
   input_required:
     - question_type
     - hard_causality_request
     - construct_disposition
-    - initial_causal_disposition
     - rejected_premises
     - answer_target
-    - compiled_questions
+    - target_relations
     - candidate_dependency_paths
     - physical_variables
     - candidate_substrates
@@ -26,175 +26,161 @@ answerability_planner:
 
   admission_routing:
     premise_rejected:
-      plan:
-        - state_the_premise_failure
-        - identify_the_handle_that_supplied_false_entity_or_defect_status
-        - assign_causal_rejected_when_the_question_is_causal
-        - prevent_entity_level_mechanism_retrieval
-        - preserve_only_explicit_observations_if_any
-      evidence_allowed:
-        - evidence_testing_construct_coherence
-        - evidence_disconfirming_the_entity_or_defect_premise
-        - descriptive_context_explicitly_requested_by_the_user
-      evidence_forbidden:
-        - papers_that_presuppose_the_rejected_entity_as_support_for_its_mechanism
-        - literature_search_for_a_more_charitable_surrogate_question
-      output_status: premise_rejected
+      - state_the_premise_failure
+      - assign_causal_rejected_to_targets_that_require_the_failed_construct
+      - stop_entity_level_mechanism_retrieval
+      - preserve_only_explicit_observations
     grouping_handle_only:
-      plan:
-        - retain_label_only_as_grouping_metadata
-        - require_independently_measured_variables_for_any_physical_question
-        - reject_unitary_causal_claims_about_the_grouping_handle
+      - retain_label_as_grouping_metadata
+      - require_independently_measured_variables_for_physical_claims
+      - reject_unitary_causal_claims_about_the_grouping_handle
     admitted:
-      plan:
-        - continue_to_chain_and_causal_planning
+      - continue_to_relation_specific_planning
     underspecified:
-      plan:
-        - name_the_missing_measurement_or_relation
-        - do_not_fill_it_from_conventional_definitions
+      - name_the_missing_measurement_or_relation
+      - do_not_fill_it_from_conventional_definitions
 
-  causal_admission_plan:
-    applies_when: hard_causality_request_is_true
-    required_checks:
-      construct_coherence:
-        - construct_is_admitted_independently_of_the_label
-        - target_relation_is_directly_specified
-      temporal_direction:
-        - claimed_source_precedes_required_change
-        - timing_matches_the_claimed_operation
-      dependency_or_intervention:
-        - intervention_or_dependency_evidence_tests_the_required_route
-        - systemic_collapse_compensation_and_reverse_causation_are_bounded
-      prediction:
-        - route_generates_specific_out_of_sample_predictions
-        - predictive_performance_exceeds_realistic_baselines
-        - performance_survives_relevant_comparators_and_condition_changes
-      heterogeneity:
-        - effect_direction_and_route_are_stable_or_condition_bounded
-        - subgroup_or_context_variation_is_generated_by_explicit_routes
-        - broad_overlap_does_not_support_a_unitary_defect_or_individual_state
-      practical_magnitude:
-        - effect_is_large_relative_to_variance_overlap_noise_and_functional_threshold
-      scale_translation:
-        - carried_variable_and_intermediate_dependencies_close_the_requested_scale
-      independent_convergence:
-        - independent_evidence_families_test_the_same_required_relation
-        - convergence_uses_distinct_failure_modes
-      disconfirmation:
-        - no_required_premise_or_segment_is_broken_by_stronger_evidence
-    hard_failure_results:
-      rejected_construct: causal_rejected
-      heterogeneous_unbounded_effects: causal_rejected
-      poor_out_of_sample_prediction: causal_rejected
-      postdictive_only_body: causal_rejected
-      small_overlapping_group_differences: causal_rejected
-      missing_route_with_otherwise_admissible_construct: causal_unresolved
-      failed_scale_translation: causal_rejected_for_the_requested_cross_scale_claim
-    rule: >
-      A hard causal question may not be answered with association language. When any necessary causal test fails,
-      the requested causal proposition receives causal_rejected and mechanism planning stops for that proposition.
+  target_relation_plans:
+    descriptive_distribution:
+      required:
+        - valid_measurement
+        - stated_population_condition_and_time
+        - sampling_and_missingness_bounded
+      causal_disposition: not_a_causal_question
+    observational_causal_relation:
+      required:
+        - construct_independent_target
+        - temporal_direction
+        - alternative_routes_and_confounding_paths_tested
+        - negative_controls_or_equivalent_failure_probes
+        - practical_effect_magnitude
+        - bounded_heterogeneity_and_condition_stability
+        - independent_operationalizations
+        - prediction_when_the_claim_entails_prediction
+        - every_claimed_mechanism_and_scale_bridge_closed
+      default_without_full_closure: descriptive_only
+    intervention_to_outcome:
+      required:
+        - manipulation_integrity
+        - valid_comparator_or_counterfactual
+        - temporal_precedence
+        - direct_or_validly_translated_outcome_measurement
+        - full_effect_and_response_distribution
+        - practical_magnitude
+        - bounded_or_generated_heterogeneity
+        - specificity_against_relevant_alternative_routes
+        - durability_matching_claim
+        - bounded_attrition_missingness_crossover_and_adverse_outcomes
+        - replication_or_internal_strength_proportionate_to_scope
+        - survival_of_disconfirmation
+      prediction_required_only_when:
+        - claim_generalizes_beyond_tested_conditions
+        - route_identity_entails_distinct_predictions
+        - future_or_individual_state_prediction_is_claimed
+      pass_result: causal_admitted_for_intervention_to_outcome
+    endogenous_dependency:
+      required:
+        - direct_dependency_or_intervention_evidence_on_the_route
+        - route_position_direction_and_timing
+        - compensation_and_redundancy_checks
+        - route_discrimination
+        - condition_stability
+        - relevant_prediction_when_route_identity_entails_it
+    etiology_or_origin:
+      required:
+        - source_precedes_generated_outcome
+        - endogenous_route_from_source_to_outcome
+        - alternative_origins_discriminated
+        - intervention_response_not_used_as_origin_without_additional_route
+    mechanism_or_route:
+      required:
+        - explicit_substrate_variable_operation_and_carrier
+        - every_segment_and_join_closed
+        - source_implementation_and_readout_roles_discriminated
+        - competing_routes_bounded
+    cross_scale_translation:
+      required:
+        - source_and_target_scales
+        - carried_variable
+        - intermediate_dependencies
+        - temporal_and_condition_compatibility
+
+  data_requirements:
+    universal:
+      - exact_outcome_definition
+      - baseline_distribution
+      - comparator_or_counterfactual
+      - full_effect_distribution
+      - effect_magnitude_and_uncertainty
+      - overlap_and_response_heterogeneity
+      - sample_flow_attrition_and_missingness
+      - timing_and_durability
+      - adverse_or_opposing_outcomes
+      - measurement_validity_and_noise
+      - analysis_integrity
+    rule: Missing data remain missing and cannot be replaced by source adjectives or design labels.
+
+  hard_failure_results:
+    rejected_construct: causal_rejected_for_dependent_targets
+    invalid_counterfactual: causal_rejected_for_claimed_effect
+    narrative_exceeds_data: causal_rejected_for_excess_scope
+    heterogeneous_unbounded_effects: causal_rejected_for_unitary_claim
+    poor_prediction_when_prediction_is_entailed: causal_rejected_for_predictive_or_generalized_claim
+    postdictive_only_body: causal_rejected_for_prediction_and_direction
+    small_overlapping_average_difference: causal_rejected_for_defect_or_individual_state_claim
+    failed_scale_translation: causal_rejected_for_requested_cross_scale_claim
+    missing_route_without_positive_failure: causal_unresolved
 
   planning_dimensions:
     measurement:
-      asks:
-        - Which variables must be directly measured?
-        - At what scale, resolution, time, and condition?
-        - Does the measurement observe the claimed operation or only a readout?
-    perturbation:
-      asks:
-        - Which dependency can be altered without making the result uninterpretable?
-        - What outcome distinguishes source, route, implementation, and readout?
-        - Could compensation or redundancy hide the dependency?
-    temporality:
-      asks:
-        - What must precede what?
-        - Is the evidence predictive, prospective, concurrent, retrospective, or postdictive?
-        - Does the measured interval match the claimed operation?
-    prediction:
-      asks:
-        - What does the proposed route predict out of sample?
-        - Does it outperform realistic baselines and competing routes?
-        - Does prediction survive independent cohorts, tasks, conditions, and operationalizations?
+      - Which variables were directly measured?
+      - Does the measurement observe the target or a proxy composite or readout?
+      - What noise threshold and scale limit apply?
+    counterfactual:
+      - What comparison supports the claimed contrast?
+      - Does it isolate the named exposure or intervention?
+      - Which alternative routes remain compatible?
+    effect_distribution:
+      - What is the full response distribution?
+      - Is the effect practically large relative to variance overlap noise and threshold?
+      - Are nonresponse worsening and adverse outcomes included?
+    temporality_and_durability:
+      - What precedes what?
+      - How long does the measured change persist?
+      - Does the time horizon match the claim?
     heterogeneity:
-      asks:
-        - Is variation bounded by explicit conditions or routes?
-        - Are direction, magnitude, and route stable enough to support the requested causal unit?
-        - Does broad overlap defeat a defect or individual-state claim?
+      - Is variation generated by explicit conditions or routes?
+      - Are direction magnitude and response stable enough for the requested scope?
     translation:
-      asks:
-        - Which physical steps carry the measured change across scales?
-        - Which step is inferred from shared language rather than demonstrated dependency?
-        - What narrower source-scale conclusion survives if translation remains open?
-    controlled_difference:
-      asks:
-        - What variable must differ when nominal inputs are held constant?
-        - What candidate route generates each divergent outcome?
-    organism_state:
-      asks:
-        - Which reachable or stabilizable state transition is at issue?
-        - Which operation changes availability, weighting, stabilization, blocking, release, maintenance, or switching?
-        - Which constraints define a successful transition?
+      - Which physical dependencies carry the result across each claimed scale?
+      - What narrower source-side conclusion survives an open bridge?
     route_discrimination:
-      asks:
-        - What do the surviving routes predict differently?
-        - Which measurement or perturbation separates those predictions?
-        - Which result would reopen a currently closed segment?
-
-  segment_closure_requirements:
-    observation:
-      - measurement_matches_variable
-      - scope_and_condition_are_stated
-    dependency:
-      - direction_is_supported
-      - timing_is_compatible
-      - competing_explanations_are_bounded
-    intervention:
-      - perturbation_changes_the_required_relation
-      - interpretation_survives_systemic_collapse_and_compensation_checks
-    scale_translation:
-      - carried_variable_is_identified
-      - intermediate_dependencies_are_explicit
-      - source_and_target_conditions_are_compatible
-    route_discrimination:
-      - candidate_routes_generate_distinct_predictions
-      - a_discriminating_observation_favors_or_breaks_a_route
+      - What do surviving routes predict differently?
+      - Which measurement or manipulation separates them?
 
   output_schema:
     construct_disposition:
       vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
       value: string
-    causal_disposition:
+    per_target_causal_disposition:
       vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
-      value: string
-    causal_failure_basis: list
-    premise_rejection_basis: list
-    per_compiled_question:
-      - required_measurements
-      - required_perturbations
-      - required_temporality
-      - required_predictions
-      - required_heterogeneity_bounds
-      - required_dependency_closure
-      - required_translation_steps
-      - compensation_or_redundancy_checks
-      - discriminating_observations
-      - available_chain_segments
-      - missing_chain_segments
-      - incompatible_evidence
-      - narrower_answerable_targets
+      values: map
+    per_target_failure_basis: map
+    data_requirements_available: list
+    data_requirements_missing: list
+    per_target_plan: map
+    narrower_answerable_targets: list
     answerability_status:
       state: [premise_rejected, causal_rejected, causal_unresolved, answerable, partially_answerable, descriptive_only, currently_unanswerable]
       basis: list
 
   rules:
-    - Premise rejection precedes and terminates mechanism planning for the rejected entity.
-    - A rejected diagnostic construct cannot be rescued by substituting traits, deficits, or region associations not stated in the question.
-    - A failed hard-causality gate terminates causal explanation for the requested proposition.
-    - Heterogeneous poorly predictive work remains descriptive or non-probative and cannot be restated as causal.
-    - A missing route produces an explicit research requirement only for an admitted observation.
-    - Partial closure permits conclusions that use only the closed path.
-    - Missing segments outside a narrower conclusion do not cap that conclusion.
-    - Descriptive evidence may fully answer a descriptive question.
-    - A question may compile successfully when the current corpus cannot answer it.
-    - Recency affects search and supersession review, never causal weight.
-    - Multiple routes remain open until a discriminating observation breaks or favors one.
+    - Premise rejection terminates only targets that require the rejected entity.
+    - Causal admission is target-relation specific.
+    - Observational evidence begins noncausal and must earn causal scope affirmatively.
+    - Intervention evidence may close the exact manipulated relation when its full burden passes.
+    - A decisive intervention must not be rejected merely because it is therapeutic.
+    - Intervention effects do not automatically establish etiology endogenous mechanism construct validity or cross-scale explanation.
+    - Prediction is required when entailed by the target claim rather than as a universal checkbox.
+    - Source narrative cannot replace missing data or bridges.
+    - A valid narrower relation survives failure of a broader claim.
