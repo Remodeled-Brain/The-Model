@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Validate policies that prevent folklore rescue, causal laundering, and evidence-count weighting."""
+"""Validate generic evidence policy and domain-cartridge separation."""
 
 from __future__ import annotations
 
+import json
 import pathlib
 
 import validate_repo as vr
@@ -10,27 +11,28 @@ import validate_repo as vr
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 MODEL = ROOT / "model"
 KERNEL = MODEL / "kernel" / "chain_contract.yaml"
-EVIDENCE_ADMISSION = MODEL / "kernel" / "evidence_admission.yaml"
+EVIDENCE = MODEL / "kernel" / "evidence_admission.yaml"
 EVIDENCE_FIXTURES = MODEL / "kernel" / "evidence_admission_fixtures.json"
 COMPILER = MODEL / "runtime" / "question_compiler.yaml"
 PLANNER = MODEL / "runtime" / "answerability_planner.yaml"
 BINDER = MODEL / "runtime" / "evidence_binding_contract.yaml"
 ANSWER = MODEL / "runtime" / "answer_contract.yaml"
+RUNTIME_FIXTURES = MODEL / "runtime" / "fixtures.json"
 INGEST_ARCHITECTURE = MODEL / "ingest" / "architecture.yaml"
 INGEST_RULES = MODEL / "ingest" / "rules.yaml"
 FAILURE_ROUTING = MODEL / "ingest" / "failure_routing.yaml"
 RECORD_SCHEMA = MODEL / "ingest" / "record_schema.yaml"
-RUNTIME_FIXTURES = MODEL / "runtime" / "fixtures.json"
 INGEST_FIXTURES = MODEL / "ingest" / "fixtures.json"
-CARTRIDGE = MODEL / "cartridges" / "neuroscience.yaml"
+NEURO_CARTRIDGE = MODEL / "cartridges" / "neuroscience.yaml"
+NEURO_FIXTURES = MODEL / "cartridges" / "neuroscience_fixtures.json"
 RUNTIME_MANIFEST = MODEL / "manifests" / "runtime.json"
 INGEST_MANIFEST = MODEL / "manifests" / "ingest.json"
 
 CONSTRUCT_REF = "model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions"
 CAUSAL_REF = "model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions"
 EVIDENCE_REF = "model/kernel/evidence_admission.yaml#evidence_admission"
-EVIDENCE_ROLE_REF = "model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.evidence_role_classes"
-BODY_VERDICT_REF = "model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.body_of_evidence_assessment.body_verdicts"
+ROLE_REF = "model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.evidence_role_classes"
+BODY_REF = "model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.body_of_evidence_assessment.body_verdicts"
 
 
 def require_text(path: pathlib.Path, fragments: list[str]) -> None:
@@ -39,229 +41,232 @@ def require_text(path: pathlib.Path, fragments: list[str]) -> None:
         vr.require(fragment in text, f"{path.relative_to(ROOT)} missing policy fragment: {fragment}")
 
 
+def fixture_data(path: pathlib.Path) -> dict:
+    return vr.load_json(path)
+
+
 def fixture_ids(path: pathlib.Path) -> set[str]:
-    data = vr.load_json(path)
-    fixtures = data.get("fixtures", [])
+    fixtures = fixture_data(path).get("fixtures", [])
     return {item.get("id") for item in fixtures if isinstance(item, dict)}
 
 
-def fixture_by_id(path: pathlib.Path, fixture_id: str) -> dict:
-    data = vr.load_json(path)
-    for item in data.get("fixtures", []):
-        if isinstance(item, dict) and item.get("id") == fixture_id:
-            return item
-    raise vr.ValidationError(f"fixture missing: {fixture_id}")
+def require_fixture_ids(path: pathlib.Path, expected: set[str]) -> None:
+    missing = expected - fixture_ids(path)
+    vr.require(not missing, f"{path.relative_to(ROOT)} missing fixtures: {sorted(missing)}")
 
 
-def validate_construct_admission() -> None:
+def validate_fixture_shape(path: pathlib.Path, *, modes: bool) -> None:
+    fixtures = fixture_data(path).get("fixtures")
+    vr.require(isinstance(fixtures, list) and fixtures, f"{path.relative_to(ROOT)} fixtures missing")
+    seen: set[str] = set()
+    for fixture in fixtures:
+        vr.require(isinstance(fixture, dict), f"{path.relative_to(ROOT)} fixture must be an object")
+        fixture_id = fixture.get("id")
+        vr.require(isinstance(fixture_id, str) and fixture_id, f"{path.relative_to(ROOT)} fixture id missing")
+        vr.require(fixture_id not in seen, f"duplicate fixture id in {path.relative_to(ROOT)}: {fixture_id}")
+        seen.add(fixture_id)
+        if modes:
+            vr.require(fixture.get("mode") in {"question", "condition"}, f"{fixture_id}: invalid mode")
+            source_field = "source_question" if fixture["mode"] == "question" else "condition"
+            vr.require(isinstance(fixture.get(source_field), str) and fixture[source_field], f"{fixture_id}: {source_field} missing")
+            vr.require(isinstance(fixture.get("required"), list) and fixture["required"], f"{fixture_id}: required missing")
+            vr.require(isinstance(fixture.get("forbidden"), list) and fixture["forbidden"], f"{fixture_id}: forbidden missing")
+
+
+def validate_manifests() -> None:
+    required_sources = {"kernel/evidence_admission.yaml", "kernel/evidence_admission_fixtures.json"}
+    required_domain = {"cartridges/neuroscience.yaml", "cartridges/neuroscience_fixtures.json"}
+    for path in (RUNTIME_MANIFEST, INGEST_MANIFEST):
+        manifest = fixture_data(path)
+        vr.require(required_sources <= set(manifest.get("source_files", [])), f"{path.name}: shared evidence kernel omitted")
+        vr.require(required_domain <= set(manifest.get("domain_modules", [])), f"{path.name}: neuroscience cartridge or fixtures omitted")
+
+
+def validate_construct_and_causal_kernel() -> None:
     dispositions = set(vr.yaml_list(KERNEL, "dispositions"))
     expected = {"admitted", "grouping_handle_only", "premise_rejected", "underspecified"}
     vr.require(dispositions == expected, f"construct dispositions drifted: {sorted(dispositions)}")
 
     for path in (COMPILER, PLANNER, BINDER, ANSWER, INGEST_RULES, RECORD_SCHEMA):
-        require_text(path, [CONSTRUCT_REF])
+        require_text(path, [CONSTRUCT_REF, CAUSAL_REF])
 
     require_text(
         KERNEL,
         [
-            "downstream_evidence_cannot_rescue_a_rejected_construct: true",
-            "publication_volume_cannot_outweigh_failure_of_a_required_premise: true",
-            "A rejected premise stops mechanism search for the labeled entity.",
-        ],
-    )
-    require_text(
-        COMPILER,
-        [
-            "stop_entity_level_mechanism_search",
-            "do_not_retrieve_evidence_to_accommodate_the_rejected_construct",
-            "inferred_trait_bundle_from_diagnostic_label",
-        ],
-    )
-    require_text(
-        CARTRIDGE,
-        [
-            "source_question: Is ADHD a defective prefrontal cortex?",
-            "construct_disposition: premise_rejected",
-            "causal_disposition: causal_rejected",
-            "ADHD is a diagnostic folklore grouping",
-        ],
-    )
-
-
-def validate_causal_admission() -> None:
-    causal_states = {"causal_admitted", "causal_rejected", "causal_unresolved", "not_a_causal_question"}
-    kernel_text = KERNEL.read_text(encoding="utf-8")
-    for state in causal_states:
-        vr.require(f"- {state}" in kernel_text, f"kernel causal disposition missing: {state}")
-
-    for path in (COMPILER, PLANNER, BINDER, ANSWER, INGEST_RULES, RECORD_SCHEMA):
-        require_text(path, [CAUSAL_REF])
-
-    require_text(
-        KERNEL,
-        [
-            "heterogeneous_poorly_predictive_work_cannot_be_rephrased_as_causal: true",
-            "Poor out-of-sample prediction forbids causal restatement of group-level associations.",
-            "Causal verbs and causal-feeling paraphrases are forbidden unless the disposition is causal_admitted.",
+            "causal_admission_is_target_relation_specific: true",
+            "intervention_status_neither_grants_nor_denies_causality: true",
+            "required_tests_by_target:",
+            "intervention_to_outcome:",
+            "observational_causal_relation:",
+            "endogenous_dependency_or_mechanism:",
+            "A decisive controlled intervention can close the exact manipulated",
+            "no_intervention_scope_transfer",
         ],
     )
     require_text(
         PLANNER,
         [
-            "poor_out_of_sample_prediction: causal_rejected",
-            "heterogeneous_unbounded_effects: causal_rejected",
-            "A hard causal question may not be answered with association language.",
-        ],
-    )
-    require_text(
-        BINDER,
-        [
-            "out_of_sample_route_prediction",
-            "route_bounded_heterogeneity",
-            "Poorly predictive or postdictive work cannot be restated as causal contribution",
-        ],
-    )
-    require_text(
-        ANSWER,
-        [
-            "state_no_or_the_direct_causal_rejection_in_the_first_sentence",
-            "heterogeneous_poorly_predictive_work_rephrased_as_causal",
-            "A causal-rejected answer must not be softened into mixed, complex, multifactorial, linked, associated, or may-contribute framing.",
+            "target_relation_plans:",
+            "observational_causal_relation:",
+            "intervention_to_outcome:",
+            "A decisive intervention must not be rejected merely because it is therapeutic.",
+            "Prediction is required when entailed by the target claim rather than as a universal checkbox.",
         ],
     )
 
 
-def validate_evidence_admission() -> None:
-    for path in (BINDER, ANSWER, INGEST_RULES, RECORD_SCHEMA):
+def validate_data_first_admission() -> None:
+    for path in (BINDER, ANSWER, INGEST_ARCHITECTURE, INGEST_RULES, RECORD_SCHEMA):
         require_text(path, [EVIDENCE_REF])
 
-    runtime_manifest = vr.load_json(RUNTIME_MANIFEST)
-    ingest_manifest = vr.load_json(INGEST_MANIFEST)
-    for manifest, name in ((runtime_manifest, "runtime"), (ingest_manifest, "ingest")):
-        sources = set(manifest.get("source_files", []))
-        vr.require("kernel/evidence_admission.yaml" in sources, f"{name} manifest omits evidence admission kernel")
-        vr.require("kernel/evidence_admission_fixtures.json" in sources, f"{name} manifest omits evidence admission fixtures")
-
     require_text(
-        EVIDENCE_ADMISSION,
+        EVIDENCE,
         [
             "source_claim_status: unadmitted_assertion",
             "causal_weight: zero",
-            "author_interpretation_is_evidence: false",
-            "consensus_is_evidence: false",
-            "meta_analysis_repairs_invalid_inputs: false",
-            "Read to locate inferential debt, not to preserve the paper's intended story.",
-            "The model must prefer a sparse surviving observation over a rich unsupported causal narrative.",
+            "data_first_admission:",
+            "The admissible claim is generated from the actual observations and design.",
+            "observational_record:",
+            "intervention_record:",
+            "A decisive intervention may establish intervention-to-outcome causality",
+            "statistically_significant_as_effective",
+            "measured_proxy_change_as_named_biological_process",
         ],
     )
     require_text(
         INGEST_RULES,
         [
-            "default_status: unadmitted_assertion",
-            "default_causal_weight: zero",
-            "abstract_or_discussion_conclusion_as_evidence",
-            "shared_inferential_bridges_never_count_as_independent_convergence: true",
+            "actual_data_outranks_source_narrative: true",
+            "observational_evidence_defaults_to_noncausal: true",
+            "intervention_evidence_is_target_specific: true",
+            "statistical_significance_does_not_establish_effectiveness: true",
+            "named_process_language_does_not_establish_measured_process: true",
+        ],
+    )
+    require_text(
+        RECORD_SCHEMA,
+        [
+            "data_record:",
+            "effect_distribution",
+            "comparator_or_counterfactual",
+            "missingness_attrition_and_crossover",
+            "timing_and_durability",
+            "intervention_label_neither_grants_nor_denies_causality: true",
         ],
     )
     require_text(
         BINDER,
         [
-            "reviewed_does_not_mean_admitted: true",
-            "Bind the observation or closed bridge, never the paper's prose conclusion.",
-            "A meta-analysis inherits construct, measurement, direction, task, proxy, treatment-response, and bridge failures from its inputs.",
+            "The actual data outrank the source narrative.",
+            "A strong controlled intervention can outweigh many observational associations for the exact manipulated relation.",
+            "Intervention efficacy cannot be transferred automatically to etiology endogenous mechanism or construct validity.",
+            "Observational evidence begins descriptive or more restricted",
         ],
     )
     require_text(
         ANSWER,
         [
-            "The answer may summarize only admitted observations and closed bridges.",
-            "unsupported_bridge_hidden_in_summary_language",
-            "inference_audit:",
-        ],
-    )
-    require_text(
-        RECORD_SCHEMA,
-        [
-            "source_claim_status_default: unadmitted_assertion",
-            "causal_weight_default: zero",
-            "bridge_ledger",
-            "source_conclusion_never_binds_directly: true",
+            "The actual data outrank the source narrative.",
+            "Use effective only with an explicit target, comparator, practical threshold, full response distribution, durability,",
+            "A strong intervention must be allowed to close the exact manipulated relation.",
+            "A named process cannot be inferred from a proxy or pre-post change.",
         ],
     )
 
-    expected_fixtures = {
-        "author-conclusion-is-assertion",
-        "consensus-repeats-one-bridge",
-        "meta-analysis-inherits-input-failure",
-        "prediction-failure-breaks-causal-story",
-        "sparse-observation-over-rich-story",
+
+def validate_shared_fixtures() -> None:
+    validate_fixture_shape(EVIDENCE_FIXTURES, modes=False)
+    validate_fixture_shape(RUNTIME_FIXTURES, modes=True)
+    require_fixture_ids(
+        EVIDENCE_FIXTURES,
+        {
+            "observational-defaults-noncausal",
+            "decisive-intervention-can-close-manipulated-relation",
+            "intervention-scope-does-not-transfer",
+            "narrative-effective-exceeds-data",
+            "named-process-claim-needs-direct-data",
+            "construct-indexed-defaults-label-dependent",
+            "proxy-requires-translation",
+            "meta-analysis-inherits-input-failure",
+        },
+    )
+    require_fixture_ids(
+        RUNTIME_FIXTURES,
+        {
+            "reified-category-as-entity",
+            "observational-hard-causality",
+            "decisive-intervention",
+            "intervention-scope-transfer",
+            "narrative-data-conflict",
+            "descriptive-question",
+            "competing-routes",
+            "narrow-answer-from-partial-chain",
+        },
+    )
+    require_fixture_ids(
+        INGEST_FIXTURES,
+        {
+            "observational-causal-overreach",
+            "decisive-controlled-intervention",
+            "weak-intervention-effectiveness-narrative",
+            "intervention-scope-transfer",
+            "construct-indexed-observation",
+            "proxy-named-as-mechanism",
+            "named-process-without-measurement",
+            "synthesis-inherits-input-failure",
+            "premise-breaking-dominance",
+        },
+    )
+
+
+def validate_domain_separation() -> None:
+    forbidden = {
+        "adhd",
+        "autism",
+        "prefrontal",
+        "cortex",
+        "nitric oxide",
+        "cbt",
+        "depression",
+        "neuroplasticity",
+        "ocd",
+        "striatum",
     }
-    missing = expected_fixtures - fixture_ids(EVIDENCE_FIXTURES)
-    vr.require(not missing, f"missing evidence admission fixtures: {sorted(missing)}")
+    for path in (RUNTIME_FIXTURES, INGEST_FIXTURES, EVIDENCE_FIXTURES):
+        text = path.read_text(encoding="utf-8").lower()
+        leaked = sorted(term for term in forbidden if term in text)
+        vr.require(not leaked, f"domain-specific terms leaked into generic fixtures {path.relative_to(ROOT)}: {leaked}")
 
-
-def validate_restrictive_presumptions() -> None:
-    require_text(
-        EVIDENCE_ADMISSION,
-        [
-            "construct_indexed:",
-            "presumed_closure_state: label_dependent",
-            "proxy_record:",
-            "presumed_closure_state: proxy_limited",
-            "treatment_response:",
-            "Treatment response identifies an intervention-outcome relation under the tested conditions.",
-            "local_guard_pass_as_global_upgrade",
-        ],
+    validate_fixture_shape(NEURO_FIXTURES, modes=True)
+    require_fixture_ids(
+        NEURO_FIXTURES,
+        {
+            "neuro-region-as-agent",
+            "neuro-diagnostic-entity",
+            "neuro-adhd-prefrontal-defect",
+            "neuro-diagnostic-biomarker",
+            "neuro-cbt-depression-effectiveness",
+            "neuro-therapy-neuroplasticity",
+            "neuro-decisive-stimulation",
+            "neuro-same-mutation-divergent-labels",
+            "neuro-cross-species-translation",
+        },
     )
     require_text(
-        BINDER,
+        NEURO_CARTRIDGE,
         [
-            "classify_record_before_local_checks",
-            "Construct-indexed records begin label_dependent, not neutral.",
-            "Proxy records begin proxy_limited and cannot bind to causal or mechanistic segments.",
-            "Treatment-response records can bind intervention-outcome relations but never etiology",
-            "local_passes_remove_presumption: false",
-        ],
-    )
-    require_text(
-        INGEST_ARCHITECTURE,
-        [
-            "phase_0_presumption:",
-            "Construct-indexed work begins label_dependent rather than neutral.",
-            "Proxy work begins proxy_limited and cannot bind to causal or mechanistic segments.",
-            "Treatment-response work may bind intervention-outcome relations but cannot bind etiology or endogenous mechanism.",
-        ],
-    )
-    require_text(
-        FAILURE_ROUTING,
-        [
-            "initial_channel: label_dependent_observation",
-            "initial_channel: proxy_only",
-            "count_can_escape_presumption: false",
-            "presumption_survives_local_passes: true",
-        ],
-    )
-    require_text(
-        RECORD_SCHEMA,
-        [
-            "restrictive_presumption_assigned_before_local_checks: true",
-            "construct_indexed_defaults_to_label_dependent: true",
-            "proxy_defaults_to_proxy_limited: true",
-            "proxy_never_binds_causal_segment: true",
-            "treatment_response_never_binds_etiology_or_endogenous_mechanism: true",
+            "fixture_ref: model/cartridges/neuroscience_fixtures.json",
+            "therapy_and_intervention_policy:",
+            "psychotherapy_and_rating_scale_policy:",
+            "named_process_policy:",
+            "neuroplasticity:",
+            "decisive_intervention_rule:",
+            "CBT treats depression without a stated causal contrast",
         ],
     )
 
-    expected = {
-        "construct-indexed-defaults-label-dependent",
-        "proxy-cannot-bind-causal-segment",
-        "treatment-response-cannot-bind-etiology",
-    }
-    missing = expected - fixture_ids(EVIDENCE_FIXTURES)
-    vr.require(not missing, f"missing restrictive-presumption fixtures: {sorted(missing)}")
 
-
-def validate_evidence_weighting() -> None:
+def validate_evidence_vocabularies() -> None:
     roles = set(vr.yaml_mapping(BINDER, "evidence_role_classes"))
     expected_roles = {
         "premise_breaking",
@@ -284,64 +289,33 @@ def validate_evidence_weighting() -> None:
         "contested",
     }
     vr.require(verdicts == expected_verdicts, f"body verdicts drifted: {sorted(verdicts)}")
-
-    require_text(BINDER, ["evidence_role_classes:", "unit_of_counting: independent_evidence_family_after_bridge_audit", "no_numeric_average: true"])
-    require_text(ANSWER, [BODY_VERDICT_REF, "exclude_non_probative_records_from_the_support_narrative"])
-    require_text(INGEST_RULES, [EVIDENCE_ROLE_REF, "publication_volume_never_supplies_weight: true"])
-    require_text(RECORD_SCHEMA, [EVIDENCE_ROLE_REF, "body_weight_inputs:", "shared_assumption_family_id"])
+    require_text(ANSWER, [BODY_REF])
+    require_text(INGEST_RULES, [ROLE_REF])
 
 
-def validate_regressions() -> None:
-    runtime = vr.load_json(RUNTIME_FIXTURES)
-    required_fields = set(runtime.get("required_answer_fields", []))
-    vr.require(
-        {"construct_disposition", "causal_disposition", "causal_failure_path", "rejected_premises", "body_of_evidence"}
-        <= required_fields,
-        "runtime answer fields omit construct, causal, or body-of-evidence output",
-    )
-
-    required_runtime_ids = {
-        "diagnostic-category",
-        "adhd-prefrontal-defect",
-        "body-of-evidence-weighting",
+def validate_runtime_answer_fields() -> None:
+    fields = set(fixture_data(RUNTIME_FIXTURES).get("required_answer_fields", []))
+    required = {
+        "direct_answer",
+        "construct_disposition",
+        "evidence_admission",
+        "body_of_evidence",
+        "closure_report",
+        "conclusions",
+        "confidence",
     }
-    missing_runtime = required_runtime_ids - fixture_ids(RUNTIME_FIXTURES)
-    vr.require(not missing_runtime, f"missing runtime policy fixtures: {sorted(missing_runtime)}")
-
-    adhd = fixture_by_id(RUNTIME_FIXTURES, "adhd-prefrontal-defect")
-    required = "\n".join(adhd.get("required", []))
-    forbidden = "\n".join(adhd.get("forbidden", []))
-    for fragment in (
-        "answer no in the first sentence",
-        "assign causal_disposition causal_rejected",
-        "heterogeneous poorly predictive label-selected work fails causal admission",
-    ):
-        vr.require(fragment in required, f"ADHD regression fixture missing requirement: {fragment}")
-    for fragment in (
-        "some-studies-suggest",
-        "complex or multifactorial",
-        "contribute to, play a role in, underlie, mediate, partly explain, or are involved in",
-    ):
-        vr.require(fragment in forbidden, f"ADHD regression fixture missing forbidden pattern: {fragment}")
-
-    required_ingest_ids = {
-        "diagnostic-entity-premise",
-        "heterogeneous-poor-prediction",
-        "correlated-volume",
-        "premise-breaking-dominance",
-    }
-    missing_ingest = required_ingest_ids - fixture_ids(INGEST_FIXTURES)
-    vr.require(not missing_ingest, f"missing ingest policy fixtures: {sorted(missing_ingest)}")
+    vr.require(required <= fields, f"runtime answer fields missing: {sorted(required - fields)}")
 
 
 if __name__ == "__main__":
     try:
-        validate_construct_admission()
-        validate_causal_admission()
-        validate_evidence_admission()
-        validate_restrictive_presumptions()
-        validate_evidence_weighting()
-        validate_regressions()
-    except (vr.ValidationError, OSError) as exc:
+        validate_manifests()
+        validate_construct_and_causal_kernel()
+        validate_data_first_admission()
+        validate_shared_fixtures()
+        validate_domain_separation()
+        validate_evidence_vocabularies()
+        validate_runtime_answer_fields()
+    except (vr.ValidationError, OSError, json.JSONDecodeError) as exc:
         raise SystemExit(f"POLICY VALIDATION FAILED: {exc}") from exc
     print("model policy validation passed")
