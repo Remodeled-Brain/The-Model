@@ -4,20 +4,22 @@
 
 ## Role
 
-Ingest maintains the evidence substrate used by the question runtime. It strips author framing, extracts the physical claim, tests route and translation limits, records provenance, and assigns support roles. It does not define the user’s question or the shape of the final answer.
+Ingest maintains the evidence substrate used by the question runtime. It extracts the actual data, classifies evidence design and target relation, separates observations from narrative, audits inferential bridges, and assigns relation-specific support roles. It does not define the user’s question or transfer a source conclusion into the final answer.
 
 ## Required boundary
 
-Ingest may update available evidence, supersession status, chain-segment closure, disconfirmation, and confidence attached to evidence bindings. It may not silently change the chain kernel, question-compilation grammar, or settled claim layer.
+Ingest may update available observations, data-supported scope, evidence-family membership, bridge closure, supersession status, chain-segment closure, disconfirmation, and target-specific confidence. It may not silently change the chain kernel, question-compilation grammar, domain cartridge, or settled claim layer.
 
 ## Operating sequence
 
-`paper -> identity resolution -> author-interface stripping -> claim extraction -> evidence validation -> support record -> evidence binder`
+`source -> identity resolution -> data extraction -> design and target classification -> narrative stripping -> bridge audit -> relation-specific validation -> support record -> evidence binder`
+
+Observational evidence begins descriptive or more restricted. Intervention evidence may earn causality for the exact manipulated relation when the comparator, effect distribution, heterogeneity, durability, missingness, measurement, replication, and disconfirmation burden closes. Neither evidence class receives causal status by name.
 
 ## Recency
 
-Recent evidence receives retrieval and supersession priority. Recency does not provide causal weight. A newer paper replaces an older result only when it measures or tests the same variable, route, dependency, or translation step with stronger or disconfirming evidence.
+Recent evidence receives retrieval and supersession priority. Recency does not provide causal weight. A newer source supersedes an older relation only when it tests the same target under compatible conditions with stronger, more direct, or disconfirming evidence.
 
 ## Output
 
-The ingest runtime emits reviewed support records. Canonical integration remains serialized behind explicit adoption.
+The ingest runtime emits audited relation-level support records. Canonical integration remains serialized behind explicit adoption.
