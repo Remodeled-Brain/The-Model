@@ -4,10 +4,14 @@ answer_contract:
   purpose: >
     Produce a responsive answer from admitted observations and closed bridges. The actual data determine claim scope.
     Causal status is assigned separately to each target relation and cannot be transferred by narrative language.
+    Every biological or behavioral answer remains on one continuous physical chain and binds through metabolically
+    maintained state or exposes the missing physical and metabolic joins.
 
   closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
   construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
   causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
+  physical_continuity_ref: model/kernel/physical_continuity.yaml#physical_continuity
+  physical_answer_ref: model/runtime/physical_answer_contract.yaml#physical_answer_contract
   evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission
   body_verdict_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.body_of_evidence_assessment.body_verdicts
 
@@ -32,6 +36,10 @@ answer_contract:
     - per_segment_closure
     - chain_join_status
     - unresolved_chain_slots
+    - explanatory_scope_by_target
+    - physical_chain_by_target
+    - metabolic_binding_by_target
+    - unresolved_physical_chain_slots
     - narrower_answerable_targets
 
   answer_precedence:
@@ -40,12 +48,15 @@ answer_contract:
       - identify_the_failed_construct_data_counterfactual_bridge_or_causal_premise
       - name_the_load_bearing_failure_path
       - report_only_the_data_supported_scope_that_survives
+      - expose_any_observed_physical_relation_without_inventing_the_missing_route
       - stop_unless_more_context_is_required_to_explain_the_failure
     admitted_target:
       - state_the_best_supported_answer_at_the_exact_valid_scope
       - identify_the_design_counterfactual_effect_distribution_and_conditions_that_support_it
-      - generate_the_required_physical_path
-      - identify_the_operations_and_state_transition
+      - generate_the_shortest_sufficient_physical_path
+      - bind_biological_scope_through_metabolically_maintained_state
+      - identify_the_operations_and_organism_state_transition
+      - expose_open_physical_or_metabolic_segments
       - state_which_broader_targets_remain_open
 
   answer_sequence:
@@ -55,11 +66,35 @@ answer_contract:
     - distinguish_each_target_relation_and_its_causal_disposition
     - identify_the_strongest_surviving_observation_or_closed_bridge
     - report_the_load_bearing_support_or_failure_path
+    - expose_the_shortest_supported_physical_chain
+    - bind_biological_or_behavioral_scope_through_metabolically_maintained_state
+    - report_unresolved_physical_and_metabolic_slots_without_filling_them
     - expose_stripped_narrative_claims_when_they_exceeded_the_data
     - exclude_non_probative_records_from_the_support_narrative
     - report_segment_and_join_closure
     - report_unresolved_chain_slots_separately
-    - translate_back_without_restoring_failed_handles_bridges_or_causal_relations
+    - translate_back_without_restoring_failed_handles_bridges_causal_relations_or_magic_transitions
+
+  universal_physical_rule: >
+    Every answer remains compatible with one continuous physical surface. Physics chemistry biology and behavior
+    describe organized scales of the same physical process. No answer may introduce action at a distance between
+    named components or a separate force causal currency agent or substance at biological or behavioral scope.
+
+  biological_metabolic_rule: >
+    At biological or behavioral scope the answer identifies the physical or chemical input energetic or material
+    carrier change in metabolically maintained state biological operation and organism-state transition at the
+    resolution supported by the evidence. If one of these segments is unmeasured the answer identifies the open slot.
+
+  shortest_sufficient_chain_rule: >
+    Expose the shortest physical chain sufficient for the question. Closed lower-level detail may be compressed.
+    Open joins may not be skipped hidden inside a named component or replaced with metabolism energy activation
+    signaling regulation information processing network change or another unexplained process noun.
+
+  causal_mechanistic_separation_rule: >
+    A decisive controlled intervention may establish causality for the exact intervention-to-outcome relation while
+    intermediate physical and metabolic mechanics remain partial. State the causal result and the open route.
+    Mechanistic language requires the physical carrier metabolic binding biological operation and target transition
+    to close.
 
   data_authority_rule: >
     The answer must follow the comparator, effect magnitude, full response distribution, heterogeneity, attrition,
@@ -73,15 +108,16 @@ answer_contract:
   intervention_rule: >
     Intervention evidence may support causality for the exact manipulated relation when the design and data close the
     required burden. A decisive intervention should be stated causally at that scope. The effect must not be transferred
-    automatically to etiology, endogenous mechanism, construct validity, or cross-scale explanation.
+    automatically to etiology, endogenous mechanism, construct validity, cross-scale explanation, or a closed internal route.
 
   effectiveness_language_rule: >
     Use effective only with an explicit target, comparator, practical threshold, full response distribution, durability,
     adverse-outcome scope, and population conditions. Statistical significance or mean improvement alone is insufficient.
 
   named_process_rule: >
-    Use a named biological process only when the substrate, variable, operation, timing, persistence, comparator,
-    specificity, and dependency to the claimed outcome are directly supported. Otherwise report the measured change.
+    Use a named biological process only when the substrate, variable, physical carrier, operation, timing, persistence,
+    comparator, specificity, metabolic binding, and dependency to the claimed outcome are directly supported. Otherwise
+    report the measured change and open route.
 
   evidence_admission_rule: >
     Summarize only admitted observations and closed bridges. Paper conclusions, reviews, consensus statements, and
@@ -90,6 +126,8 @@ answer_contract:
   causal_language_gate:
     relation_specific: true
     allowed_only_when: causal_disposition_for_that_target_is_causal_admitted
+    biological_scope_also_requires: a_physical_chain_claim_with_metabolic_binding_or_explicit_open_slots
+    mechanism_also_requires: closed_physical_chain_and_closed_metabolic_binding
     forbidden_after_rejection:
       - causes
       - contributes_to
@@ -115,12 +153,18 @@ answer_contract:
       - conclusion
       - target_relation
       - data_supported_scope
+      - explanatory_scope
       - construct_disposition
       - causal_disposition
       - design_mode
       - counterfactual
       - effect_distribution
       - required_chain_path
+      - physical_chain_status
+      - physical_chain_segments
+      - metabolic_binding_status
+      - unresolved_physical_chain_slots
+      - organism_state_transition
       - supporting_admitted_bindings
       - failed_or_open_bridges
       - stripped_narrative_claims
@@ -138,7 +182,9 @@ answer_contract:
     causal_target:
       basis: relation_specific_causal_burden
     segment_closure:
-      basis: evidence_for_each_required_segment_and_join
+      basis: evidence_for_each_required_physical_segment_and_join
+    metabolic_binding:
+      basis: evidence_for_the_energetic_material_and_metabolically_maintained_state_relation
     scale_translation:
       basis: demonstrated_dependency_across_required_scales
     answer_translation:
@@ -147,9 +193,13 @@ answer_contract:
   rules:
     - Never collapse confidence into one score.
     - The actual data outrank the source narrative.
+    - Every biological or behavioral answer remains on one continuous physical chain.
+    - At biological scope metabolically maintained state is an obligatory binding layer.
+    - Metabolism energy activation signaling processing regulation information and network change cannot act as operators by name.
     - Observational evidence defaults to noncausal.
     - Intervention evidence is neither categorically causal nor categorically noncausal.
     - A strong intervention must be allowed to close the exact manipulated relation.
+    - Exact causal closure does not imply closed internal physical or metabolic mechanism.
     - An intervention effect cannot be transferred automatically to etiology endogenous mechanism construct validity or cross-scale explanation.
     - Statistical significance cannot be translated into effectiveness.
     - A group mean cannot hide the response distribution.
@@ -157,11 +207,12 @@ answer_contract:
     - Unsupported bridges cannot be hidden inside a literature summary.
     - Repeated use of one inferential bridge is one shared assumption family, not convergence.
     - A synthesis cannot elevate claims its inputs could not admit.
-    - A necessary data counterfactual premise bridge or causal-test failure outranks downstream literature that assumes it.
+    - A necessary data counterfactual premise bridge physical-segment metabolic-binding or causal-test failure outranks downstream literature that assumes it.
 
   output_schema:
     direct_answer: string
     answer_scope: string
+    explanatory_scope_by_target: map
     construct_disposition:
       vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
       value: string
@@ -184,6 +235,8 @@ answer_contract:
       strongest_disconfirmation: list
       excluded_or_capped_families: list
       basis: list
+    physical_chain_by_target: map
+    metabolic_binding_by_target: map
     generated_chain: list
     operations: list
     state_transition: string
@@ -193,6 +246,7 @@ answer_contract:
       per_join: map
       by_state: map
       unresolved_chain_slots: list
+      unresolved_physical_chain_slots: list
     alternative_routes: list
     translation_back: string
     conclusions: list
@@ -201,6 +255,7 @@ answer_contract:
       evidence_admission: map
       causal_target: map
       segment_closure: map
+      metabolic_binding: map
       scale_translation: map
       answer_translation: map
 
@@ -220,3 +275,9 @@ answer_contract:
     - soft_causal_language_after_causal_rejection
     - hidden_single_score
     - certainty_beyond_required_path_closure
+    - action_at_a_distance_between_named_components
+    - metabolism_as_magic_operator
+    - energy_as_untyped_explanation
+    - biological_or_behavioral_answer_without_physical_chain
+    - open_metabolic_route_hidden_from_answer
+    - mechanism_language_with_partial_physical_or_metabolic_route
