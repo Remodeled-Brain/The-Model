@@ -48,3 +48,9 @@ Scope separation places an exact intervention relation beside a broader etiologi
 ## Adoption requirement
 
 Structural CI proves that the schemas, fixtures, validator, renderer, and self-tests remain consistent. It does not prove a provider follows them. Candidate adoption requires fresh provider result bundles satisfying `required_runs.json`. Runtime, kernel, cartridge, fixture, or provider-version changes invalidate earlier results.
+
+The strict adoption check verifies current hashes and requires the configured number of complete independent runs for every critical generic and neuroscience variant:
+
+```bash
+python scripts/validate_conformance.py --adoption
+```
