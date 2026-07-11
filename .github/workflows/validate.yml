@@ -24,3 +24,5 @@ jobs:
         run: python scripts/validate_repo.py
       - name: Validate premise rejection and evidence weighting
         run: python scripts/validate_model_policy.py
+      - name: Validate semantic conformance contracts
+        run: python scripts/validate_conformance.py
