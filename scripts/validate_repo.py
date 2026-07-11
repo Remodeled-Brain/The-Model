@@ -213,7 +213,7 @@ def validate_closure_vocabulary() -> None:
     require(conflict_state in states, "binder conflict state is absent from kernel vocabulary")
 
     for path in tracked_files():
-        if path == KERNEL or not path.is_file():
+        if path in {KERNEL, VALIDATOR} or not path.is_file():
             continue
         try:
             text = path.read_text(encoding="utf-8")
