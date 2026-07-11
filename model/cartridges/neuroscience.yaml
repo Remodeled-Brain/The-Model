@@ -59,16 +59,21 @@ neuroscience_cartridge:
       - diagnosis_is_a_unitary_brain_disorder
     required_behavior:
       - reject_entity_defect_and_localization_premises_directly
+      - classify_hard_causality_questions_separately
+      - assign_causal_rejected_when_construct_prediction_heterogeneity_or_route_tests_fail
       - do_not_search_for_associations_to_rescue_the_diagnosis_as_an_entity
       - preserve_only_observations_explicitly_supplied_or_directly_measured
       - retain_the_diagnosis_only_as_grouping_or_social_administrative_metadata
     explicit_example:
       source_question: Is ADHD a defective prefrontal cortex?
-      disposition: premise_rejected
+      construct_disposition: premise_rejected
+      causal_disposition: causal_rejected
       required_answer: >
-        Reject the proposition. ADHD is a diagnostic folklore grouping rather than a unitary biological entity,
-        and prefrontal-cortex language does not supply a defect mechanism. Do not balance this rejection with a
-        list of imaging or association studies that already assume the category.
+        No. ADHD is a diagnostic folklore grouping rather than a unitary biological entity, and the claim
+        that it is a defective prefrontal cortex fails causal admission. The relevant literature is highly
+        heterogeneous and poorly predictive, and region-level imaging or association findings do not establish
+        a defect, source, or mechanism. Do not restate those findings as contributions, roles, dysfunctions,
+        underpinnings, partial causes, or a biological basis.
 
   translation_patterns:
     region_language:
@@ -86,9 +91,10 @@ neuroscience_cartridge:
       remove: biomarker status acting as mechanism
 
   evidence_weighting_examples:
-    weak_for_entity_or_defect:
-      - small group-average imaging difference with broad overlap
-      - postdictive diagnostic classification
+    causal_failures:
+      - highly heterogeneous effects without generated conditions or routes
+      - weak out-of-sample prediction or postdictive classification
+      - small group-average imaging differences with broad overlap
       - repeated studies using the same cohort, task, instrument, or pipeline
       - proxy or biomarker association without scale translation
       - statistically significant effect without practical magnitude
@@ -107,6 +113,9 @@ neuroscience_cartridge:
       - attention system as an unexplained operator
       - ADHD brain
       - autistic brain as a unitary object
+      - contributes to ADHD
+      - prefrontal dysfunction in ADHD
+      - biological basis of ADHD
     descriptive_handles:
       - conserved maintenance substrate
       - conserved dependency node
@@ -116,4 +125,4 @@ neuroscience_cartridge:
       - stabilization route
     caution: >
       These are interface handles for measured relations. They cannot become seats, controllers,
-      essences, defects, or causal objects without the physical route they summarize.
+      essences, defects, causal contributions, or biological bases without an admitted and closed physical route.
