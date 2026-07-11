@@ -5,16 +5,19 @@
   "source_files": [
     "00_purpose_and_scope.md",
     "kernel/chain_contract.yaml",
+    "kernel/physical_continuity.yaml",
     "kernel/evidence_admission.yaml",
     "kernel/evidence_admission_fixtures.json",
     "runtime/question_compiler.yaml",
     "runtime/answerability_planner.yaml",
     "runtime/evidence_binding_contract.yaml",
     "runtime/answer_contract.yaml",
+    "runtime/physical_answer_contract.yaml",
     "runtime/fixtures.json"
   ],
   "domain_modules": [
     "cartridges/neuroscience.yaml",
+    "cartridges/neuroscience_physical_continuity.yaml",
     "cartridges/neuroscience_fixtures.json"
   ],
   "support_manifests": [
