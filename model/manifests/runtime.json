@@ -14,6 +14,7 @@
     "runtime/answerability_planner.yaml",
     "runtime/evidence_binding_contract.yaml",
     "runtime/answer_contract.yaml",
+    "runtime/target_identity_answer_contract.yaml",
     "runtime/physical_answer_contract.yaml",
     "runtime/fixtures.json",
     "runtime/target_identity_fixtures.json"
