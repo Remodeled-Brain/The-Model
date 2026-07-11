@@ -1,31 +1,43 @@
 ingest_rules:
   status: candidate
   layer: evidence_maintenance
+  construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+  evidence_role_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.evidence_role_classes
 
   strip_and_extract:
     phase: admissibility
     trigger: every_source
-    purpose: Remove causal work assigned to author handles while preserving measured observations.
+    purpose: Remove causal work assigned to author handles while preserving only measured observations.
     required_questions:
       - What substrate was measured?
       - What variable changed?
       - What grouped or selected the samples?
       - What physical or descriptive claim remains after handles are removed?
       - Which parts of the claim still depend on a removed handle?
+      - Does any claimed entity or defect exist independently of the grouping label?
     outputs:
       - measured_substrate
       - measured_variable
       - grouping_variable
+      - explicit_observations
       - post_strip_claim
+      - construct_disposition
+      - rejected_entity_claims
       - handle_dependencies
       - handle_flags
     handle_categories:
       diagnostic_label:
-        allowed_role: grouping
-        blocked_role: causal_object
+        allowed_role: administrative_sampling_or_descriptive_grouping
+        blocked_roles:
+          - causal_object
+          - biological_entity
+          - unitary_route
+          - defect_target
       spectrum_label:
         allowed_role: cohort_description
-        blocked_role: unified_causal_route
+        blocked_roles:
+          - unified_causal_route
+          - scalar_biological_object
       controller_or_decision_language:
         rewrite_to: measured interaction, dependency, route, balance, gating, release, or stabilization
       biomarker_status:
@@ -33,15 +45,59 @@ ingest_rules:
         blocked_role: mechanism
       region_label:
         allowed_role: implementation_site
-        blocked_role: causal_origin_without_route
+        blocked_roles:
+          - causal_origin_without_route
+          - defect_explanation_by_location
       conservation_label:
         allowed_role: search_priority_handle
         blocked_role: causal_weight_or_origin
       clinical_promise_language:
         allowed_role: stated_application
         blocked_role: biological_or_clinical_weight
-    admissible_if: a sound physical or descriptive post_strip_claim survives
-    inadmissible_if: no claim survives handle removal
+    admissible_if: a sound physical or descriptive post_strip_claim survives independently of a rejected construct
+    inadmissible_for_entity_mechanism_if: no entity-level claim survives handle removal
+
+  construct_admission:
+    phase: admissibility
+    rule: >
+      A diagnostic, taxonomic, spectrum, faculty, or controller handle cannot enter the support layer as a
+      biological entity. When the source's mechanism or defect claim disappears after handle removal, assign
+      premise_rejected for that claim and block all entity-level grounding roles.
+    premise_rejection_triggers:
+      - diagnosis_supplies_biological_unity
+      - diagnosis_supplies_defect_status
+      - region_name_supplies_defect_location
+      - faculty_noun_supplies_the_operation
+      - no_explicit_observation_survives_label_removal
+    preserves:
+      - source_record
+      - provenance
+      - explicitly_measured_relations
+      - grouping_metadata
+      - construct_failure_note
+    blocks:
+      - entity_level_mechanism
+      - unitary_defect_claim
+      - regional_localization_of_diagnosis
+      - evidence_weight_for_construct_validity
+
+  evidence_role_classification:
+    rule: >
+      Classify each surviving claim by its actual contribution to a required premise, segment, join, or
+      descriptive relation. Do not assign a stronger role from journal prestige, author language, citation count,
+      sample size alone, or framework fit.
+    roles:
+      premise_breaking: Breaks a required entity, unity, defect, direction, or translation premise.
+      route_closing: Directly closes a required dependency segment or join under stated conditions.
+      route_discriminating: Produces observations that separate surviving routes.
+      segment_supporting: Supports one bounded segment without closing the route.
+      descriptive_only: Supports only a measured descriptive relation.
+      non_probative: Cannot bear on the requested conclusion after applicable gates.
+    required_outputs:
+      - evidence_role_class
+      - role_target
+      - non_probative_for
+      - evidence_family_keys
 
   validation_gates:
     controlled_sameness_missing_differentiator:
@@ -118,26 +174,48 @@ ingest_rules:
       required_when_practical_weight_is_claimed:
         - effect_magnitude
         - variance_envelope
+        - group_overlap
         - noise_floor
         - biological_range
         - functional_threshold
         - replication
+      broad_overlap_rule: >
+        A small group-average difference with broad overlap cannot support a unitary defect, biological entity,
+        or individual-level state assignment.
       failure_cap: assay_or_measurement_level_only
+
+    instrument_and_task_dependency:
+      rule: >
+        A relation generated by one diagnostic instrument, selection rule, task, threshold, or analysis pipeline
+        remains dependent on that construction until it recurs under independent operationalizations.
+      failure_cap: label_dependent_observation
+      required_outputs:
+        - diagnostic_instrument_id
+        - task_id
+        - selection_rule
+        - threshold_dependency
 
     independence:
       rule: >
-        Shared cohorts, pipelines, labs, model families, or inherited datasets do not count as independent
-        route closure. Correlated records remain visible but cannot accumulate weight as independent support.
+        Shared cohorts, pipelines, labs, model families, instruments, tasks, or inherited datasets do not count as
+        independent route closure. Correlated records remain visible but cannot accumulate weight as independent support.
       outputs:
         - independence_status
+        - evidence_family_id
         - shared_pipeline_id
         - shared_cohort_id
         - shared_dataset_id
+        - shared_instrument_id
+        - shared_task_id
 
   common_invariants:
     handles_never_generate: true
+    rejected_constructs_never_receive_entity_level_support: true
+    downstream_records_cannot_rescue_failed_construct_admission: true
     descriptive_claims_are_positive_support: true
     failed_mechanism_gate_does_not_discard_source: true
     each_gate_caps_only_the_role_it_tests: true
     recency_never_supplies_causal_weight: true
     framework_fit_never_supplies_weight: true
+    publication_volume_never_supplies_weight: true
+    correlated_low_grade_evidence_cannot_accumulate_into_mechanism: true
