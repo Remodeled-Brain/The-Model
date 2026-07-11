@@ -2,27 +2,47 @@ answer_contract:
   status: candidate
   layer: primary_runtime
   purpose: >
-    Produce a responsive answer that follows the chain path required by the question, preserves
-    unresolved alternatives, and keeps confidence attached to the operation that generated it.
+    Produce a responsive answer that rejects invalid premises before evidence accommodation, follows only
+    admitted chain paths, and reports the weighted body of evidence without laundering weak records through volume.
 
   closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+  construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+  body_verdict_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.body_of_evidence_assessment.body_verdicts
 
   required_inputs:
     - source_question
     - question_type
+    - construct_disposition
+    - rejected_premises
     - answer_target
     - compiled_questions
     - answerability_status
     - evidence_bindings
+    - body_of_evidence_verdict
+    - body_of_evidence_basis
+    - excluded_or_capped_records
     - per_segment_closure
     - chain_join_status
     - unresolved_chain_slots
     - narrower_answerable_targets
 
+  answer_precedence:
+    premise_rejected:
+      - state_the_rejection_in_the_first_sentence
+      - identify_the_label_or_region_story_that_supplied_false_entity_or_defect_status
+      - explain_the_premise_failure_without_surveying_accommodating_associations
+      - state_any_explicit_observation_that_survives
+      - stop_unless_the_user_asks_for_a_replacement_empirical_question
+    admitted_or_underspecified:
+      - state_the_best_supported_answer_at_the_requested_or_narrower_valid_scope
+      - generate_the_required_physical_path
+      - identify_the_operations_and_state_transition
+
   answer_sequence:
-    - state_the_best_supported_answer_at_the_requested_or_narrower_valid_scope
-    - generate_the_required_physical_path
-    - identify_the_operations_and_state_transition
+    - apply_construct_disposition_before_evidence_summary
+    - state_the_direct_answer
+    - report_the_body_of_evidence_verdict_and_its_load_bearing_basis
+    - exclude_non_probative_records_from_the_support_narrative
     - report_segment_and_join_closure_using_the_kernel_vocabulary
     - report_unresolved_chain_slots_separately
     - preserve_alternative_routes_until_discriminated
@@ -30,16 +50,30 @@ answer_contract:
     - translate_back_to_source_language_without_restoring_handles_as_mechanism
     - state_confidence_for_each_claimed_conclusion
 
+  premise_rejection_rule: >
+    A rejected construct is not answered with a balanced literature review. Records that presuppose the rejected
+    entity may be mentioned only to explain why they are non-probative. The answer may not rescue the premise by
+    substituting a familiar trait bundle, deficit story, or nearby regional association.
+
+  evidence_summary_rule: >
+    Summarize the body of evidence by independent evidence family and chain contribution. Lead with premise-breaking,
+    route-closing, route-discriminating, and disconfirming evidence. Do not present a paper count, citation parade,
+    or undifferentiated list of associations as balance.
+
   conclusion_record:
     required_fields:
       - conclusion
+      - construct_disposition
       - required_chain_path
       - supporting_bindings
+      - excluded_or_capped_bindings
+      - body_of_evidence_verdict
       - closure_state
       - translation_steps
       - unresolved_limits
       - confidence
     closure_state_rule: Use exactly one state from closure_vocabulary_ref.
+    body_verdict_rule: Use exactly one verdict from body_verdict_ref.
 
   confidence_dimensions:
     compilation:
@@ -57,17 +91,32 @@ answer_contract:
 
   rules:
     - Never collapse confidence into one score.
-    - A responsive answer may reuse the user's label as an interface handle after removing its causal role.
+    - A premise-rejected answer may reuse the user's label only to name the rejected folklore handle.
+    - A grouping handle cannot be translated back as a biological entity.
     - Missing evidence must be named as an unresolved segment, join, dependency, measurement, discriminator, or translation step.
     - Multiple surviving routes remain explicit until evidence distinguishes their generated consequences.
     - A descriptive answer is complete when the question is descriptive and the measurements support it.
     - A partial answer states the narrower answer target it actually closes.
     - Conflicting evidence uses the contested kernel state only after the kernel conflict checks are complete.
     - Conventional terminology cannot fill an unresolved route.
+    - A necessary premise failure outranks any volume of downstream literature that assumes the premise.
+    - Label-dependent, proxy-limited, source-scale-only, postdictive, or practically trivial evidence cannot be narrated as mechanism support.
 
   output_schema:
     direct_answer: string
     answer_scope: string
+    construct_disposition:
+      vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+      value: string
+    rejected_premises: list
+    body_of_evidence:
+      verdict:
+        vocabulary_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.body_of_evidence_assessment.body_verdicts
+        value: string
+      load_bearing_evidence_families: list
+      strongest_disconfirmation: list
+      excluded_or_capped_families: list
+      basis: list
     generated_chain: list
     operations: list
     state_transition: string
@@ -89,7 +138,11 @@ answer_contract:
   forbidden_patterns:
     - definition_sorting_as_primary_explanation
     - label_reintroduced_as_operator
+    - diagnostic_label_reintroduced_as_biological_entity
+    - charitable_rewrite_that_rescues_a_rejected_premise
+    - literature_laundry_list_after_premise_rejection
     - citation_volume_as_confidence
+    - weak_association_presented_as_balance_against_premise_failure
     - recency_as_causal_weight
     - hidden_single_score
     - certainty_beyond_required_path_closure
