@@ -16,6 +16,7 @@
       "provider.kernel_hash",
       "provider.cartridge_hash",
       "provider.fixture_hash",
+      "provider.target_identity_contract_hash",
       "provider.physical_contract_hash",
       "provider.temperature",
       "provider.seed"
@@ -25,6 +26,7 @@
       "kernel_hash_change",
       "cartridge_hash_change",
       "fixture_hash_change",
+      "target_identity_contract_hash_change",
       "physical_contract_hash_change",
       "provider_model_change"
     ],
