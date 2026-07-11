@@ -2,40 +2,80 @@ ingest_architecture:
   status: candidate
   layer: evidence_maintenance
   purpose: >
-    Convert a paper into a provenance-bound support record without allowing author handles,
-    proxies, significance language, or implementation sites to become causal mechanisms.
+    Convert a source into a provenance-bound audited record without allowing construct dependence,
+    proxies, treatment response, significance language, or implementation sites to become causal mechanisms.
+
+  evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission.presumptive_classification
 
   boundary:
     consumes: paper_or_source
-    emits: reviewed_support_record
+    emits: audited_support_record
     cannot:
       - define_the_source_question
       - alter_the_chain_kernel
       - determine_the_final_answer_shape
       - write_canonical_claim_state_without_adoption
+      - treat_source_conclusions_as_admitted_evidence
+
+  phase_0_presumption:
+    purpose: Assign the restrictive starting classification before any local gate can pass.
+    required_outputs:
+      - presumptive_class
+      - presumption_triggers
+      - presumed_closure_state
+      - presumed_support_role
+      - initially_blocked_roles
+      - escape_conditions_required
+    routing:
+      construct_indexed: label_dependent
+      proxy_record: proxy_limited
+      treatment_response: descriptive_only_with_label_dependent_secondary_state_when_construct_selected
+      direct_construct_independent: unresolved
+    rules:
+      - Construct-indexed work begins label_dependent rather than neutral.
+      - Proxy work begins proxy_limited and cannot bind to causal or mechanistic segments.
+      - Treatment-response work may bind intervention-outcome relations but cannot bind etiology or endogenous mechanism.
+      - Local gate passes cannot erase the presumption.
+      - Missing escape evidence preserves the presumption.
+      - Publication count and meta-analysis cannot escape the presumption.
 
   phase_A_admissibility:
-    purpose: Strip author-interface text and extract the physical claim. No evidence weighting.
+    purpose: Strip author-interface text, separate observations from interpretations, and audit inferential bridges.
     required_outputs:
+      - direct_observations
+      - author_interpretations
       - measured_substrate
       - measured_variable
       - grouping_variable
       - post_strip_claim
       - handle_dependencies
       - handle_flags
-    admissible_if: a physical or descriptive post_strip_claim survives handle removal
-    inadmissible_if: no claim survives handle removal
+      - bridge_ledger
+      - shared_assumption_families
+    admissible_if: a physical or descriptive observation survives handle and bridge removal
+    inadmissible_if: no observation survives handle and bridge removal
 
   phase_B_validation:
-    purpose: Test route, translation, magnitude, dependency, and practical limits on extracted fields.
+    purpose: Test presumption escape, route, translation, prediction, heterogeneity, magnitude, and dependency.
     gates:
+      - presumption_escape
+      - construct_admission
+      - causal_admission
       - controlled_sameness_missing_differentiator
       - region_source_closure
       - conservation_dependency
       - proxy_promotion
+      - predictive_adequacy
+      - heterogeneity_control
       - practical_significance
+      - scale_translation
+      - independence
     outputs:
+      - escape_conditions_tested
+      - escape_conditions_passed
+      - escape_complete
       - causal_frame_status
+      - failed_presumptions
       - missing_route_slots
       - chain_closure_status
       - proxy_status
@@ -43,8 +83,29 @@ ingest_architecture:
       - support_channels
       - blocked_roles
 
+  phase_C_binding_eligibility:
+    purpose: Determine which exact relations the audited record may support.
+    rules:
+      - Begin with presumed_closure_state.
+      - Upgrade only after every required escape condition, bridge, and segment closes.
+      - Proxy records never bind causal or mechanistic segments.
+      - Treatment-response records never bind etiology, pathogenesis, construct validity, or endogenous mechanism.
+      - Construct-indexed records without complete escape remain label_dependent.
+    outputs:
+      - final_closure_state
+      - eligible_binding_relations
+      - forbidden_binding_relations
+      - evidence_role_class
+      - non_probative_for
+
   write_boundary:
     allowed:
+      - presumptive_classification
+      - escape_test_results
+      - admitted_observations
+      - stripped_assertions
+      - bridge_ledger
+      - shared_assumption_families
       - evidence
       - provenance
       - paper_links
@@ -53,6 +114,7 @@ ingest_architecture:
       - method_notes
       - category_failure_notes
       - proxy_status_notes
+      - treatment_response_limits
       - missing_route_notes
       - descriptive_support_notes
       - source_tree_handles
@@ -65,14 +127,20 @@ ingest_architecture:
     search_priority: true
     supersession_review_priority: true
     causal_weight: false
+    presumption_escape: false
 
   invariants:
-    phase_A_before_phase_B: true
+    phase_0_before_phase_A_before_phase_B_before_phase_C: true
+    restrictive_presumption_precedes_local_checks: true
     node_mapping_requires_post_strip_claim: true
     support_layer_only_during_ingest: true
+    construct_indexed_defaults_to_label_dependent: true
+    proxy_defaults_to_proxy_limited: true
+    proxy_never_binds_causal_segment: true
+    treatment_response_never_binds_etiology_or_endogenous_mechanism: true
     diagnostic_label_can_group_but_cannot_ground: true
     region_label_cannot_supply_origin: true
     conservation_cannot_supply_weight_directly: true
     analytical_significance_cannot_supply_practical_weight_directly: true
-    failed_gate_routes_to_bounded_support_by_default: true
+    failed_gate_preserves_restrictive_state: true
     support_note_count_cannot_create_grounding: true
