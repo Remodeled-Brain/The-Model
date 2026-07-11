@@ -24,6 +24,8 @@ jobs:
         run: python scripts/validate_repo.py
       - name: Validate premise rejection and evidence weighting
         run: python scripts/validate_model_policy.py
+      - name: Validate folk-behavior construct translation
+        run: python scripts/validate_folk_behavior.py
       - name: Validate semantic and adoption conformance contracts
         run: python scripts/validate_conformance.py
       - name: Validate physical continuity and metabolic binding
