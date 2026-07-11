@@ -1,11 +1,12 @@
 ingest_record_schema:
   status: candidate
-  schema_version: v4
+  schema_version: v5
   layer: support_layer
   closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
   construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
   causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
   evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission
+  presumption_ref: model/kernel/evidence_admission.yaml#evidence_admission.presumptive_classification
   evidence_role_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.evidence_role_classes
   support_channel_crosswalk_ref: model/ingest/failure_routing.yaml#ingest_failure_routing.closure_state_crosswalk
 
@@ -40,6 +41,44 @@ ingest_record_schema:
     source_claim_status_default: unadmitted_assertion
     causal_weight_default: zero
 
+  presumption:
+    required: true
+    class_enum:
+      - construct_indexed
+      - proxy_record
+      - treatment_response
+      - direct_construct_independent
+    required_fields:
+      - presumptive_class
+      - presumption_triggers
+      - presumed_closure_state
+      - presumed_support_role
+      - initially_blocked_roles
+      - escape_conditions_required
+      - escape_conditions_tested
+      - escape_conditions_passed
+      - escape_complete
+    default_rules:
+      construct_indexed:
+        closure_state: label_dependent
+        causal_binding: forbidden
+        mechanism_binding: forbidden
+      proxy_record:
+        closure_state: proxy_limited
+        causal_binding: forbidden
+        mechanism_binding: forbidden
+      treatment_response:
+        closure_state: descriptive_only
+        causal_binding_scope: intervention_outcome_only
+        etiologic_binding: forbidden
+        endogenous_mechanism_binding: forbidden
+      direct_construct_independent:
+        closure_state: unresolved
+        causal_binding: denied_until_exact_bridges_and_segments_close
+    upgrade_rule: >
+      A stronger closure state may be written only when escape_complete is true and the exact bridge and segment
+      independently close. Missing or untested escape conditions preserve the presumed closure state.
+
   inference_audit:
     required: true
     bridge_status_enum:
@@ -70,7 +109,7 @@ ingest_record_schema:
       - strongest_surviving_claim
     rule: >
       A source conclusion cannot bind directly. Only admitted observations and bridges marked bridge_closed
-      may contribute beyond their measured scope.
+      may contribute beyond their measured scope, subject to the record's categorical binding prohibitions.
 
   extraction:
     required_fields:
@@ -111,6 +150,7 @@ ingest_record_schema:
     causal_test_results:
       required_when: source_claims_cause_defect_dysfunction_control_mechanism_or_biological_basis
       required_fields:
+        - presumption_escape
         - construct_coherence
         - temporal_direction
         - dependency_or_intervention
@@ -124,6 +164,7 @@ ingest_record_schema:
         - disconfirmation_survival
       output_fields:
         - causal_disposition
+        - failed_presumptions
         - failed_causal_tests
         - failed_inferential_bridges
         - passed_causal_tests
@@ -137,17 +178,21 @@ ingest_record_schema:
     chain_segments:
       required: true
       closure_state_rule: >
-        Use exactly one kernel closure state. When the state derives from an ingest support channel,
-        use support_channel_crosswalk_ref rather than assigning a second ingest-specific vocabulary.
+        Begin with presumed_closure_state. Use a stronger kernel closure state only when escape_complete is true and
+        the exact bridge and segment close. Proxy and treatment-response categorical prohibitions remain in force.
       per_segment_fields:
         - segment_id
         - relation
-        - closure_state
+        - presumed_closure_state
+        - final_closure_state
+        - upgrade_basis
         - measured_scale
         - translation_limit
 
   body_weight_inputs:
     required_fields:
+      - presumptive_class
+      - presumption_escape_status
       - admission_status
       - claim_directness
       - construct_dependency
@@ -172,9 +217,9 @@ ingest_record_schema:
       - shared_assumption_family_id
       - disconfirmation_target
     rule: >
-      These fields describe admission, chain contribution, causal admissibility, and family independence. They are
-      not combined into a numerical quality score and cannot be overridden by publication count, prestige, peer
-      review, consensus, recency, citation volume, or familiar causal wording.
+      These fields describe restrictive presumption, admission, chain contribution, causal eligibility, and family
+      independence. They are not combined into a numerical score and cannot be overridden by publication count,
+      prestige, peer review, consensus, recency, citation volume, treatment response, or proxy recurrence.
 
   provenance:
     required_fields:
@@ -186,6 +231,9 @@ ingest_record_schema:
       - independence_status
       - evidence_family_id
       - shared_assumption_family_id
+      - shared_construct_id
+      - shared_proxy_id
+      - shared_treatment_indication_id
       - shared_pipeline_id
       - shared_cohort_id
       - shared_dataset_id
@@ -195,6 +243,12 @@ ingest_record_schema:
 
   outputs:
     required_fields:
+      - presumptive_class
+      - presumed_closure_state
+      - presumption_basis
+      - escape_conditions_tested
+      - escape_conditions_passed
+      - escape_complete
       - admitted_observations
       - stripped_assertions
       - bridge_ledger
@@ -205,6 +259,7 @@ ingest_record_schema:
       - translation_limits
       - construct_disposition
       - causal_disposition
+      - failed_presumptions
       - failed_causal_tests
       - failed_inferential_bridges
       - evidence_role_class
@@ -227,6 +282,13 @@ ingest_record_schema:
   invariants:
     support_layer_only: true
     no_unilateral_claim_write: true
+    restrictive_presumption_assigned_before_local_checks: true
+    missing_escape_evidence_preserves_presumption: true
+    local_pass_does_not_remove_presumption: true
+    construct_indexed_defaults_to_label_dependent: true
+    proxy_defaults_to_proxy_limited: true
+    proxy_never_binds_causal_segment: true
+    treatment_response_never_binds_etiology_or_endogenous_mechanism: true
     source_conclusion_never_binds_directly: true
     causal_weight_defaults_to_zero: true
     peer_review_is_not_admission: true
@@ -239,4 +301,3 @@ ingest_record_schema:
     unresolved_never_grants_closure: true
     rejected_construct_cannot_receive_entity_level_promotion: true
     causal_rejected_record_cannot_receive_causal_promotion: true
-    heterogeneous_poorly_predictive_record_cannot_receive_causal_language: true
