@@ -5,6 +5,8 @@ answer_contract:
     Produce a responsive answer that follows the chain path required by the question, preserves
     unresolved alternatives, and keeps confidence attached to the operation that generated it.
 
+  closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+
   required_inputs:
     - source_question
     - question_type
@@ -21,7 +23,8 @@ answer_contract:
     - state_the_best_supported_answer_at_the_requested_or_narrower_valid_scope
     - generate_the_required_physical_path
     - identify_the_operations_and_state_transition
-    - report_closed_partial_contested_and_missing_segments
+    - report_segment_and_join_closure_using_the_kernel_vocabulary
+    - report_unresolved_chain_slots_separately
     - preserve_alternative_routes_until_discriminated
     - distinguish_observation_readout_implementation_route_and_source
     - translate_back_to_source_language_without_restoring_handles_as_mechanism
@@ -36,6 +39,7 @@ answer_contract:
       - translation_steps
       - unresolved_limits
       - confidence
+    closure_state_rule: Use exactly one state from closure_vocabulary_ref.
 
   confidence_dimensions:
     compilation:
@@ -54,11 +58,11 @@ answer_contract:
   rules:
     - Never collapse confidence into one score.
     - A responsive answer may reuse the user's label as an interface handle after removing its causal role.
-    - Missing evidence must be named as a missing segment, join, dependency, measurement, discriminator, or translation step.
+    - Missing evidence must be named as an unresolved segment, join, dependency, measurement, discriminator, or translation step.
     - Multiple surviving routes remain explicit until evidence distinguishes their generated consequences.
     - A descriptive answer is complete when the question is descriptive and the measurements support it.
     - A partial answer states the narrower answer target it actually closes.
-    - Conflicting evidence marks the affected segment as contested rather than averaging the conflict away.
+    - Conflicting evidence uses the contested kernel state only after the kernel conflict checks are complete.
     - Conventional terminology cannot fill an unresolved route.
 
   output_schema:
@@ -68,11 +72,11 @@ answer_contract:
     operations: list
     state_transition: string
     closure_report:
-      closed: list
-      partial: list
-      contested: list
-      missing: list
-      contradicted: list
+      vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+      per_segment: map
+      per_join: map
+      by_state: map
+      unresolved_chain_slots: list
     alternative_routes: list
     translation_back: string
     conclusions: list
@@ -90,3 +94,4 @@ answer_contract:
     - hidden_single_score
     - certainty_beyond_required_path_closure
     - unresolved_full_scope_presented_as_a_closed_answer
+    - closure_state_defined_outside_the_kernel
