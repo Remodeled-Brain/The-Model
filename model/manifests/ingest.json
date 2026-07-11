@@ -13,6 +13,7 @@
     "ingest/architecture.yaml",
     "ingest/rules.yaml",
     "ingest/target_identity_extraction.yaml",
+    "ingest/target_identity_record_schema.yaml",
     "ingest/physical_extraction_contract.yaml",
     "ingest/failure_routing.yaml",
     "ingest/record_schema.yaml",
