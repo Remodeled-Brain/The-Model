@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse, datetime as dt, hashlib, json, pathlib, shlex, subprocess, sys, uuid
 from typing import Any
 import validate_conformance as vc
+import validate_physical_continuity as pc
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 MODEL=ROOT/"model"
@@ -22,12 +23,10 @@ def catalogs():
         data=vc.load(path)
         for fixture in data["fixtures"]: rows.append((data["fixture_set"],fixture,path))
     return rows
-
 def build_runtime()->str:
     subprocess.run([sys.executable,str(BUILDER)],cwd=ROOT,check=True)
     if not RUNTIME_OUTPUT.is_file(): raise RuntimeError("runtime build output missing")
     return RUNTIME_OUTPUT.read_text(encoding="utf-8")
-
 def call_provider(command:list[str],payload:dict[str,Any])->dict[str,Any]:
     run=subprocess.run(command,cwd=ROOT,input=json.dumps(payload),text=True,capture_output=True,check=False)
     if run.returncode:
@@ -37,7 +36,6 @@ def call_provider(command:list[str],payload:dict[str,Any])->dict[str,Any]:
     if isinstance(value,dict) and "decision_record" in value: value=value["decision_record"]
     if not isinstance(value,dict): raise RuntimeError("provider must return a decision-record object")
     return value
-
 def main()->int:
     p=argparse.ArgumentParser()
     p.add_argument("--provider-command",required=True,help="command reading fixture payload JSON on stdin")
@@ -70,20 +68,21 @@ def main()->int:
                   "runtime":{"manifest":RUNTIME_MANIFEST.relative_to(ROOT).as_posix(),"sha256":runtime_hash,"text":runtime},
                   "decision_record_schema":schema,
                   "fixture":{"fixture_set":fixture_set,"fixture_id":fixture["id"],"mutation_type":fixture["mutation_type"],"variant_id":variant["id"],"input":variant["input"]},
-                  "instruction":"Return only a decision_record JSON object. Extract actual data before narrative, separate every target relation, and place final wording only in structured claims."
+                  "instruction":"Return only a decision_record JSON object. Extract actual data before narrative, separate every target relation, keep every explanation on one continuous physical chain, bind biological and behavioral claims through metabolically maintained state, mark unmeasured physical or metabolic segments unresolved rather than inventing them, and place final wording only in structured claims."
                 }
                 record=call_provider(command,payload)
                 result={
                   "schema_version":"v1","run_id":run_id,"fixture_set":fixture_set,"fixture_id":fixture["id"],"variant_id":variant["id"],
-                  "provider":{"name":args.provider_name,"model":args.model_id,"runtime_hash":runtime_hash,"kernel_hash":kernel_hash,"cartridge_hash":cartridge_hash,"fixture_hash":fixture_hash,"temperature":args.temperature,"seed":str(args.seed)},
+                  "provider":{"name":args.provider_name,"model":args.model_id,"runtime_hash":runtime_hash,"kernel_hash":kernel_hash,"cartridge_hash":cartridge_hash,"fixture_hash":fixture_hash,"physical_contract_hash":pc.physical_contract_hash(),"temperature":args.temperature,"seed":str(args.seed)},
                   "decision_record":record,"rendered_answer":vc.render_answer(record)
                 }
                 vc.validate_result(result,variants)
+                pc.validate_result(result,variants)
                 out=output_root/f"{fixture_set}__{fixture['id']}__{variant['id']}.json"
                 out.write_text(json.dumps(result,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
                 generated.append(result)
-        _,fixtures=vc.catalog(); vc.validate_mutation_groups(generated,fixtures)
-    except (OSError,RuntimeError,subprocess.CalledProcessError,vc.ConformanceError) as e:
+        _,fixtures=vc.catalog(); vc.validate_mutation_groups(generated,fixtures); pc.validate_mutation_groups(generated,fixtures)
+    except (OSError,RuntimeError,subprocess.CalledProcessError,vc.ConformanceError,pc.PhysicalConformanceError) as e:
         print(f"CONFORMANCE RUN FAILED: {e}",file=sys.stderr); return 1
     finally:
         if not args.keep_runtime:
