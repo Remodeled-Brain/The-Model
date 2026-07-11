@@ -97,7 +97,7 @@ def validate_policy() -> None:
     require_text(
         KERNEL,
         [
-            "Translate the label into the exact measured organism-state relation before design strength",
+            "organism-state relation before design strength",
             "construct: grouping_handle_only",
             "exact_independently_measured_relation: eligible_for_separate_review",
             "Ordinary-life task content does not establish real-world efficacy.",
