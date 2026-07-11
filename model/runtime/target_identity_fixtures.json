@@ -1,0 +1,89 @@
+{
+  "schema_version": "v1",
+  "status": "candidate",
+  "purpose": "Generic runtime regressions for target identity reconstruction before evidence review.",
+  "fixtures": [
+    {
+      "id": "target-identity-before-evidence",
+      "mode": "question",
+      "source_question": "Does intervention X reduce target T?",
+      "required": [
+        "remove target T from the outcome identity before evaluating intervention evidence",
+        "build separate speaker-intent and corpus-identity records",
+        "enumerate the exact measured relations constructions conditions and timing that survive",
+        "assign an identity disposition before causal weighting",
+        "emit separate relations for the exact measurement constructed target and claimed broader target"
+      ],
+      "forbidden": [
+        "treat the target name as its own definition",
+        "let randomization or effect magnitude establish target identity",
+        "infer a standard property bundle from familiar terminology",
+        "begin causal review before exact target relations are emitted"
+      ]
+    },
+    {
+      "id": "recoverable-identity-shortcut",
+      "mode": "condition",
+      "condition": "A source uses a short target name but supplies a recoverable algorithm or standard, variables, conditions, uncertainty, and a reproducible reconstruction path.",
+      "required": [
+        "permit the shortcut without regenerating the full definition in every sentence",
+        "classify the identity as generated closed conditional or constructed measurement according to its generator",
+        "bind evidence only within the generator conditions and transport scope",
+        "test sensitivity to plausible alternate constructions"
+      ],
+      "forbidden": [
+        "reject a reproducible target merely because it is constructed or shorthand",
+        "generalize the target outside its generator regime",
+        "hide algorithm threshold apparatus or model dependence"
+      ]
+    },
+    {
+      "id": "speaker-corpus-target-mismatch",
+      "mode": "condition",
+      "condition": "The asker names a broad target while the corpus measures several non-equivalent events scores or operationalizations under that name.",
+      "required": [
+        "identify the relation the asker cares about without treating speaker wording as construct proof",
+        "state what each source actually measured",
+        "keep non-equivalent operationalizations separate",
+        "ask only the smallest observable fork when the interpretations produce materially different answers"
+      ],
+      "forbidden": [
+        "collapse the speaker and corpus records into one target",
+        "ask for another circular verbal definition",
+        "answer the broad name from whichever measure is most convenient"
+      ]
+    },
+    {
+      "id": "heterogeneity-must-be-generated",
+      "mode": "condition",
+      "condition": "A field preserves one target by calling divergent measurements complex multidimensional heterogeneous context-dependent or task-impure without generating the differentiating variables.",
+      "required": [
+        "treat the divergence as identity-breaking evidence",
+        "require a generator that predicts how conditions produce the variants",
+        "preserve the exact divergent observations as separate relations",
+        "assign grouping_handle_only or identity_unresolved when the generator remains open"
+      ],
+      "forbidden": [
+        "use heterogeneity language as construct protection",
+        "average non-equivalent operationalizations into one causal target",
+        "treat repeated academic usage as identity evidence"
+      ]
+    },
+    {
+      "id": "exact-relation-positive-control",
+      "mode": "condition",
+      "condition": "A decisive controlled intervention changes one exact independently measured relation while the source also claims a broader target whose identity or transport remains open.",
+      "required": [
+        "permit causal admission for the exact relation when its full burden closes",
+        "keep the broader target separately restricted",
+        "state the generator conditions and tested scope",
+        "preserve the distinction between exact effect target identity and transport"
+      ],
+      "forbidden": [
+        "reject the exact effect because the broader target fails",
+        "let the exact effect validate the broader target",
+        "generalize beyond the tested relation and conditions"
+      ]
+    }
+  ]
+}
