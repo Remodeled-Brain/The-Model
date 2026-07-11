@@ -2,13 +2,13 @@ answer_contract:
   status: candidate
   layer: primary_runtime
   purpose: >
-    Produce a responsive answer that rejects invalid premises and failed causal propositions before evidence
-    accommodation, follows only admitted chain paths, and reports the weighted body of evidence without laundering
-    heterogeneous or poorly predictive work into causal language.
+    Produce a responsive answer from admitted observations and closed bridges only. Reject invalid premises and
+    failed causal propositions before evidence summary, and expose the inferential debt stripped from the corpus.
 
   closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
   construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
   causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
+  evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission
   body_verdict_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.body_of_evidence_assessment.body_verdicts
 
   required_inputs:
@@ -22,7 +22,10 @@ answer_contract:
     - answer_target
     - compiled_questions
     - answerability_status
-    - evidence_bindings
+    - admitted_bindings
+    - rejected_assertions
+    - bridge_ledger
+    - shared_assumption_families
     - body_of_evidence_verdict
     - body_of_evidence_basis
     - excluded_or_capped_records
@@ -34,7 +37,7 @@ answer_contract:
   answer_precedence:
     causal_rejected:
       - state_no_or_the_direct_causal_rejection_in_the_first_sentence
-      - identify_the_failed_construct_or_causal_premise
+      - identify_the_failed_construct_bridge_or_causal_premise
       - name_the_load_bearing_failure_path
       - do_not_restate_descriptive_associations_in_causal_feeling_language
       - stop_unless_descriptive_context_is_needed_to_explain_the_failure
@@ -42,7 +45,7 @@ answer_contract:
       - state_the_rejection_in_the_first_sentence
       - identify_the_label_or_region_story_that_supplied_false_entity_or_defect_status
       - explain_the_premise_failure_without_surveying_accommodating_associations
-      - state_any_explicit_observation_that_survives
+      - state_any_admitted_observation_that_survives
       - stop_unless_the_user_asks_for_a_replacement_empirical_question
     admitted_or_underspecified:
       - state_the_best_supported_answer_at_the_requested_or_narrower_valid_scope
@@ -50,16 +53,24 @@ answer_contract:
       - identify_the_operations_and_state_transition
 
   answer_sequence:
-    - apply_construct_and_causal_dispositions_before_evidence_summary
+    - apply_construct_causal_and_evidence_admission_before_summary
     - state_the_direct_answer
-    - report_the_body_of_evidence_verdict_and_its_load_bearing_basis
+    - identify_the_strongest_surviving_observation_or_closed_bridge
+    - report_the_load_bearing_failure_or_support_path
+    - expose_stripped_assertions_and_shared_assumption_families_when_they_shaped_the_literature_story
     - exclude_non_probative_records_from_the_support_narrative
     - report_segment_and_join_closure_using_the_kernel_vocabulary
     - report_unresolved_chain_slots_separately
     - preserve_alternative_routes_until_discriminated
     - distinguish_observation_readout_implementation_route_and_source
-    - translate_back_to_source_language_without_restoring_handles_or_failed_causal_relations
+    - translate_back_without_restoring_handles_failed_bridges_or_failed_causal_relations
     - state_confidence_for_each_claimed_conclusion
+
+  evidence_admission_rule: >
+    The answer may summarize only admitted observations and closed bridges. Paper conclusions, reviews,
+    meta-analyses, consensus statements, and repeated inferential language cannot appear as support unless the
+    underlying bridge independently closes. When a literature story depends on an unsupported shared bridge,
+    name the bridge failure rather than paraphrasing the story.
 
   premise_rejection_rule: >
     A rejected construct is not answered with a balanced literature review. Records that presuppose the rejected
@@ -68,8 +79,8 @@ answer_contract:
 
   causal_rejection_rule: >
     A hard causality question with causal_rejected is answered as a failed causal proposition. Heterogeneous,
-    unstable, overlapping, postdictive, weakly predictive, proxy-limited, or label-selected findings remain
-    descriptive failures of causal admission. They may not be restated as contributions, roles, bases,
+    unstable, overlapping, postdictive, weakly predictive, proxy-limited, label-selected, or bridge-dependent
+    findings remain failures of causal admission. They may not be restated as contributions, roles, bases,
     dysfunctions, deficits, mechanisms, underpinnings, mediation, or partial causes.
 
   causal_language_gate:
@@ -90,12 +101,12 @@ answer_contract:
       - is_consistent_with_a_causal_role
     association_context_rule: >
       Association findings may be named only as non-causal observations needed to explain why the causal claim
-      fails. Do not provide an association catalogue after the failure path is already established.
+      fails. Do not provide an association catalogue after the failure path is established.
 
   evidence_summary_rule: >
-    Summarize the body of evidence by independent evidence family and chain contribution. Lead with premise-breaking,
-    route-closing, route-discriminating, and disconfirming evidence. Do not present a paper count, citation parade,
-    undifferentiated list of associations, or heterogeneous descriptive work as balance.
+    Summarize admitted evidence by independent family and chain contribution. Lead with premise-breaking,
+    bridge-breaking, route-closing, route-discriminating, and disconfirming evidence. Do not present paper counts,
+    citation parades, consensus, meta-analytic pooling, or heterogeneous descriptive work as balance.
 
   conclusion_record:
     required_fields:
@@ -103,7 +114,8 @@ answer_contract:
       - construct_disposition
       - causal_disposition
       - required_chain_path
-      - supporting_bindings
+      - supporting_admitted_bindings
+      - failed_or_open_bridges
       - excluded_or_capped_bindings
       - body_of_evidence_verdict
       - closure_state
@@ -117,6 +129,8 @@ answer_contract:
   confidence_dimensions:
     compilation:
       basis: security_of_source_to_physical_mapping
+    evidence_admission:
+      basis: directness_of_observations_and_closure_of_required_bridges
     segment_closure:
       basis: evidence_for_each_required_segment_and_join
     scale_translation:
@@ -125,21 +139,23 @@ answer_contract:
       basis: distance_from_the_closed_chain_to_the_source_wording
 
   confidence_rule: >
-    Confidence is conclusion-specific. A conclusion cannot exceed the weakest segment or translation
-    step on its required path. Open segments outside that path do not cap a narrower conclusion.
+    Confidence is conclusion-specific. A conclusion cannot exceed its weakest required bridge, segment, or
+    translation step. Publication count, consensus, or absence of disconfirmation cannot raise it.
 
   rules:
     - Never collapse confidence into one score.
     - A causal-rejected answer must not be softened into mixed, complex, multifactorial, linked, associated, or may-contribute framing.
     - A premise-rejected answer may reuse the user's label only to name the rejected folklore handle.
     - A grouping handle cannot be translated back as a biological entity.
-    - Missing evidence must be named as an unresolved segment, join, dependency, measurement, discriminator, or translation step.
+    - An unsupported bridge cannot be hidden inside a literature summary.
+    - Repeated use of one inferential bridge is one shared assumption family, not convergence.
+    - A meta-analysis cannot elevate claims that its inputs could not admit.
+    - Missing evidence must be named as an unresolved bridge, segment, join, dependency, measurement, discriminator, or translation step.
     - Multiple surviving routes remain explicit until evidence distinguishes their generated consequences.
-    - A descriptive answer is complete when the question is descriptive and the measurements support it.
+    - A descriptive answer is complete when the question is descriptive and admitted measurements support it.
     - A partial answer states the narrower answer target it actually closes.
-    - Conflicting evidence uses the contested kernel state only after the kernel conflict checks are complete.
-    - Conventional terminology cannot fill an unresolved route.
-    - A necessary premise or causal-test failure outranks any volume of downstream literature that assumes it.
+    - Conflicting evidence uses the contested kernel state only after admission and conflict checks are complete.
+    - A necessary premise, bridge, or causal-test failure outranks any volume of downstream literature that assumes it.
     - Label-dependent, proxy-limited, source-scale-only, postdictive, heterogeneous, poorly predictive, or practically trivial evidence cannot be narrated as mechanism support.
 
   output_schema:
@@ -153,6 +169,12 @@ answer_contract:
       value: string
     causal_failure_path: list
     rejected_premises: list
+    inference_audit:
+      admitted_observations: list
+      closed_bridges: list
+      failed_or_open_bridges: list
+      stripped_assertions: list
+      shared_assumption_families: list
     body_of_evidence:
       verdict:
         vocabulary_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.body_of_evidence_assessment.body_verdicts
@@ -175,11 +197,17 @@ answer_contract:
     conclusions: list
     confidence:
       compilation: map
+      evidence_admission: map
       segment_closure: map
       scale_translation: map
       answer_translation: map
 
   forbidden_patterns:
+    - source_conclusion_presented_as_evidence
+    - peer_review_or_consensus_presented_as_validation
+    - meta_analysis_used_to_repair_invalid_inputs
+    - shared_inference_presented_as_independent_convergence
+    - unsupported_bridge_hidden_in_summary_language
     - definition_sorting_as_primary_explanation
     - label_reintroduced_as_operator
     - diagnostic_label_reintroduced_as_biological_entity
