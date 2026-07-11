@@ -1,14 +1,20 @@
 # Neuroscience domain cartridge
 # Status: CANDIDATE
 #
-# The generic runtime and ingest contracts define handle categories. This cartridge supplies
-# neuroscience-specific instances and translation vocabulary. It is embedded by both manifests.
+# The shared kernel defines construct admission, data-first evidence admission, target-specific causality,
+# chain closure, and answer behavior. This cartridge supplies neuroscience and clinical-neurobehavioral
+# handles, domain-specific failure patterns, translation burdens, and semantic fixtures.
 neuroscience_cartridge:
   status: candidate
-  domain: neuroscience (systems, motor, developmental, behavioral)
+  domain: neuroscience (systems, motor, developmental, behavioral, clinical neurobehavioral)
+  generic_contracts:
+    - model/kernel/chain_contract.yaml
+    - model/kernel/evidence_admission.yaml
+    - model/runtime/evidence_binding_contract.yaml
+  fixture_ref: model/cartridges/neuroscience_fixtures.json
   fills:
     - model/runtime/question_compiler.yaml handle_categories
-    - model/ingest/rules.yaml strip_and_extract.handle_categories
+    - model/ingest/rules.yaml domain_instances
 
   handle_instances:
     region_or_structure_as_agent:
@@ -16,6 +22,7 @@ neuroscience_cartridge:
       - cortex
       - cerebellum
       - basal ganglia
+      - striatum
       - superior colliculus
       - hippocampus
       - prefrontal cortex
@@ -27,6 +34,8 @@ neuroscience_cartridge:
       - autism / ASD
       - intellectual disability
       - ADHD
+      - depression
+      - OCD
       - spectrum diagnoses
     faculty_or_cognitive_noun_as_operator:
       - attention
@@ -35,10 +44,27 @@ neuroscience_cartridge:
       - intelligence
       - decision
       - salience
+      - emotion regulation
     biomarker_or_proxy_as_mechanism:
       - blood marker named as the mechanism of a syndrome
       - cellular marker named as the mechanism of a syndrome
-      - imaging signal named as the cognitive operation
+      - imaging signal named as a cognitive operation
+      - connectivity score named as a functional route
+      - classifier output named as a biological state
+    named_process_as_explanation:
+      - neuroplasticity
+      - normalization
+      - rewiring
+      - regulation
+      - network restoration
+      - brain change
+    intervention_or_therapy_handle:
+      - CBT
+      - psychotherapy
+      - medication class
+      - neuromodulation
+      - stimulation
+      - behavioral intervention
     controller_command_or_decision_language:
       - region X controls Y
       - region X commands Y
@@ -49,60 +75,170 @@ neuroscience_cartridge:
 
   diagnostic_construct_policy:
     default_disposition: grouping_handle_only
-    folklore_rule: >
-      A diagnosis is a conventional grouping produced by criteria, thresholds, instruments, and institutions.
-      It does not name one generated biological object, shared defect, or unitary route.
+    rule: >
+      A diagnosis is produced by criteria, thresholds, instruments, selection, and institutions. It may organize
+      records or services but does not supply one generated biological object, shared defect, unitary route, or
+      causal target.
     premise_rejection_patterns:
       - diagnosis_is_a_defective_region
       - diagnosis_is_located_in_a_region
       - diagnosis_is_caused_by_one_region_or_faculty
       - diagnosis_is_a_unitary_brain_disorder
+      - treatment_response_validates_the_diagnosis_as_a_biological_entity
     required_behavior:
       - reject_entity_defect_and_localization_premises_directly
-      - classify_hard_causality_questions_separately
-      - assign_causal_rejected_when_construct_prediction_heterogeneity_or_route_tests_fail
-      - do_not_search_for_associations_to_rescue_the_diagnosis_as_an_entity
-      - preserve_only_observations_explicitly_supplied_or_directly_measured
+      - do_not_infer_a_trait_bundle_from_the_diagnosis
+      - preserve_only_explicitly_measured_traits_behaviors_transitions_or_support_needs
       - retain_the_diagnosis_only_as_grouping_or_social_administrative_metadata
-    explicit_example:
-      source_question: Is ADHD a defective prefrontal cortex?
-      construct_disposition: premise_rejected
-      causal_disposition: causal_rejected
-      required_answer: >
-        No. ADHD is a diagnostic folklore grouping rather than a unitary biological entity, and the claim
-        that it is a defective prefrontal cortex fails causal admission. The relevant literature is highly
-        heterogeneous and poorly predictive, and region-level imaging or association findings do not establish
-        a defect, source, or mechanism. Do not restate those findings as contributions, roles, dysfunctions,
-        underpinnings, partial causes, or a biological basis.
+
+  regional_causality_policy:
+    rule: >
+      Activity, localization, perturbability, lesion association, or imaging separation identifies a measured site
+      or intervention leverage. Source, controller, defect, or endogenous route status requires timing, dependency
+      position, upstream conditions, route discrimination, and scale closure.
+    common_failures:
+      - region_name_supplies_source_status
+      - activity_supplies_control
+      - perturbability_supplies_endogenous_origin
+      - group_average_region_difference_supplies_defect
+      - intervention_target_supplies_diagnostic_etiology
+
+  therapy_and_intervention_policy:
+    generic_rule_ref: model/kernel/evidence_admission.yaml#evidence_admission.presumptive_classification.classes.intervention_record
+    rule: >
+      A named therapy or intervention receives no evidentiary privilege. Evaluate the actual manipulated relation,
+      comparator, outcome definition, full response distribution, practical magnitude, heterogeneity, attrition,
+      durability, adverse outcomes, measurement validity, and replication.
+    causal_scope:
+      may_earn:
+        - intervention_to_measured_outcome_under_tested_conditions
+      separately_requires_chain_closure:
+        - treatment_of_a_unitary_diagnostic_entity
+        - etiology_or_origin
+        - endogenous_mechanism
+        - diagnostic_construct_validity
+        - regional_defect_or_dysfunction
+        - organism_level_recovery
+    effectiveness_language_requires:
+      - exact_target_outcome
+      - comparator_supporting_the_claimed_counterfactual
+      - practical_effect_threshold
+      - full_response_distribution
+      - bounded_nonresponse_and_worsening
+      - bounded_attrition_missingness_and_crossover
+      - durability_matching_the_claim
+      - adverse_outcome_scope
+      - replication_or_equivalent_internal_strength
+    decisive_intervention_rule: >
+      A large, highly consistent, specific, durable, well-controlled, independently replicated neural or behavioral
+      intervention may be causal for the exact intervention-to-outcome relation. Do not reject such evidence merely
+      because typical psychiatric treatment evidence is heterogeneous. Do not transfer that relation automatically
+      to diagnosis validity, etiology, or the untreated endogenous route.
+
+  psychotherapy_and_rating_scale_policy:
+    applies_to:
+      - CBT
+      - psychotherapy families
+      - counseling interventions
+      - depression anxiety OCD and related diagnosis-indexed treatment claims
+    rule: >
+      A change in a diagnosis-indexed symptom scale is a change in that measured composite under the tested
+      comparator and time horizon. It is not automatically treatment of a unitary disorder, recovery, correction of
+      a defect, or biological normalization.
+    required_checks:
+      - active_waitlist_usual_care_sham_or_natural_history_comparator
+      - blinding_expectancy_contact_time_and_allegiance
+      - scale_construction_threshold_and_outcome_switching
+      - mean_change_and_full_response_distribution
+      - remission_response_and_reliable_change_definitions
+      - attrition_missingness_crossover_and_rescue_treatment
+      - durability_relapse_and_followup_loss
+      - adverse_worsening_and_null_outcomes
+    failure_behavior:
+      - strip_effective_treats_or_works_when_data_do_not_meet_the_stated_scope
+      - retain_only_the_supported_scale_or_behavioral_change
+      - do_not_convert_statistical_significance_into_clinical_or_causal_importance
+
+  named_process_policy:
+    neuroplasticity:
+      rule: >
+        Neuroplasticity is not an admissible explanation or measured result by name. Specify the substrate, variable,
+        operation, direction, timing, persistence, comparator, and dependency connecting the change to the claimed
+        behavioral or organism-level outcome.
+      common_non_closure:
+        - pre_post_imaging_change
+        - connectivity_difference
+        - activation_change
+        - biomarker_change
+        - task_practice_or_habituation
+        - regression_to_the_mean
+        - scanner_or_analysis_pipeline_variation
+      forbidden_promotions:
+        - any_neural_change_equals_neuroplasticity
+        - neuroplasticity_equals_beneficial_change
+        - proxy_change_equals_treatment_mechanism
+        - biological_sounding_language_strengthens_weak_clinical_data
+    normalization:
+      rule: >
+        Normalization requires a justified target range, valid comparator, directionally interpretable variable,
+        practical magnitude, persistence, and evidence that movement toward the reference distribution improves the
+        requested organism-state relation.
 
   translation_patterns:
     region_language:
-      preserve: measured activity, perturbation leverage, timing, dependency position, and route
-      remove: source or defect status supplied by the region name
+      preserve: measured activity perturbation leverage timing dependency position and route
+      remove: source controller or defect status supplied by the region name
     faculty_language:
-      preserve: explicitly measured behavior, task relation, state transition, persistence, weighting, interruption, or release
+      preserve: explicitly measured behavior task relation state transition persistence weighting interruption or release
       remove: faculty noun acting as an internal operator
     diagnostic_language:
-      preserve: explicitly measured traits, behaviors, support needs, developmental timing, and route heterogeneity
-      remove: diagnosis acting as a generated biological object, shared defect, or unitary route
-      guard: do not infer a trait bundle from the diagnosis when the source question supplies none
+      preserve: explicitly measured traits behaviors support needs developmental timing and route heterogeneity
+      remove: diagnosis acting as a generated biological object shared defect or unitary route
+      guard: do not infer a trait bundle from the diagnosis when the source supplies none
     biomarker_language:
-      preserve: measured substrate, variable, magnitude, timing, and assay conditions
+      preserve: measured substrate variable magnitude timing comparator and assay conditions
       remove: biomarker status acting as mechanism
+    intervention_language:
+      preserve: exact manipulation comparator measured outcome response distribution timing durability and adverse outcomes
+      remove: therapy name acting as proof of efficacy diagnosis validity or endogenous mechanism
+    process_language:
+      preserve: directly measured substrate variable operation timing persistence and dependency
+      remove: named process acting as explanation without those fields
 
   evidence_weighting_examples:
     causal_failures:
       - highly heterogeneous effects without generated conditions or routes
       - weak out-of-sample prediction or postdictive classification
       - small group-average imaging differences with broad overlap
-      - repeated studies using the same cohort, task, instrument, or pipeline
-      - proxy or biomarker association without scale translation
-      - statistically significant effect without practical magnitude
+      - rating-scale mean change without adequate comparator practical magnitude or durability
+      - proxy or biomarker association without physical translation
+      - pre-post imaging change renamed neuroplasticity
+      - repeated studies using the same cohort task instrument comparator or pipeline
     potentially_load_bearing:
       - premise-breaking evidence against biological unity
       - direct dependency manipulation under stated conditions
+      - decisive intervention with large consistent specific durable effects
       - prospective route discrimination
       - independent cross-method recurrence of the same physical relation
+
+  explicit_examples:
+    adhd_prefrontal_defect:
+      source_question: Is ADHD a defective prefrontal cortex?
+      required_answer_shape: >
+        Reject the diagnostic entity and regional-defect premises directly. Do not accommodate them with imaging,
+        executive-function, association, or classifier findings that remain label-dependent, heterogeneous, weakly
+        predictive, or route-incomplete.
+    cbt_depression:
+      source_claim: CBT is effective for depression.
+      required_analysis: >
+        Replace the claim with the exact comparator-bound distribution of measured outcomes. Admit effectiveness only
+        to the practical, durable, and population scope supported by the data. A diagnosis-indexed rating-scale change
+        does not establish treatment of one biological entity.
+    therapy_neuroplasticity:
+      source_claim: Therapy induces neuroplasticity.
+      required_analysis: >
+        Preserve the exact measured neural or proxy change. Require direct process specification, comparator, timing,
+        persistence, specificity, and a closed route to the claimed outcome before using neuroplasticity language.
 
   terminology_guard:
     avoid_promoting:
@@ -113,9 +249,10 @@ neuroscience_cartridge:
       - attention system as an unexplained operator
       - ADHD brain
       - autistic brain as a unitary object
-      - contributes to ADHD
       - prefrontal dysfunction in ADHD
       - biological basis of ADHD
+      - CBT treats depression without a stated causal contrast
+      - therapy-induced neuroplasticity without a specified measured process
     descriptive_handles:
       - conserved maintenance substrate
       - conserved dependency node
@@ -124,5 +261,5 @@ neuroscience_cartridge:
       - downstream gating surface
       - stabilization route
     caution: >
-      These are interface handles for measured relations. They cannot become seats, controllers,
-      essences, defects, causal contributions, or biological bases without an admitted and closed physical route.
+      These are interface handles for measured relations. They cannot become seats, controllers, entities, defects,
+      causal contributions, treatment mechanisms, or biological bases without an admitted and closed physical route.
