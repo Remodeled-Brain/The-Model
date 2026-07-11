@@ -1,0 +1,100 @@
+target_identity_gate:
+  status: candidate
+  layer: primary_runtime
+  kernel_ref: model/kernel/target_identity.yaml#target_identity
+  extends: model/runtime/question_compiler.yaml#question_compiler
+  purpose: >
+    Reconstruct the target jointly from speaker intent and corpus operations before evidence receives causal,
+    mechanistic, effectiveness, or transport weight.
+
+  insertion_point:
+    after: detect_handles_and_hidden_operators
+    before: evaluate_construct_admission
+
+  required_sequence:
+    - identify_named_targets_and_identity_shortcuts
+    - build_speaker_intent_record
+    - remove_each_target_name_from_the_question
+    - enumerate_surviving_observations_constructions_conditions_and_relations
+    - locate_or_request_recoverable_identity_generator
+    - build_corpus_identity_record_from_source_operations
+    - compare_operationalizations_and_search_identity_breaking_evidence
+    - test_whether_heterogeneity_is_generated_and_predictive
+    - assign_identity_disposition_per_target_relation
+    - emit_separate_exact_constructed_and_broader_target_relations
+    - continue_causal_review_only_for_the_exact_relations_that_survive
+
+  speaker_intent_handling:
+    infer_without_interrupting_when:
+      - source_context_identifies_one_exact_relation
+      - plausible_referents_produce_the_same_answer
+      - a bounded_answer_can_preserve_all_material_interpretations
+    ask_smallest_useful_fork_when:
+      - candidate_referents_produce_different_causal_targets
+      - candidate_referents_require_different_evidence
+      - operational_scope_changes_the_answer
+      - practical_requested_outcome_is_unclear
+    fork_form: >
+      Present observable alternatives such as initiation latency, completion by deadline, reported state, score,
+      or general cross-context pattern. Do not ask the speaker for a circular verbal definition.
+
+  required_output:
+    target_identity_records:
+      per_target_fields:
+        - source_label
+        - speaker_intended_referent
+        - intended_scope_and_time_horizon
+        - surviving_exact_relations_after_label_removal
+        - source_defined_target
+        - measurement_or_construction_operations
+        - imported_generator_pointer
+        - generator_type
+        - generator_status
+        - boundary_conditions_and_regime
+        - aggregation_threshold_or_classification_rule
+        - operational_equivalence_evidence
+        - identity_breaking_evidence
+        - heterogeneity_generator
+        - transport_status
+        - identity_disposition
+        - mapped_construct_disposition
+        - rejected_identity_claims
+        - exact_relations_eligible_for_evidence_review
+        - unresolved_identity_slots
+
+  disposition_routing:
+    generated_identity_closed:
+      action: continue_at_demonstrated_scope
+    generated_identity_conditional:
+      action: continue_with_conditions_rendered_in_every_target_claim
+    constructed_measurement_identity:
+      action: bind_evidence_to_the_construction_and_separate_broader_natural_kind_claims
+    grouping_handle_only:
+      action: preserve_name_as_handle_and_review_each_exact_relation_separately
+    identity_unresolved:
+      action: preserve_observations_and_report_identity_slots_as_unresolved
+    premise_rejected:
+      action: stop_entity_level_evidence_search_and_answer_the_failed_premise_directly
+
+  corpus_retrieval_rule: >
+    Retrieval may begin to resolve target identity, definitions, operationalizations, and failure evidence. Causal
+    weighting must wait until the exact target relation and its identity disposition are emitted.
+
+  answer_target_rule: >
+    The answer must state the exact relation the speaker asked about, the relation the corpus measured, and any
+    broader relation the source claimed when those differ. Conditions, construction operations, and transport limits
+    remain attached to every admitted target.
+
+  no_blacklist_rule: >
+    Detection is structural. The gate does not require a list of folklore, diagnostic, behavioral, social, or scientific
+    terms. Any target whose identity is supplied by its name or by unexplained equivalence receives the same audit.
+
+  forbidden_compilations:
+    - target_name_used_as_its_own_definition
+    - corpus_consensus_used_as_identity_generator
+    - validated_instrument_used_as_construct_escape_without_external_equivalence
+    - complexity_or_multidimensionality_used_as_identity_protection
+    - exact_protocol_effect_rewritten_as_broader_target_effect
+    - speaker_wording_used_as_physical_or_causal_closure
+    - identity_shortcut_without_recoverable_generator
+    - evidence_review_started_before_exact_target_relations_are_emitted
