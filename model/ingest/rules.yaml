@@ -3,7 +3,57 @@ ingest_rules:
   layer: evidence_maintenance
   construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
   causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
+  evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission
   evidence_role_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.evidence_role_classes
+
+  source_ingress:
+    default_status: unadmitted_assertion
+    default_causal_weight: zero
+    rule: >
+      Publication, peer review, author confidence, disciplinary consensus, statistical significance, and review
+      status do not admit a source conclusion. Every source must be decomposed under evidence_admission_ref before
+      any claim can enter the support layer.
+    required_sequence:
+      - separate_direct_observations_from_author_interpretation
+      - expose_sampling_grouping_measurement_and_analysis_operations
+      - enumerate_every_inferential_bridge
+      - identify_hidden_construct_direction_scale_and_causal_assumptions
+      - collapse_shared_assumption_families
+      - admit_only_surviving_observations_and_closed_bridges
+    forbidden_ingress:
+      - abstract_or_discussion_conclusion_as_evidence
+      - review_article_synthesis_as_direct_support
+      - meta_analysis_as_repair_for_invalid_inputs
+      - consensus_language_as_causal_weight
+      - repeated_inference_as_independent_convergence
+
+  inference_audit:
+    phase: pre_admission
+    required_for: every_source
+    required_outputs:
+      - admitted_observations
+      - stripped_assertions
+      - bridge_ledger
+      - shared_assumption_families
+      - non_probative_claims
+      - strongest_surviving_claim
+    bridge_rule: >
+      Each transition from observation to construct, individual state, direction, source, control, mechanism,
+      scale, prediction, practical importance, defect, dysfunction, or biological meaning is a distinct bridge.
+      The bridge receives zero support unless its required physical dependency is independently closed.
+    hostile_reading_questions:
+      - What was directly measured before the author named it?
+      - What result was produced by labels, thresholds, tasks, instruments, models, or selection rules?
+      - Which causal direction was observed and which was inferred?
+      - Which claimed scale transition lacks a physical carrier?
+      - Which conclusion assumes the construct it claims to validate?
+      - Which nulls, reversals, overlaps, failed predictions, or unstable conditions are compressed out of the narrative?
+      - Which papers repeat one assumption family rather than test it independently?
+    positive_failure_rules:
+      - Poor prediction counts against a proposed unitary causal relation when that relation should predict the target.
+      - Broad overlap counts against defect, dysfunction, or individual-state assignment from group means.
+      - Unbounded heterogeneity counts against a unitary route rather than becoming generic complexity.
+      - Selective reporting and missing nulls reduce admissible support rather than preserving a causal story under uncertainty.
 
   strip_and_extract:
     phase: admissibility
@@ -109,6 +159,7 @@ ingest_rules:
       - broad_overlap_with_small_group_mean_difference
       - region_localization_without_source_dependency
       - failed_cross_scale_translation
+      - unsupported_inferential_bridge
     hard_failure_output: causal_rejected
     blocked_roles_after_failure:
       - causal_support
@@ -119,9 +170,8 @@ ingest_rules:
 
   evidence_role_classification:
     rule: >
-      Classify each surviving claim by its actual contribution to a required premise, segment, join, prediction,
-      or descriptive relation. Do not assign a stronger role from journal prestige, author language, citation count,
-      sample size alone, or framework fit.
+      Classify each surviving admitted claim by its actual contribution to a required premise, segment, join,
+      prediction, or descriptive relation. Source language and unclosed bridges supply no role.
     roles:
       premise_breaking: Breaks a required entity, unity, defect, direction, predictive, or translation premise.
       route_closing: Directly closes a required dependency segment or join under stated conditions.
@@ -258,11 +308,12 @@ ingest_rules:
 
     independence:
       rule: >
-        Shared cohorts, pipelines, labs, model families, instruments, tasks, or inherited datasets do not count as
-        independent route closure. Correlated records remain visible but cannot accumulate weight as independent support.
+        Shared cohorts, pipelines, labs, model families, instruments, tasks, inherited datasets, or inferential
+        bridges do not count as independent route closure. Correlated records remain visible but cannot accumulate weight.
       outputs:
         - independence_status
         - evidence_family_id
+        - shared_assumption_family_id
         - shared_pipeline_id
         - shared_cohort_id
         - shared_dataset_id
@@ -270,6 +321,13 @@ ingest_rules:
         - shared_task_id
 
   common_invariants:
+    sources_enter_as_unadmitted_assertions: true
+    causal_weight_defaults_to_zero: true
+    author_conclusions_never_bind_directly: true
+    peer_review_never_supplies_admission: true
+    consensus_never_supplies_causal_weight: true
+    meta_analysis_never_repairs_invalid_inputs: true
+    shared_inferential_bridges_never_count_as_independent_convergence: true
     handles_never_generate: true
     rejected_constructs_never_receive_entity_level_support: true
     downstream_records_cannot_rescue_failed_construct_admission: true
