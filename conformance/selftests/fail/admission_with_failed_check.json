@@ -1,0 +1,27 @@
+{
+  "expected_error_code": "CAUSAL_ADMISSION_WITH_FAILED_CHECKS",
+  "base": "../pass/decisive_intervention.json",
+  "mutations": [
+    {
+      "path": "decision_record.relations.0.failed_checks",
+      "value": [
+        "valid_comparator_or_counterfactual"
+      ]
+    },
+    {
+      "path": "decision_record.relations.0.passed_checks",
+      "value": [
+        "attrition_missingness_and_crossover_bounded",
+        "bounded_or_generated_heterogeneity",
+        "durability_appropriate_to_claim",
+        "effect_magnitude_and_full_response_distribution",
+        "manipulation_integrity",
+        "measurement_validity",
+        "no_stronger_disconfirmation",
+        "replication_or_internal_strength_proportionate_to_claim_scope",
+        "specificity_against_relevant_alternative_routes",
+        "temporal_precedence"
+      ]
+    }
+  ]
+}
