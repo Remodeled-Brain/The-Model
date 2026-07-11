@@ -1,5 +1,5 @@
 {
-  "schema_version": "v4",
+  "schema_version": "v5",
   "status": "candidate",
   "purpose": "Domain-neutral conformance contracts for construct admission, relation-specific causality, chain construction, and evidence binding.",
   "execution_scope": {
@@ -10,8 +10,8 @@
     "direct_answer",
     "answer_scope",
     "construct_disposition",
-    "causal_disposition",
-    "causal_failure_path",
+    "causal_disposition_by_target",
+    "causal_failure_path_by_target",
     "rejected_premises",
     "evidence_admission",
     "body_of_evidence",
