@@ -95,15 +95,35 @@ chain_contract:
       - compensation_or_redundancy_check
     rule: Retain alternative routes until an observation distinguishes their generated consequences.
 
-  closure_states:
-    - closed
-    - partial
-    - descriptive_only
-    - source_scale_only
-    - proxy_limited
-    - label_dependent
-    - unresolved
-    - contradicted
+  closure_vocabulary:
+    owner: model/kernel/chain_contract.yaml
+    states:
+      - closed
+      - partial
+      - descriptive_only
+      - source_scale_only
+      - proxy_limited
+      - label_dependent
+      - contested
+      - unresolved
+      - contradicted
+    meanings:
+      closed: Every segment and join required for the stated conclusion is closed under the stated conditions.
+      partial: A physical route is supported but at least one required segment or join remains open.
+      descriptive_only: The evidence closes a descriptive claim without closing a generating route.
+      source_scale_only: The measured claim is supported at its source scale while translation to the requested scale remains open.
+      proxy_limited: A measured proxy or correlate is supported while its translation to the claimed mechanism remains open.
+      label_dependent: The surviving observation depends on pre-labeled groups and does not independently generate the grouping distinction.
+      contested: Compatible evidence binds to the same segment under the same conditions and remains in unresolved conflict after review.
+      unresolved: Available evidence does not assign another closure state to the required segment or join.
+      contradicted: Evidence breaks the asserted segment or join under the stated conditions.
+    missing_segment_rule: >
+      Missing segments are recorded in unresolved_chain_slots and receive the unresolved closure state.
+      Missing is a report category, not an additional closure state.
+    contested_rule: >
+      Contested is assigned only after segment identity, conditions, scale, independence, measurement,
+      and translation limits have been checked and the conflict still survives.
+    consumer_rule: Runtime and ingest consumers must reference this vocabulary and may not define additional closure states.
 
   confidence_propagation:
     rule: >
