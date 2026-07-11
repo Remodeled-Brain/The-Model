@@ -15,6 +15,8 @@ candidate_adoption_gate:
     - layer_fit
     - contradiction
     - reification
+    - folk_behavior_construct_translation
+    - ecological_scope_transport
     - operation_product
     - chain_generation
     - universal_physical_continuity
@@ -38,6 +40,7 @@ candidate_adoption_gate:
     decision_record_ref: conformance/decision_record.schema.json
     causal_validator: scripts/validate_conformance.py
     physical_validator: scripts/validate_physical_continuity.py
+    folk_behavior_validator: scripts/validate_folk_behavior.py
     adoption_validator: scripts/validate_adoption.py
     requirements:
       - every critical generic and active-cartridge fixture passes
@@ -46,6 +49,11 @@ candidate_adoption_gate:
       - every biological or behavioral answer exposes a physical chain or explicit open chain slots
       - biological scope binds through metabolically maintained state
       - metabolism energy activation signaling and named components cannot act as replacement operators
+      - familiar folk behavior labels are reconstructed before evidence review or causal weighting
+      - construct rejection preserves exact independently measured behavior at its measured scope
+      - exact measured behavior does not validate or receive automatic transfer to a unitary folk construct
+      - ordinary-life task content does not establish real-world efficacy without ecological transport evidence
+      - randomization attaches to the object actually assigned rather than every named active component
       - exact intervention causality remains separate from etiology endogenous mechanism and route closure
       - a decisive intervention may retain exact causality while intermediate physical mechanics remain partial
       - mechanistic language requires closed physical and metabolic routes
@@ -73,6 +81,9 @@ candidate_adoption_gate:
     biology_has_no_separate_causal_currency: true
     metabolism_is_not_a_magic_operator: true
     open_physical_segments_remain_visible: true
+    folk_behavior_label_is_not_a_unitary_target: true
+    exact_observation_survives_construct_rejection: true
+    protocol_bound_measurement_is_not_real_world_transport: true
 
   required_output:
     - verdict
@@ -85,5 +96,7 @@ candidate_adoption_gate:
     - semantic_conformance_status
     - physical_continuity_status
     - metabolic_binding_status
+    - folk_behavior_construct_status
+    - ecological_transport_status
     - provider_result_freshness
     - adoption_status
