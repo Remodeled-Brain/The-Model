@@ -22,6 +22,8 @@ chain_contract:
     observations_may_not_be_inferred_from_a_label_definition: true
     downstream_evidence_cannot_rescue_a_rejected_construct: true
     publication_volume_cannot_outweigh_failure_of_a_required_premise: true
+    causal_language_requires_causal_admission: true
+    heterogeneous_poorly_predictive_work_cannot_be_rephrased_as_causal: true
 
   construct_admission:
     owner: model/kernel/chain_contract.yaml
@@ -49,6 +51,59 @@ chain_contract:
       - Do not manufacture a trait bundle, support-need profile, or surrogate phenotype from a label definition.
       - A rejected label may remain visible only as a grouping or social-administrative handle.
     consumer_rule: Runtime and ingest consumers must reference these dispositions and may not rescue a rejected premise through evidence retrieval.
+
+  causal_claim_admission:
+    owner: model/kernel/chain_contract.yaml
+    trigger_terms:
+      - cause
+      - caused_by
+      - defect
+      - dysfunction
+      - controls
+      - drives
+      - underlies
+      - mechanism
+      - responsible_for
+      - located_in
+      - biological_basis
+    dispositions:
+      - causal_admitted
+      - causal_rejected
+      - causal_unresolved
+      - not_a_causal_question
+    meanings:
+      causal_admitted: The requested causal relation has an admitted construct, a closed or discriminated route, and evidence that survives every required causal test.
+      causal_rejected: A required construct, direction, route, predictive, heterogeneity, or translation premise fails, so the requested causal proposition must be rejected.
+      causal_unresolved: The construct and target relation are admissible, but evidence does not yet close or break the causal route.
+      not_a_causal_question: The source question requests description or interpretation without causal attribution.
+    required_tests:
+      - construct_is_admitted_independently_of_the_label
+      - target_relation_is_directly_specified_and_measurable
+      - temporal_order_supports_the_claimed_direction
+      - intervention_or_dependency_evidence_bears_on_the_required_route
+      - route_specific_predictions_recur_out_of_sample
+      - predictive_performance_exceeds_realistic_baselines_and_survives_relevant_comparators
+      - heterogeneity_is_bounded_by_conditions_or_generated_routes
+      - effect_magnitude_is_practically_relevant_relative_to_overlap_variance_and_noise
+      - scale_translation_is_physically_closed
+      - independent_evidence_families_converge_on_the_same_required_relation
+      - relevant_disconfirmation_does_not_break_a_required_premise_or_segment
+    hard_failure_rules:
+      - A rejected construct forces causal_rejected.
+      - Highly heterogeneous effects without route-bounded conditions force causal_rejected for a unitary causal claim.
+      - Poor out-of-sample prediction forbids causal restatement of group-level associations.
+      - Postdictive separation cannot satisfy prediction, direction, or generative-route requirements.
+      - Small overlapping group differences cannot establish a defect, dysfunction, or individual causal state.
+      - A named region cannot become a defect, source, or controller from localization, activity, or perturbability alone.
+      - Any failed necessary causal test defeats downstream records that presuppose the failed relation.
+    language_rule: >
+      Causal verbs and causal-feeling paraphrases are forbidden unless the disposition is causal_admitted.
+      After causal_rejected, do not restate associations as contributions, roles, bases, dysfunctions,
+      deficits, mechanisms, underpinnings, mediation, or partial causes.
+    answer_rule: >
+      A hard causality question with causal_rejected must receive a direct rejection before any descriptive
+      context. Descriptive findings may be mentioned only when necessary to explain why they fail causal admission.
+    consumer_rule: Runtime and ingest consumers must reference these dispositions and may not soften causal rejection into mixed, complex, multifactorial, associated, or may-contribute language.
 
   chain_segment:
     required_fields:
@@ -176,3 +231,5 @@ chain_contract:
     - no_confidence_transfer_from_unrelated_closed_segments
     - no_mechanism_search_for_a_rejected_construct
     - no_evidence_laundry_list_to_rescue_folklore
+    - no_causal_restating_of_heterogeneous_poorly_predictive_work
+    - no_soft_causal_language_after_causal_rejection
