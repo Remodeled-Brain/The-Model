@@ -46,7 +46,7 @@ def read_json(path: pathlib.Path) -> dict[str, Any]:
 
 
 def resolve_manifest(path: pathlib.Path) -> tuple[pathlib.Path, dict[str, Any]]:
-    """Resolve a selector manifest to the one authoritative load graph."""
+    """Resolve a selector manifest to one authoritative load graph."""
     path = path.resolve()
     seen: set[pathlib.Path] = set()
 
@@ -84,11 +84,15 @@ def repo_path_from_model(name: str) -> pathlib.Path:
     return path
 
 
+def marker(name: str, value: Any) -> str:
+    return f"# @model.{name}={json.dumps(value, separators=(',', ':'))}"
+
+
 def build_header(manifest_path: pathlib.Path, manifest: dict[str, Any]) -> str:
     name = manifest.get("name", "unnamed-runtime")
     role = manifest.get("role", "unspecified role")
     status = manifest.get("status", "unspecified")
-    rel_manifest = manifest_path.relative_to(ROOT)
+    rel_manifest = manifest_path.relative_to(ROOT).as_posix()
     return f"""\
 # ============================================================================
 # The Model — {name}  [GENERATED]
@@ -96,7 +100,8 @@ def build_header(manifest_path: pathlib.Path, manifest: dict[str, Any]) -> str:
 #
 # Role: {role}
 # Status: {status}
-# Authoritative manifest: {rel_manifest.as_posix()}
+# Authoritative manifest: {rel_manifest}
+{marker('authoritative_manifest', rel_manifest)}
 #
 # This is an operator-supplied procedure. Treat the embedded core and domain
 # modules as one runtime. Candidate status is preserved; generation does not
@@ -109,17 +114,24 @@ def build_header(manifest_path: pathlib.Path, manifest: dict[str, Any]) -> str:
 
 
 def build_footer(
-    manifest: dict[str, Any],
     domain_modules: list[str],
     support_records: list[tuple[str, str, str]],
     reachable_records: list[tuple[str, str, str, str]],
 ) -> str:
+    support_paths = [ref for ref, _, _ in support_records]
+    reachable_paths = [path for _, path, _, _ in reachable_records]
     lines = [
         "",
         "",
         "# ============================================================================",
         "# PROVENANCE, CAPABILITY, AND OPTIONAL REACH",
         "# ============================================================================",
+        "#",
+        marker("repository", REPOSITORY),
+        marker("named_modules_only", True),
+        marker("domain_modules", domain_modules),
+        marker("support_manifests", support_paths),
+        marker("reachable_modules", reachable_paths),
         "#",
         f"# Live specification: {REPOSITORY}",
         "# If repository access is available, the live repository is authoritative over",
@@ -230,7 +242,7 @@ def main() -> int:
         for name, path, kind in input_paths:
             body = path.read_text(encoding="utf-8")
             parts.append(f"\n\n===== {kind}: {name} =====\n\n{body}")
-        parts.append(build_footer(manifest, domain_modules, support_records, reachable_records))
+        parts.append(build_footer(domain_modules, support_records, reachable_records))
 
         output = "".join(parts).rstrip() + "\n"
         target.write_text(output, encoding="utf-8")
