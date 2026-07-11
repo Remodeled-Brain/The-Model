@@ -28,7 +28,7 @@ target_identity_gate:
     infer_without_interrupting_when:
       - source_context_identifies_one_exact_relation
       - plausible_referents_produce_the_same_answer
-      - a bounded_answer_can_preserve_all_material_interpretations
+      - a_bounded_answer_can_preserve_all_material_interpretations
     ask_smallest_useful_fork_when:
       - candidate_referents_produce_different_causal_targets
       - candidate_referents_require_different_evidence
@@ -77,8 +77,8 @@ target_identity_gate:
       action: stop_entity_level_evidence_search_and_answer_the_failed_premise_directly
 
   corpus_retrieval_rule: >
-    Retrieval may begin to resolve target identity, definitions, operationalizations, and failure evidence. Causal
-    weighting must wait until the exact target relation and its identity disposition are emitted.
+    Retrieval may begin to resolve target identity, definitions, operationalizations, and failure evidence.
+    Causal weighting must wait until the exact target relation and its identity disposition are emitted.
 
   answer_target_rule: >
     The answer must state the exact relation the speaker asked about, the relation the corpus measured, and any
