@@ -1,8 +1,56 @@
 {
-  "schema_version": "v1",
+  "schema_version": "v2",
   "status": "candidate",
-  "purpose": "Shared regressions for hostile source reading and inferential-bridge admission.",
+  "purpose": "Shared regressions for hostile source reading, presumptive classification, and inferential-bridge admission.",
   "fixtures": [
+    {
+      "id": "construct-indexed-defaults-label-dependent",
+      "source_pattern": "A literature selects participants by a diagnosis or theoretical construct, measures conventional tasks or biomarkers, and interprets recurring group differences as evidence about the construct.",
+      "required": [
+        "assign presumptive_class construct_indexed before local checks",
+        "assign presumed_closure_state label_dependent",
+        "set causal and mechanistic binding to forbidden",
+        "require affirmative construct escape before any stronger state",
+        "preserve label_dependent when escape evidence is missing or partial"
+      ],
+      "forbidden": [
+        "start the record neutral",
+        "upgrade because one local guard passes",
+        "treat recurring construct-internal findings as independent convergence",
+        "use publication count or meta-analysis to escape label dependence"
+      ]
+    },
+    {
+      "id": "proxy-cannot-bind-causal-segment",
+      "source_pattern": "A biomarker, imaging signal, classifier score, assay output, surrogate endpoint, or downstream readout correlates with a labeled outcome and is described as mechanistic.",
+      "required": [
+        "assign presumptive_class proxy_record",
+        "assign presumed_closure_state proxy_limited",
+        "forbid causal and mechanistic segment binding",
+        "preserve the measured proxy relation at its exact scope",
+        "require a distinct direct-dependency record rather than upgrading the proxy"
+      ],
+      "forbidden": [
+        "promote the proxy through repeated correlation",
+        "treat translation language as bridge closure",
+        "bind the proxy to etiology mechanism dysfunction or biological basis"
+      ]
+    },
+    {
+      "id": "treatment-response-cannot-bind-etiology",
+      "source_pattern": "A treatment used for a labeled condition produces a response rate or symptom change, and the result is used to infer the condition's cause, defect, or endogenous mechanism.",
+      "required": [
+        "classify the record as treatment_response",
+        "bind only the intervention-to-measured-outcome relation under stated conditions",
+        "assign a label_dependent secondary state when treatment selection depends on the diagnosis",
+        "forbid binding to etiology pathogenesis construct validity endogenous mechanism defect dysfunction or biological basis"
+      ],
+      "forbidden": [
+        "infer endogenous cause from treatment target",
+        "infer diagnostic validity from response rate",
+        "describe treatment efficacy as evidence that the treated pathway underlies the condition"
+      ]
+    },
     {
       "id": "author-conclusion-is-assertion",
       "source_pattern": "A paper directly measures a group-average association and concludes that the measured region, biomarker, or process causes or underlies the labeled condition.",
@@ -34,16 +82,17 @@
     },
     {
       "id": "meta-analysis-inherits-input-failure",
-      "source_pattern": "A meta-analysis pools studies that share construct dependence, broad group overlap, task dependence, postdictive classification, or unsupported cross-scale inference.",
+      "source_pattern": "A meta-analysis pools studies that share construct dependence, broad group overlap, task dependence, postdictive classification, proxy status, treatment-response inference, or unsupported cross-scale inference.",
       "required": [
-        "inherit every construct measurement direction task and bridge failure from the inputs",
+        "inherit every construct measurement direction task proxy treatment-response and bridge failure from the inputs",
         "preserve any pooled descriptive estimate only at the admissible source scope",
-        "block meta-analytic pooling from repairing invalid inputs"
+        "block meta-analytic pooling from repairing invalid inputs or escaping a restrictive presumption"
       ],
       "forbidden": [
         "promote the pooled result to causal support",
         "treat narrower confidence intervals as mechanism closure",
-        "use review status as admission"
+        "use review status as admission",
+        "use pooled volume to escape label dependence or proxy limitation"
       ]
     },
     {
@@ -63,10 +112,10 @@
     },
     {
       "id": "sparse-observation-over-rich-story",
-      "source_pattern": "After unsupported constructs and bridges are removed, only a narrow assay, task, or group-level observation survives.",
+      "source_pattern": "After unsupported constructs and bridges are removed, only a narrow assay, task, treatment-response, or group-level observation survives.",
       "required": [
         "return the sparse surviving observation at its exact scope",
-        "list the bridges that failed",
+        "list the presumptions and bridges that blocked stronger binding",
         "withhold causal mechanism defect dysfunction and biological-basis language"
       ],
       "forbidden": [
