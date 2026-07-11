@@ -1,0 +1,14 @@
+{
+  "expected_error_code": "CAUSAL_ADMISSION_WITH_UNRESOLVED_IDENTITY",
+  "base": "../pass/decisive_intervention.json",
+  "mutations": [
+    {
+      "path": "decision_record.target_identities.0.identity_disposition",
+      "value": "grouping_handle_only"
+    },
+    {
+      "path": "decision_record.target_identities.0.mapped_construct_disposition",
+      "value": "grouping_handle_only"
+    }
+  ]
+}
