@@ -1,9 +1,10 @@
 ingest_record_schema:
   status: candidate
-  schema_version: v2
+  schema_version: v3
   layer: support_layer
   closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
   construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+  causal_admission_ref: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions
   evidence_role_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.evidence_role_classes
   support_channel_crosswalk_ref: model/ingest/failure_routing.yaml#ingest_failure_routing.closure_state_crosswalk
 
@@ -34,10 +35,13 @@ ingest_record_schema:
       - explicit_observations
       - post_strip_claim
       - construct_disposition
+      - causal_disposition
       - rejected_entity_claims
+      - rejected_causal_claims
       - handle_dependencies
       - handle_flags
     construct_disposition_rule: Use exactly one disposition from construct_admission_ref for each questioned construct.
+    causal_disposition_rule: Use exactly one disposition from causal_admission_ref for each hard causal claim.
     optional_fields:
       - source_scale
       - target_scale
@@ -59,6 +63,23 @@ ingest_record_schema:
         - support_channels
         - blocked_roles
         - unresolved_slots
+    causal_test_results:
+      required_when: source_claims_cause_defect_dysfunction_control_mechanism_or_biological_basis
+      required_fields:
+        - construct_coherence
+        - temporal_direction
+        - dependency_or_intervention
+        - out_of_sample_prediction
+        - baseline_and_comparator_performance
+        - heterogeneity_control
+        - practical_magnitude
+        - scale_translation
+        - independent_convergence
+        - disconfirmation_survival
+      output_fields:
+        - causal_disposition
+        - failed_causal_tests
+        - passed_causal_tests
     evidence_role:
       required: true
       vocabulary_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.evidence_role_classes
@@ -82,8 +103,15 @@ ingest_record_schema:
     required_fields:
       - claim_directness
       - construct_dependency
+      - causal_disposition
       - causal_leverage
       - temporality
+      - prediction_target
+      - out_of_sample_performance
+      - realistic_baseline
+      - comparator_performance
+      - condition_stability
+      - heterogeneity_bound
       - scale_translation_status
       - effect_magnitude
       - variance_envelope
@@ -95,8 +123,9 @@ ingest_record_schema:
       - evidence_family_id
       - disconfirmation_target
     rule: >
-      These fields describe chain contribution and family independence. They are not combined into a
-      numerical quality score and cannot be overridden by publication count, prestige, recency, or citation volume.
+      These fields describe chain contribution, causal admissibility, and family independence. They are not
+      combined into a numerical quality score and cannot be overridden by publication count, prestige, recency,
+      citation volume, or familiar causal wording.
 
   provenance:
     required_fields:
@@ -119,6 +148,9 @@ ingest_record_schema:
       - support_channels
       - blocked_roles
       - translation_limits
+      - construct_disposition
+      - causal_disposition
+      - failed_causal_tests
       - evidence_role_class
       - non_probative_for
       - visibility_status
@@ -144,3 +176,5 @@ ingest_record_schema:
     identity_resolved_before_canonical_write: true
     unresolved_never_grants_closure: true
     rejected_construct_cannot_receive_entity_level_promotion: true
+    causal_rejected_record_cannot_receive_causal_promotion: true
+    heterogeneous_poorly_predictive_record_cannot_receive_causal_language: true
