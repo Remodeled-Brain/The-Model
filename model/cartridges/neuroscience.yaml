@@ -47,19 +47,56 @@ neuroscience_cartridge:
     spectrum_or_continuum_label:
       - autism spectrum treated as one explanatory object
 
+  diagnostic_construct_policy:
+    default_disposition: grouping_handle_only
+    folklore_rule: >
+      A diagnosis is a conventional grouping produced by criteria, thresholds, instruments, and institutions.
+      It does not name one generated biological object, shared defect, or unitary route.
+    premise_rejection_patterns:
+      - diagnosis_is_a_defective_region
+      - diagnosis_is_located_in_a_region
+      - diagnosis_is_caused_by_one_region_or_faculty
+      - diagnosis_is_a_unitary_brain_disorder
+    required_behavior:
+      - reject_entity_defect_and_localization_premises_directly
+      - do_not_search_for_associations_to_rescue_the_diagnosis_as_an_entity
+      - preserve_only_observations_explicitly_supplied_or_directly_measured
+      - retain_the_diagnosis_only_as_grouping_or_social_administrative_metadata
+    explicit_example:
+      source_question: Is ADHD a defective prefrontal cortex?
+      disposition: premise_rejected
+      required_answer: >
+        Reject the proposition. ADHD is a diagnostic folklore grouping rather than a unitary biological entity,
+        and prefrontal-cortex language does not supply a defect mechanism. Do not balance this rejection with a
+        list of imaging or association studies that already assume the category.
+
   translation_patterns:
     region_language:
       preserve: measured activity, perturbation leverage, timing, dependency position, and route
-      remove: source status supplied by the region name
+      remove: source or defect status supplied by the region name
     faculty_language:
-      preserve: measured behavior, task relation, state transition, persistence, weighting, interruption, or release
+      preserve: explicitly measured behavior, task relation, state transition, persistence, weighting, interruption, or release
       remove: faculty noun acting as an internal operator
     diagnostic_language:
-      preserve: measured traits, support needs, developmental timing, and route heterogeneity
-      remove: diagnosis acting as one generated biological object
+      preserve: explicitly measured traits, behaviors, support needs, developmental timing, and route heterogeneity
+      remove: diagnosis acting as a generated biological object, shared defect, or unitary route
+      guard: do not infer a trait bundle from the diagnosis when the source question supplies none
     biomarker_language:
       preserve: measured substrate, variable, magnitude, timing, and assay conditions
       remove: biomarker status acting as mechanism
+
+  evidence_weighting_examples:
+    weak_for_entity_or_defect:
+      - small group-average imaging difference with broad overlap
+      - postdictive diagnostic classification
+      - repeated studies using the same cohort, task, instrument, or pipeline
+      - proxy or biomarker association without scale translation
+      - statistically significant effect without practical magnitude
+    potentially_load_bearing:
+      - premise-breaking evidence against biological unity
+      - direct dependency manipulation under stated conditions
+      - prospective route discrimination
+      - independent cross-method recurrence of the same physical relation
 
   terminology_guard:
     avoid_promoting:
@@ -68,6 +105,8 @@ neuroscience_cartridge:
       - basal-ganglia controller
       - cerebellum module
       - attention system as an unexplained operator
+      - ADHD brain
+      - autistic brain as a unitary object
     descriptive_handles:
       - conserved maintenance substrate
       - conserved dependency node
@@ -77,4 +116,4 @@ neuroscience_cartridge:
       - stabilization route
     caution: >
       These are interface handles for measured relations. They cannot become seats, controllers,
-      essences, or causal objects without the physical route they summarize.
+      essences, defects, or causal objects without the physical route they summarize.
