@@ -5,6 +5,9 @@ evidence_binding_contract:
     Bind reviewed corpus records to the exact chain segments required by an answerability plan without
     allowing paper framing, recency, volume, model agreement, or shared vocabulary to substitute for closure.
 
+  closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+  ingest_crosswalk_ref: model/ingest/failure_routing.yaml#ingest_failure_routing.closure_state_crosswalk
+
   corpus_modes:
     frozen:
       rule: The runtime remains operable against a fixed reviewed corpus.
@@ -37,6 +40,9 @@ evidence_binding_contract:
       - recency_status
       - independence_status
       - applicable_conditions
+    closure_state_rule: >
+      The closure state must be a kernel state. Ingest records enter through ingest_crosswalk_ref;
+      binder-derived contested status is assigned only through conflict_handling.
 
   binding_rules:
     - Support attaches only to the segment and conditions actually measured.
@@ -74,18 +80,26 @@ evidence_binding_contract:
     result: preserve both records until a reviewed supersession decision is made
 
   conflict_handling:
-    actions:
+    required_checks:
       - verify_segment_identity
       - separate_condition_or_scale_differences
       - check_independence_and_shared_pipeline
       - inspect_measurement_and_translation_limits
-      - mark_segment_as_contested_when_conflict_survives
+    surviving_conflict_state: contested
+    rule: >
+      Assign contested only when evidence binds to the same segment under compatible conditions and
+      the conflict survives every required check. Condition-separated or scale-separated results retain
+      their own kernel states and are not merged into a contested bucket.
     majority_vote_closes_conflict: false
 
   output_schema:
     bindings: list
-    per_segment_closure: map
-    chain_join_status: map
+    per_segment_closure:
+      vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+      values: map
+    chain_join_status:
+      vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+      values: map
     conflicts: list
     supersession_candidates: list
     disconfirmed_segments: list
