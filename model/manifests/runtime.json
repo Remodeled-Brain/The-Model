@@ -6,24 +6,22 @@
     "00_purpose_and_scope.md",
     "kernel/chain_contract.yaml",
     "kernel/physical_continuity.yaml",
-    "kernel/folk_behavior_construct.yaml",
+    "kernel/target_identity.yaml",
     "kernel/evidence_admission.yaml",
     "kernel/evidence_admission_fixtures.json",
     "runtime/question_compiler.yaml",
-    "runtime/folk_behavior_compiler_gate.yaml",
+    "runtime/target_identity_gate.yaml",
     "runtime/answerability_planner.yaml",
     "runtime/evidence_binding_contract.yaml",
     "runtime/answer_contract.yaml",
     "runtime/physical_answer_contract.yaml",
     "runtime/fixtures.json",
-    "runtime/folk_behavior_fixtures.json"
+    "runtime/target_identity_fixtures.json"
   ],
   "domain_modules": [
     "cartridges/neuroscience.yaml",
     "cartridges/neuroscience_physical_continuity.yaml",
-    "cartridges/neuroscience_folk_behavior.yaml",
-    "cartridges/neuroscience_fixtures.json",
-    "cartridges/neuroscience_folk_behavior_fixtures.json"
+    "cartridges/neuroscience_fixtures.json"
   ],
   "support_manifests": [
     "manifests/ingest.json"
