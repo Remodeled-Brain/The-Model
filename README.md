@@ -41,7 +41,7 @@ Domain cartridges own specialized handles, failure patterns, translation burdens
 | `model/manifest.json` | Default-manifest selector only |
 | `governance/` | Candidate review and adoption rules |
 | `providers/` | Provider-specific adapters and incompatibility notes only |
-| `conformance/results/` | Semantic conformance results from standardized provider runs |
+| `conformance/` | Canonical decision-record schema, mutation fixtures, validator self-tests, provider results, and adoption-run policy |
 | `decisions/` | Durable architecture decisions |
 | `packets/` | Frozen externally shipped bundles |
 
@@ -73,7 +73,23 @@ Validate evidence policy, relation-specific causality, generic/domain separation
 python scripts/validate_model_policy.py
 ```
 
-CI validates the contracts and policy invariants. It does not execute provider answers semantically. Provider runs must execute the generic and cartridge fixtures separately and record results under `conformance/results/`.
+Validate the canonical causal decision-record contract, mutation fixtures, deterministic answer rendering, and validator positive/negative controls:
+
+```bash
+python scripts/validate_conformance.py
+```
+
+Run semantic fixtures through a provider adapter that reads JSON on stdin and returns one decision-record JSON object:
+
+```bash
+python scripts/run_conformance.py \
+  --provider-command "python providers/example/adapter.py" \
+  --provider-name example \
+  --model-id model-version \
+  --fixture-set all
+```
+
+CI validates the conformance harness and any committed result bundles. It does not call external providers. Adoption requires fresh generic and neuroscience provider runs satisfying `conformance/required_runs.json`; a runtime, kernel, cartridge, fixture, or provider-version change invalidates earlier results.
 
 ## Candidate status
 
