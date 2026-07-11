@@ -16,8 +16,8 @@
       "provider.kernel_hash",
       "provider.cartridge_hash",
       "provider.fixture_hash",
-      "temperature",
-      "seed"
+      "provider.temperature",
+      "provider.seed"
     ],
     "result_invalidation_triggers": [
       "runtime_hash_change",
