@@ -1,7 +1,7 @@
 {
-  "schema_version": "v3",
+  "schema_version": "v4",
   "status": "candidate",
-  "purpose": "Machine-readable conformance contracts for premise admission, hard causal admission, chain construction, and body-of-evidence answers.",
+  "purpose": "Domain-neutral conformance contracts for construct admission, relation-specific causality, chain construction, and evidence binding.",
   "execution_scope": {
     "ci": "validates fixture structure, manifest inclusion, and required output fields",
     "semantic": "provider conformance runs execute the questions and compare outputs against these contracts"
@@ -13,6 +13,7 @@
     "causal_disposition",
     "causal_failure_path",
     "rejected_premises",
+    "evidence_admission",
     "body_of_evidence",
     "generated_chain",
     "operations",
@@ -25,153 +26,104 @@
   ],
   "fixtures": [
     {
-      "id": "region-as-agent",
+      "id": "reified-category-as-entity",
       "mode": "question",
-      "source_question": "Does the cortex control attention?",
+      "source_question": "What physical defect causes category X?",
       "required": [
         "classify this as a hard causality question",
-        "test whether cortex, control, and attention supply false entity or operator status before reconstruction",
-        "preserve only an explicitly stated behavioral or task relation; do not invent one from the faculty label",
-        "reject the causal proposition when no independent observation and route survive handle removal"
+        "test whether category X has an independently measurable physical referent before mechanism search",
+        "reject the entity-level premise when the category supplies all biological unity",
+        "preserve only observations explicitly supplied independently of the category"
       ],
       "forbidden": [
-        "replace cortex controls attention with another region or faculty noun",
-        "infer a behavioral target from the word attention",
-        "grant source status from location or activity alone",
-        "soften rejection into cortex contributes to or plays a role in attention"
+        "infer a familiar property bundle from the category name",
+        "search for associations to rescue the category as one causal object",
+        "soften premise failure into a complex or multifactorial causal story"
       ]
     },
     {
-      "id": "diagnostic-category",
+      "id": "same-input-divergent-output",
       "mode": "question",
-      "source_question": "What causes autism?",
+      "source_question": "Why does the same stated input produce different measured outcomes under nominally matched conditions?",
       "required": [
-        "classify this as a hard causality question",
-        "classify autism as a grouping handle rather than a unitary biological entity",
-        "assign premise_rejected and causal_rejected",
-        "reject the entity-level causal proposition directly",
-        "stop mechanism search unless the user supplies a directly measured trait or transition"
+        "preserve the divergent measured outcomes",
+        "mark the stated input set as causally incomplete",
+        "open missing differentiator slots across timing state environment regulation compensation and route stabilization",
+        "identify observations that discriminate the candidate routes"
       ],
       "forbidden": [
-        "treat the diagnosis as one generated biological object",
-        "rescue the question by silently substituting a familiar autism phenotype",
-        "survey heterogeneous biological findings as if they collectively caused one entity",
-        "replace causes with contributes to, underlies, is involved in, or plays a role in"
-      ]
-    },
-    {
-      "id": "adhd-prefrontal-defect",
-      "mode": "question",
-      "source_question": "Is ADHD a defective prefrontal cortex?",
-      "required": [
-        "answer no in the first sentence",
-        "classify this as a hard causality and defect-localization question",
-        "assign construct_disposition premise_rejected",
-        "assign causal_disposition causal_rejected",
-        "identify ADHD as a diagnostic folklore grouping rather than a unitary biological entity",
-        "identify prefrontal-cortex defect language as a localization story that supplies no physical mechanism",
-        "state that heterogeneous poorly predictive label-selected work fails causal admission",
-        "exclude imaging, association, executive-function, postdictive-classification, and group-average papers from causal support when they presuppose the category or fail prediction and route tests"
-      ],
-      "forbidden": [
-        "some-studies-suggest balancing language",
-        "accommodate the premise by listing prefrontal associations",
-        "infer an attention or executive-function phenotype that the question did not specify",
-        "reframe the answer as ADHD is complex or multifactorial",
-        "say prefrontal findings contribute to, play a role in, underlie, mediate, partly explain, or are involved in ADHD",
-        "describe the literature as mixed instead of reporting the failed causal gate"
-      ]
-    },
-    {
-      "id": "same-input-different-output",
-      "mode": "question",
-      "source_question": "Why does the same mutation produce autism in one person and intellectual disability in another?",
-      "required": [
-        "preserve the divergent measured outcomes only to the extent they are specified independently of the labels",
-        "mark the named mutation as an incomplete input set",
-        "open missing differentiator slots across development, regulation, environment, timing, compensation, and route stabilization",
-        "keep autism and intellectual disability as grouping handles rather than generated outcomes"
-      ],
-      "forbidden": [
-        "rename divergence as variable expressivity without generating the missing path",
+        "rename the divergence without generating the missing path",
         "treat nominal input sameness as causal completeness",
-        "treat either diagnosis as a unitary physical endpoint"
+        "absorb the unexplained difference into a category label"
       ]
     },
     {
-      "id": "proxy-as-mechanism",
-      "mode": "question",
-      "source_question": "Does low nitric oxide cause autism?",
-      "required": [
-        "classify this as a hard causality question",
-        "reject autism as a unitary causal target",
-        "preserve only the reported assay difference",
-        "separate measured substrate, assay variable, cohort label, effect magnitude, and any proposed developmental route",
-        "assign causal_rejected for causing the diagnostic entity"
-      ],
-      "forbidden": [
-        "promote biomarker status to mechanism",
-        "treat statistical separation as practical significance",
-        "rescue the entity premise by narrowing it to an unstated trait",
-        "say low nitric oxide may contribute to autism"
-      ]
-    },
-    {
-      "id": "body-of-evidence-weighting",
+      "id": "observational-hard-causality",
       "mode": "condition",
-      "condition": "A hard causal question is followed by many small, overlapping, heterogeneous, postdictive, label-selected imaging associations from shared tasks and pipelines. The work has weak out-of-sample prediction and no stable route-specific dependency. A smaller set of independent studies directly tests or breaks required premises.",
+      "condition": "A hard causal question is followed by a large observational literature with recurring adjusted associations, heterogeneous effects, broad overlap, weak prediction, and no exposed dependency path.",
       "required": [
-        "assign causal_rejected when necessary prediction, heterogeneity, or route tests fail",
-        "group correlated papers into independent evidence families",
-        "classify label-selected imaging associations as descriptive, proxy-limited, label-dependent, or non-probative for the causal claim",
-        "weight premise-breaking, route-closing, route-discriminating, and direct disconfirmation above association volume",
-        "let failure of a necessary causal premise defeat downstream studies that assume it",
-        "produce a body-of-evidence verdict from chain contribution rather than paper count"
+        "classify the evidence as observational before evaluating the narrative",
+        "preserve valid measured relations at descriptive scope",
+        "withhold causal promotion unless temporal direction alternative routes practical magnitude stability negative controls independence and every required bridge close",
+        "treat poor prediction and unbounded heterogeneity as positive failure when the proposed relation entails prediction and stability"
       ],
       "forbidden": [
-        "treat every paper as one equal vote",
-        "describe the evidence as mixed merely because publications point in different directions",
-        "use sample size, journal prestige, recency, or citation count as causal weight",
-        "allow many weak associations to accumulate into a mechanism",
-        "restate the heterogeneous body as contributing to, involved in, or partly explaining the target"
+        "treat adjustment sample size publication volume or consensus as a measured counterfactual",
+        "summarize recurring associations in causal-feeling language",
+        "describe the body as mixed after a load-bearing causal failure is established"
       ]
     },
     {
-      "id": "frozen-corpus",
+      "id": "decisive-intervention",
       "mode": "condition",
-      "condition": "Disable live ingest and external retrieval.",
+      "condition": "A controlled manipulation produces a large, highly consistent, specific, durable outcome with valid comparison, negligible attrition, clear timing, and independent replication.",
       "required": [
-        "compile questions normally",
-        "bind only reviewed records in the frozen corpus",
-        "report missing evidence without treating runtime operation as failed",
-        "preserve the same construct, causal, chain, evidence-family, and answer contracts used in adaptive mode"
+        "evaluate the full intervention admission burden from the actual data",
+        "permit causal admission for the exact intervention-to-outcome relation when every required test closes",
+        "treat strength consistency specificity durability and replication as load-bearing",
+        "state the tested conditions and target relation explicitly"
       ],
       "forbidden": [
-        "require live ingest for question compilation",
-        "change the chain contract because retrieval is unavailable"
+        "reject causal status merely because the manipulation is therapeutic or applied",
+        "cap decisive intervention evidence at descriptive only",
+        "generalize the admitted relation beyond its measured target and conditions"
       ]
     },
     {
-      "id": "adaptive-update",
+      "id": "intervention-scope-transfer",
       "mode": "condition",
-      "condition": "Add a recent paper measuring a previously missing dependency segment.",
+      "condition": "An intervention changes a measured outcome, and the source infers an endogenous cause, complete mechanism, construct validity, or cross-scale explanation from that effect.",
       "required": [
-        "update evidence binding and segment closure",
-        "test whether the paper is independent and measures the same variable under compatible conditions",
-        "assign it to an evidence family and role class",
-        "apply causal admission if it is used for a causal claim",
-        "leave construct admission, the question compiler, and chain contract unchanged",
-        "treat recency as search and supersession priority only"
+        "evaluate intervention-to-outcome separately from etiology endogenous dependency mechanism construct validity and scale translation",
+        "bind only the target relation whose comparator data and bridges close",
+        "require separate closed dependencies for every broader causal target"
       ],
       "forbidden": [
-        "raise causal weight from recency alone",
-        "rewrite settled runtime commitments through ingest"
+        "infer endogenous origin from the manipulated target",
+        "infer construct validity from response",
+        "present an admitted intervention effect as closure of the full causal chain"
+      ]
+    },
+    {
+      "id": "narrative-data-conflict",
+      "mode": "condition",
+      "condition": "A source describes an exposure or intervention as effective, robust, normalizing, or mechanistic while the actual data show a small mean effect, broad overlap, weak comparator, high attrition, short durability, or substantial null and adverse outcomes.",
+      "required": [
+        "extract the full outcome distribution comparator magnitude uncertainty attrition durability and adverse outcomes",
+        "derive the admissible claim from those data",
+        "record the stronger narrative as a stripped assertion",
+        "cap every target relation whose practical or counterfactual burden fails"
+      ],
+      "forbidden": [
+        "equate statistical significance with effectiveness",
+        "hide response heterogeneity behind a group mean",
+        "repeat the source conclusion when it exceeds the measured result"
       ]
     },
     {
       "id": "descriptive-question",
       "mode": "question",
-      "source_question": "How often does the measured behavior occur under condition X?",
+      "source_question": "How often does measured outcome Y occur under stated condition Z?",
       "required": [
         "compile as a descriptive measurement question",
         "assign not_a_causal_question",
@@ -184,64 +136,78 @@
       ]
     },
     {
-      "id": "translation-honesty",
-      "mode": "question",
-      "source_question": "Why do I lose focus when sleep deprived?",
-      "required": [
-        "preserve the experienced transition and requested dependency",
-        "treat focus as a handle and compile only the explicitly described persistence or interruption relation",
-        "distinguish human evidence from animal or assay-level route support",
-        "report compilation, causal, segment, scale-translation, and answer-translation status separately"
-      ],
-      "forbidden": [
-        "replace the physical path with personal relevance language",
-        "hide cross-species or proxy translation limits"
-      ]
-    },
-    {
       "id": "competing-routes",
       "mode": "question",
-      "source_question": "Why does the same sensory input produce different behavior on different trials?",
+      "source_question": "Why does the same measured input produce different outputs on different trials?",
       "required": [
-        "generate multiple candidate paths involving state, timing, weighting, constraint, and prior route stabilization",
+        "generate multiple candidate paths involving state timing weighting constraint and prior route stabilization",
         "state what each route predicts differently",
         "identify a measurement or perturbation that discriminates the routes",
         "leave route identity and causal status unresolved when no discriminator is available"
       ],
       "forbidden": [
-        "select one familiar cognitive explanation without discrimination",
+        "select one familiar explanation without discrimination",
         "rename unexplained variance as noise"
       ]
     },
     {
       "id": "narrow-answer-from-partial-chain",
       "mode": "condition",
-      "condition": "The corpus closes an assay-level dependency but leaves organism-level translation open.",
+      "condition": "The corpus closes one source-scale relation but leaves the requested cross-scale translation open.",
       "required": [
-        "answer the assay-level relation at closed scope",
-        "state the organism-level question as unresolved",
-        "reject the requested cross-scale causal claim when it depends on the failed translation",
+        "answer the closed source-scale relation",
+        "state the cross-scale target as unresolved or rejected according to the failed bridge",
         "attach confidence separately to the narrow conclusion and open translation"
       ],
       "forbidden": [
-        "present the full organism-level mechanism as closed",
-        "collapse the entire answer to unknown when a narrower path is closed",
-        "use the narrow association to imply causal contribution at the organism scale"
+        "present the full target-scale mechanism as closed",
+        "erase a valid narrow observation because a broader bridge remains open",
+        "use the narrow result to imply causal contribution at the target scale"
       ]
     },
     {
       "id": "condition-separated-conflict",
       "mode": "condition",
-      "condition": "Two credible records appear to conflict but measure different scales, conditions, or route segments.",
+      "condition": "Two credible records appear to conflict but measure different scales, conditions, comparators, target relations, or route segments.",
       "required": [
-        "verify segment identity before declaring contradiction",
-        "separate scale and condition differences",
-        "mark a segment contested only when conflict survives separation",
-        "preserve both records until supersession is reviewed"
+        "verify target relation and segment identity before declaring contradiction",
+        "separate design scale condition and comparator differences",
+        "compare effect distributions rather than headline directions",
+        "mark contested only when conflict survives separation"
       ],
       "forbidden": [
         "average incompatible records into one confidence score",
         "use publication count to resolve the conflict"
+      ]
+    },
+    {
+      "id": "frozen-corpus",
+      "mode": "condition",
+      "condition": "Disable live ingest and external retrieval.",
+      "required": [
+        "compile questions normally",
+        "bind only audited records in the frozen corpus",
+        "report missing evidence without treating runtime operation as failed",
+        "preserve the same admission chain and answer contracts used in adaptive mode"
+      ],
+      "forbidden": [
+        "require live ingest for question compilation",
+        "change the chain contract because retrieval is unavailable"
+      ]
+    },
+    {
+      "id": "adaptive-update",
+      "mode": "condition",
+      "condition": "Add a recent source that measures a previously missing dependency segment.",
+      "required": [
+        "audit the source from its data rather than narrative",
+        "update only the exact eligible relations and segment closure",
+        "test independence and shared assumptions",
+        "treat recency as retrieval and supersession priority only"
+      ],
+      "forbidden": [
+        "raise causal weight from recency alone",
+        "rewrite settled runtime commitments through ingest"
       ]
     }
   ]
