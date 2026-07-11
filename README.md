@@ -4,13 +4,30 @@ A platform-agnostic scaffold developed collaboratively across multiple LLMs. The
 
 ## Purpose
 
-The Model evaluates constructs, causal targets, evidence designs, and physical-chain closure before producing an explanatory answer. Published narrative does not enter as evidence by default. The admissible claim is generated from the actual observations, comparator, effect distribution, heterogeneity, attrition, durability, measurement validity, and inferential bridges.
+The Model reconstructs target identity, constructs, causal targets, evidence designs, and physical-chain closure before producing an explanatory answer. Published narrative does not enter as evidence by default. The admissible claim is generated from speaker intent, corpus operations, actual observations, comparator, effect distribution, heterogeneity, attrition, durability, measurement validity, and inferential bridges.
 
-Purely observational evidence begins descriptive or more restricted. It earns causal scope only by affirmatively closing the burden appropriate to the exact target relation. Adjustment, recurrence, sample size, peer review, consensus, and meta-analysis do not create a counterfactual or physical dependency path.
+Purely observational evidence begins descriptive or more restricted. It earns causal scope only by affirmatively closing the burden appropriate to the exact target relation. Adjustment, recurrence, sample size, peer review, consensus, and meta-analysis do not create a target identity, counterfactual, or physical dependency path.
 
-Intervention evidence is neither automatically causal nor automatically non-causal. A strong controlled manipulation may establish causality for the exact intervention-to-outcome relation when manipulation integrity, comparison, timing, effect magnitude, response consistency, specificity, durability, missingness, replication, and disconfirmation requirements close. That result does not automatically establish etiology, endogenous mechanism, construct validity, or cross-scale explanation.
+Intervention evidence is neither automatically causal nor automatically non-causal. A strong controlled manipulation may establish causality for the exact intervention-to-outcome relation when manipulation integrity, comparison, timing, effect magnitude, response consistency, specificity, durability, missingness, replication, and disconfirmation requirements close. That result does not automatically establish target identity, transport, etiology, endogenous mechanism, construct validity, or cross-scale explanation.
 
-Construct-indexed work begins `label_dependent`. Proxy or surrogate work begins `proxy_limited`. These restrictions are independent of study design and remain until the exact construct or translation burden closes.
+Construct-indexed work begins `label_dependent`. Proxy or surrogate work begins `proxy_limited`. These restrictions are independent of study design and remain until the exact identity, construct, or translation burden closes.
+
+## Target identity
+
+Names may compress generated identities. They may not generate identities by compression.
+
+The runtime separates:
+
+- what the asker intends to ask about;
+- what each source defines;
+- what each source actually measures or constructs; and
+- what broader target the source claims.
+
+A named shortcut is accepted when it points to a recoverable generator such as a stable interaction structure, equation, algorithm, measurement standard, reproducible construction, or demonstrated organism-state relation. Its variables, realization procedure, conditions, uncertainty, alternate-construction sensitivity, and transport limits remain attached.
+
+When one name groups non-equivalent measurements, the name remains a grouping handle and the relations are evaluated separately. Heterogeneity preserves common identity only when exposed variables and routes generate and predict the observed variation. Complexity, multidimensionality, heterogeneous presentation, individual variation, context dependence, and task impurity cannot protect an ungenerated identity.
+
+The target-identity rule is fully generic. Domain cartridges provide adversarial examples and specialized measurement vocabulary. They do not provide blacklists or target-identity trigger lists.
 
 ## Physical foundation
 
@@ -24,6 +41,9 @@ A decisive intervention can establish an exact effect while its internal metabol
 
 The shared kernel owns domain-neutral mechanics:
 
+- target-identity generation and identity shortcuts;
+- speaker-intent and corpus-operation separation;
+- operational-equivalence and heterogeneity testing;
 - universal physical continuity;
 - biological metabolic binding;
 - construct admission;
@@ -35,17 +55,17 @@ The shared kernel owns domain-neutral mechanics:
 - relation-specific closure and confidence;
 - evidence-family weighting.
 
-Domain cartridges own specialized handles, failure patterns, translation burdens, and regression fixtures. The neuroscience cartridge contains diagnostic folklore, region-as-agent, psychiatric treatment, rating-scale, imaging, biomarker, stimulation, and named-process examples such as “neuroplasticity.” It also applies physical continuity to neural tissue, energetic and material support, metabolic maintenance, and organism-state transitions. Those cases are not hard-coded into the generic runtime fixtures.
+Domain cartridges own specialized examples, failure patterns, translation burdens, and regression fixtures. The neuroscience cartridge contains diagnostic, region-as-agent, psychiatric treatment, rating-scale, imaging, biomarker, stimulation, and named-process examples such as “neuroplasticity.” It also applies physical continuity to neural tissue, energetic and material support, metabolic maintenance, and organism-state transitions. Those cases do not determine the generic identity rule.
 
 ## Active structure
 
 | Path | Role |
 |------|------|
 | `model/00_purpose_and_scope.md` | Candidate purpose and operating boundary |
-| `model/kernel/` | Shared physical-chain, metabolic, construct, causal, and evidence-admission invariants |
-| `model/runtime/` | Question compiler, answerability planner, evidence binder, answer contracts, and domain-neutral fixtures |
-| `model/ingest/` | Data-first evidence maintenance, physical-chain extraction, design gates, routing, and record schema |
-| `model/cartridges/` | Domain-specific rules, handles, physical-chain applications, translation vocabulary, and fixtures |
+| `model/kernel/` | Shared target-identity, physical-chain, metabolic, construct, causal, and evidence-admission invariants |
+| `model/runtime/` | Question compiler, target-identity gate, answerability planner, evidence binder, answer contracts, and domain-neutral fixtures |
+| `model/ingest/` | Target-identity crosswalks, data-first evidence maintenance, physical-chain extraction, design gates, routing, and record contracts |
+| `model/cartridges/` | Domain-specific examples, physical-chain applications, translation vocabulary, and fixtures |
 | `model/manifests/runtime.json` | Authoritative candidate question-runtime load graph |
 | `model/manifests/ingest.json` | Authoritative candidate ingest load graph |
 | `model/manifest.json` | Default-manifest selector only |
@@ -77,10 +97,11 @@ Validate repository structure and builds:
 python scripts/validate_repo.py
 ```
 
-Validate evidence policy, relation-specific causality, generic/domain separation, and required regression fixtures:
+Validate evidence policy, target identity, relation-specific causality, generic/domain separation, and required regression fixtures:
 
 ```bash
 python scripts/validate_model_policy.py
+python scripts/validate_target_identity.py
 ```
 
 Validate semantic decision records, physical continuity, metabolic binding, deterministic rendering, and validator self-tests:
@@ -100,7 +121,7 @@ python scripts/run_conformance.py \
   --fixture-set all
 ```
 
-CI validates both conformance harnesses and any committed result bundles. It does not call external providers. Adoption requires fresh complete result bundles accepted by:
+CI validates the structural and deterministic harnesses and any committed result bundles. It does not call external providers. Adoption requires fresh complete result bundles accepted by:
 
 ```bash
 python scripts/validate_adoption.py
