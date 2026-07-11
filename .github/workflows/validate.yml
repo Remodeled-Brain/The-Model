@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - "candidate/**"
+      - "release/**"
 
 permissions:
   contents: read
