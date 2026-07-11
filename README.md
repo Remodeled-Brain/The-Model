@@ -4,7 +4,9 @@ A platform-agnostic scaffold developed collaboratively across multiple LLMs. The
 
 ## Purpose
 
-The Model rejects invalid constructs and failed causal propositions before reconstruction. Questions expressed through folklore, reified categories, hidden operators, or incomplete causal language enter a construct-admission gate. Hard causality questions also enter a causal-admission gate. Heterogeneous, poorly predictive, postdictive, label-selected, proxy-limited, or practically trivial work cannot be restated as causal contribution, mechanism, defect, dysfunction, or biological basis.
+The Model rejects invalid constructs and failed causal propositions before reconstruction. Questions expressed through folklore, reified categories, hidden operators, or incomplete causal language enter a construct-admission gate. Hard causality questions also enter a causal-admission gate.
+
+Causal admission requires construct coherence, temporal direction, dependency or intervention evidence, route-specific out-of-sample prediction, realistic baseline and comparator performance, bounded heterogeneity, practical magnitude, physical scale translation, independent convergence, and survival of disconfirmation. Failure of any necessary test rejects the requested causal proposition. Heterogeneous, poorly predictive, postdictive, label-selected, proxy-limited, broad-overlap, or practically trivial work cannot be restated as causal contribution, mechanism, defect, dysfunction, or biological basis.
 
 Only admitted questions proceed to physical-chain reconstruction. The runtime binds reviewed evidence to the required path and returns a bounded answer with explicit construct, causal, closure, and translation status.
 
