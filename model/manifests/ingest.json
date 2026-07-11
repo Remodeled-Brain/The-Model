@@ -5,6 +5,7 @@
   "source_files": [
     "00_purpose_and_scope.md",
     "kernel/chain_contract.yaml",
+    "kernel/evidence_admission.yaml",
     "ingest/purpose.md",
     "ingest/architecture.yaml",
     "ingest/rules.yaml",
