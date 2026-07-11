@@ -1,6 +1,7 @@
 {
   "name": "the-model-question-runtime",
-  "status": "candidate",
+  "version": "v0.05-v5",
+  "status": "adopted",
   "role": "primary question reconstruction and answering runtime",
   "source_files": [
     "00_purpose_and_scope.md",
