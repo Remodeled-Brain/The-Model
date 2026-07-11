@@ -1,0 +1,80 @@
+neuroscience_physical_continuity:
+  status: candidate
+  layer: neuroscience_cartridge
+  purpose: >
+    Apply the shared physical-continuity and metabolic-binding rules to neural, behavioral,
+    developmental, and clinical-neurobehavioral claims.
+
+  generic_refs:
+    - model/kernel/physical_continuity.yaml
+    - model/runtime/physical_answer_contract.yaml
+    - model/ingest/physical_extraction_contract.yaml
+
+  neuroscience_binding:
+    rule: >
+      Neural tissue has no separate causal currency. Ionic gradients, membrane potentials, transmitter
+      release, receptor state, intracellular chemistry, glial and vascular support, oxygen and substrate
+      delivery, heat, mechanical structure, protein turnover, and waste handling are physical and chemical
+      conditions of metabolically maintained tissue. Neural operations must be expressed through those
+      conditions at the resolution supported by the evidence.
+    behavior_rule: >
+      A neural-to-behavior explanation must identify how a physical perturbation changes metabolically
+      maintained neural or organism state, which transition becomes available, weighted, stabilized,
+      blocked, or released, and how that state transition reaches behavior.
+    unresolved_rule: >
+      When the energetic, metabolic, or state-transition route is unmeasured, preserve the observed neural
+      relation and mark the route partial. Do not fill the gap with activation, signaling, regulation,
+      processing, network change, plasticity, attention, or a region name.
+
+  common_chain_breaks:
+    - region_X_activated_then_behavior_changed
+    - neurotransmitter_level_changed_then_faculty_improved
+    - imaging_signal_changed_then_brain_normalized
+    - therapy_changed_connectivity_then_recovery_occurred
+    - stimulation_worked_therefore_region_is_the_endogenous_controller
+    - metabolic_activity_increased_therefore_the_named_process_occurred
+    - conserved_region_named_as_source_without_the_maintained_state_dependency
+
+  required_neuroscience_fields:
+    - manipulated_or_observed_physical_variable
+    - tissue_and_state_conditions
+    - energetic_or_material_carrier
+    - metabolic_maintenance_change
+    - neural_operation
+    - organism_state_transition
+    - behavioral_readout
+    - timing_and_conditions
+    - unresolved_route_slots
+
+  translation_examples:
+    regional_activity:
+      preserve: measured electrical chemical hemodynamic or metabolic change at the stated site and time
+      require_for_behavior: carrier metabolic binding route position organism-state transition and behavioral dependency
+    stimulation:
+      preserve: exact physical waveform site timing dose comparator and measured outcome
+      exact_causal_scope: stimulation_to_measured_outcome_under_tested_conditions
+      broader_scope_requires: endogenous_route etiology compensation metabolic_binding and route_discrimination
+    psychotherapy:
+      preserve: exact environmental and behavioral intervention conditions plus measured organism outcomes
+      require_for_neural_mechanism: a measured physical path through tissue state rather than neuroplasticity language
+    biomarker_or_imaging:
+      preserve: measured source-scale variable magnitude timing and conditions
+      prohibit: treating the readout as the physical operation or metabolic driver
+
+  terminology_guard:
+    prefer:
+      - metabolically_maintained_state
+      - energetic_or_material_constraint
+      - ionic_or_chemical_carrier
+      - state_availability_weighting_stabilization_blocking_or_release
+      - organism_state_transition
+    reject_as_complete_explanation:
+      - activation
+      - signaling
+      - processing
+      - regulation
+      - metabolism
+      - metabolic_activity
+      - neuroplasticity
+      - network_change
+      - region_control
