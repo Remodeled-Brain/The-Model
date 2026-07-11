@@ -1,8 +1,10 @@
 ingest_record_schema:
   status: candidate
-  schema_version: v1
+  schema_version: v2
   layer: support_layer
   closure_vocabulary_ref: model/kernel/chain_contract.yaml#chain_contract.closure_vocabulary.states
+  construct_admission_ref: model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions
+  evidence_role_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.evidence_role_classes
   support_channel_crosswalk_ref: model/ingest/failure_routing.yaml#ingest_failure_routing.closure_state_crosswalk
 
   identity:
@@ -29,9 +31,13 @@ ingest_record_schema:
       - measured_substrate
       - measured_variable
       - grouping_variable
+      - explicit_observations
       - post_strip_claim
+      - construct_disposition
+      - rejected_entity_claims
       - handle_dependencies
       - handle_flags
+    construct_disposition_rule: Use exactly one disposition from construct_admission_ref for each questioned construct.
     optional_fields:
       - source_scale
       - target_scale
@@ -53,6 +59,13 @@ ingest_record_schema:
         - support_channels
         - blocked_roles
         - unresolved_slots
+    evidence_role:
+      required: true
+      vocabulary_ref: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.evidence_role_classes
+      required_fields:
+        - evidence_role_class
+        - role_target
+        - non_probative_for
     chain_segments:
       required: true
       closure_state_rule: >
@@ -65,6 +78,26 @@ ingest_record_schema:
         - measured_scale
         - translation_limit
 
+  body_weight_inputs:
+    required_fields:
+      - claim_directness
+      - construct_dependency
+      - causal_leverage
+      - temporality
+      - scale_translation_status
+      - effect_magnitude
+      - variance_envelope
+      - group_overlap
+      - noise_floor
+      - functional_threshold_relation
+      - replication_status
+      - independence_status
+      - evidence_family_id
+      - disconfirmation_target
+    rule: >
+      These fields describe chain contribution and family independence. They are not combined into a
+      numerical quality score and cannot be overridden by publication count, prestige, recency, or citation volume.
+
   provenance:
     required_fields:
       - source_citation
@@ -73,16 +106,21 @@ ingest_record_schema:
       - corpus_mode
     independence_fields:
       - independence_status
+      - evidence_family_id
       - shared_pipeline_id
       - shared_cohort_id
       - shared_dataset_id
       - shared_model_lineage
+      - shared_instrument_id
+      - shared_task_id
 
   outputs:
     required_fields:
       - support_channels
       - blocked_roles
       - translation_limits
+      - evidence_role_class
+      - non_probative_for
       - visibility_status
       - promotion_status
     promotion_status_enum:
@@ -102,5 +140,7 @@ ingest_record_schema:
     support_layer_only: true
     no_unilateral_claim_write: true
     recency_is_not_weight: true
+    publication_count_is_not_weight: true
     identity_resolved_before_canonical_write: true
     unresolved_never_grants_closure: true
+    rejected_construct_cannot_receive_entity_level_promotion: true
