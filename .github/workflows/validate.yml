@@ -26,3 +26,5 @@ jobs:
         run: python scripts/validate_model_policy.py
       - name: Validate semantic and adoption conformance contracts
         run: python scripts/validate_conformance.py
+      - name: Validate physical continuity and metabolic binding
+        run: python scripts/validate_physical_continuity.py --fixtures-only
