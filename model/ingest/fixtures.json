@@ -1,13 +1,18 @@
 {
-  "schema_version": "v3",
+  "schema_version": "v4",
   "status": "candidate",
-  "purpose": "Machine-readable conformance contracts for construct admission, causal admission, and adaptive evidence maintenance.",
+  "purpose": "Domain-neutral conformance contracts for data-first ingest, design-specific admission, and relation-level failure routing.",
   "execution_scope": {
     "ci": "validates structure, manifest inclusion, and required fields",
     "semantic": "provider runs apply ingest to the source pattern and compare the record with this contract"
   },
   "required_record_sections": [
     "identity",
+    "source_ingress",
+    "evidence_axes",
+    "data_record",
+    "presumption",
+    "inference_audit",
     "extraction",
     "validation",
     "body_weight_inputs",
@@ -16,81 +21,102 @@
   ],
   "fixtures": [
     {
-      "id": "diagnostic-entity-premise",
-      "source_pattern": "A paper treats ADHD, autism, or another diagnostic category as one biological entity or defect and searches for its location or mechanism.",
-      "required_gates": ["strip_and_extract", "construct_admission", "causal_admission", "instrument_and_task_dependency"],
+      "id": "observational-causal-overreach",
+      "source_pattern": "An observational study reports an adjusted association and describes it as causal despite no manipulated source, weak counterfactual exposure, untested alternatives, and incomplete route evidence.",
+      "required_gates": ["data_extraction", "evidence_axis_classification", "inference_audit", "design_admission", "causal_admission"],
+      "allowed_channels": ["descriptive_support", "route_partial", "provenance_only"],
+      "blocked_roles": ["causal_support_without_observational_burden", "mechanism_from_adjustment", "counterfactual_from_modeling"]
+    },
+    {
+      "id": "decisive-controlled-intervention",
+      "source_pattern": "A controlled manipulation produces a large, highly consistent, specific, durable measured outcome with valid comparison, negligible attrition, and independent replication.",
+      "required_gates": ["data_extraction", "evidence_axis_classification", "design_admission", "practical_significance", "heterogeneity_control", "comparator_integrity", "durability", "independence"],
+      "allowed_channels": ["mechanistic_grounded", "route_partial", "descriptive_support"],
+      "blocked_roles": ["scope_transfer_to_unmeasured_targets"]
+    },
+    {
+      "id": "weak-intervention-effectiveness-narrative",
+      "source_pattern": "An intervention is called effective although the data show a small mean change, broad response overlap, weak comparator, high attrition, short follow-up, or substantial null and adverse outcomes.",
+      "required_gates": ["data_extraction", "inference_audit", "comparator_integrity", "practical_significance", "heterogeneity_control", "durability"],
+      "allowed_channels": ["descriptive_support", "method_support", "provenance_only"],
+      "blocked_roles": ["effectiveness_language", "causal_support_for_claimed_scope", "group_mean_hides_response_distribution"]
+    },
+    {
+      "id": "intervention-scope-transfer",
+      "source_pattern": "A measured intervention effect is used to infer origin, endogenous mechanism, construct validity, or a broader cross-scale explanation.",
+      "required_gates": ["inference_audit", "causal_admission", "scale_translation"],
+      "allowed_channels": ["mechanistic_grounded", "route_partial", "descriptive_support"],
+      "blocked_roles": ["etiology_from_intervention_target", "endogenous_mechanism_without_route", "construct_validity_from_response", "cross_scale_scope_transfer"]
+    },
+    {
+      "id": "construct-indexed-observation",
+      "source_pattern": "Samples and outcomes are defined by the same theoretical category, instrument, threshold, or selection rule, and recurring differences are interpreted as evidence for the category.",
+      "required_gates": ["construct_admission", "instrument_and_task_dependency", "inference_audit"],
       "allowed_channels": ["label_dependent_observation", "descriptive_support", "provenance_only"],
-      "blocked_roles": ["biological_entity_grounding", "unitary_defect_claim", "regional_localization_of_diagnosis", "mechanism_weight_for_construct", "causal_support"]
+      "blocked_roles": ["construct_validation", "entity_grounding", "causal_support_without_construct_escape"]
     },
     {
-      "id": "heterogeneous-poor-prediction",
-      "source_pattern": "A heterogeneous label-selected literature reports unstable group associations, broad overlap, weak external prediction, and no stable route-specific dependency, then describes the findings as causal, contributory, or mechanistic.",
-      "required_gates": ["construct_admission", "causal_admission", "predictive_adequacy", "heterogeneity_control", "practical_significance", "independence"],
-      "allowed_channels": ["descriptive_support", "label_dependent_observation", "proxy_only", "provenance_only"],
-      "blocked_roles": ["causal_support", "mechanism_support", "contribution_language", "biological_basis_language", "defect_or_dysfunction_claim"]
+      "id": "proxy-named-as-mechanism",
+      "source_pattern": "A proxy, classifier, assay, surrogate, composite, or downstream readout correlates with an outcome and is described as the mechanism or causal process.",
+      "required_gates": ["evidence_axis_classification", "inference_audit", "proxy_translation", "scale_translation"],
+      "allowed_channels": ["proxy_only", "source_scale_only", "descriptive_support"],
+      "blocked_roles": ["proxy_as_mechanism", "untranslated_causal_support", "target_scale_grounding"]
     },
     {
-      "id": "diagnostic-biomarker",
-      "source_pattern": "A paper compares pre-labeled diagnostic cohorts, reports a statistically significant assay difference, and calls the measured variable a biomarker or mechanism.",
-      "required_gates": ["strip_and_extract", "construct_admission", "causal_admission", "proxy_promotion", "practical_significance", "scale_translation"],
-      "allowed_channels": ["label_dependent_observation", "proxy_only", "source_scale_only", "descriptive_support"],
-      "blocked_roles": ["diagnostic_grounding", "biomarker_as_mechanism", "organism_level_translation_without_route", "causal_support"]
+      "id": "named-process-without-measurement",
+      "source_pattern": "A post-exposure measurement change is renamed as a broad process without specifying substrate, variable, operation, timing, persistence, comparator, or dependency to the target outcome.",
+      "required_gates": ["data_extraction", "inference_audit", "measurement_admission", "proxy_translation", "scale_translation"],
+      "allowed_channels": ["proxy_only", "source_scale_only", "descriptive_support"],
+      "blocked_roles": ["named_process_as_observation", "named_process_as_mechanism", "functional_claim_without_dependency"]
     },
     {
       "id": "same-input-divergent-output",
-      "source_pattern": "Nominally matched inputs or the same mutation produce divergent outcomes that are renamed as diagnostic categories.",
-      "required_gates": ["strip_and_extract", "construct_admission", "controlled_sameness_missing_differentiator"],
+      "source_pattern": "Nominally matched inputs produce divergent measured outputs, and the divergence is renamed rather than used to open the missing differentiator.",
+      "required_gates": ["data_extraction", "controlled_sameness_missing_differentiator", "inference_audit"],
       "allowed_channels": ["route_partial", "disconfirmation"],
-      "blocked_roles": ["category_clarity_weight", "complete_causal_frame", "diagnosis_as_physical_endpoint"]
+      "blocked_roles": ["complete_causal_frame", "label_absorbs_missing_differentiator"]
     },
     {
       "id": "statistical-without-practical",
-      "source_pattern": "A sensitive assay reports a small significant group-average difference with broad overlap and no magnitude context, noise floor, biological range, threshold, or independent replication.",
-      "required_gates": ["causal_admission", "practical_significance", "instrument_and_task_dependency"],
-      "allowed_channels": ["descriptive_support", "source_scale_only", "label_dependent_observation"],
-      "blocked_roles": ["biological_significance", "clinical_significance", "mechanism_weight", "unitary_defect_claim", "individual_state_assignment", "causal_support"]
-    },
-    {
-      "id": "region-as-source",
-      "source_pattern": "Activity or perturbation at a named region is described as control, defect, or causal origin without timing, dependency position, route prediction, or competing-route controls.",
-      "required_gates": ["strip_and_extract", "causal_admission", "region_source_closure", "predictive_adequacy"],
-      "allowed_channels": ["descriptive_support", "method_support"],
-      "blocked_roles": ["origin_weight", "controller_claim", "defect_explanation_by_location", "causal_support"]
-    },
-    {
-      "id": "conservation-as-explanation",
-      "source_pattern": "A conserved or ancient structure is treated as causally sufficient because of its age or conservation.",
-      "required_gates": ["strip_and_extract", "causal_admission", "conservation_dependency", "region_source_closure"],
-      "allowed_channels": ["descriptive_support", "route_partial"],
-      "blocked_roles": ["causal_weight_from_conservation", "source_status_from_age"]
+      "source_pattern": "A sensitive analysis reports a statistically significant difference with small magnitude, broad overlap, incomplete noise or threshold context, and no stable practical effect.",
+      "required_gates": ["data_extraction", "practical_significance", "heterogeneity_control"],
+      "allowed_channels": ["descriptive_support", "source_scale_only"],
+      "blocked_roles": ["effectiveness_from_significance", "practical_importance", "individual_state_assignment", "causal_support"]
     },
     {
       "id": "postdictive-prediction",
-      "source_pattern": "A model or analysis separates diagnostic groups after outcomes are known and is described as predictive, generative, causal, or evidence of a shared defect.",
-      "required_gates": ["temporality", "predictive_adequacy", "causal_admission", "strip_and_extract", "construct_admission"],
-      "allowed_channels": ["descriptive_support", "method_support", "label_dependent_observation"],
-      "blocked_roles": ["prediction_weight", "direct_generative_grounding", "construct_validity", "causal_support"]
+      "source_pattern": "A model separates known outcomes after the fact and is described as predictive, generative, or causal.",
+      "required_gates": ["temporality", "prediction", "causal_admission", "inference_audit"],
+      "allowed_channels": ["descriptive_support", "method_support"],
+      "blocked_roles": ["prediction_weight", "prospective_grounding", "causal_support_from_postdiction"]
     },
     {
       "id": "cross-scale-language",
-      "source_pattern": "A molecular, cellular, imaging, or animal measurement is translated to an organism-level behavioral mechanism through shared terminology rather than a demonstrated dependency path.",
-      "required_gates": ["causal_admission", "scale_translation", "proxy_promotion"],
+      "source_pattern": "A source-scale measurement is translated to a target-scale mechanism through shared terminology rather than a carried variable and demonstrated dependency path.",
+      "required_gates": ["causal_admission", "scale_translation", "proxy_translation"],
       "allowed_channels": ["source_scale_only", "proxy_only", "route_partial"],
-      "blocked_roles": ["target_scale_grounding", "direct_behavioral_mechanism", "cross_scale_causal_support"]
+      "blocked_roles": ["target_scale_grounding", "cross_scale_causal_support"]
     },
     {
       "id": "correlated-volume",
-      "source_pattern": "Many papers repeat a small label-selected association using shared cohorts, datasets, diagnostic instruments, tasks, pipelines, labs, or model lineages.",
-      "required_gates": ["causal_admission", "independence", "instrument_and_task_dependency", "practical_significance"],
-      "allowed_channels": ["descriptive_support", "label_dependent_observation"],
-      "blocked_roles": ["grounding_by_count", "independence_by_publication_count", "mechanism_from_correlated_volume", "causal_support"]
+      "source_pattern": "Many papers repeat a small association using shared cohorts, datasets, instruments, interventions, comparators, outcomes, pipelines, or inferential bridges.",
+      "required_gates": ["independence", "inference_audit", "practical_significance"],
+      "allowed_channels": ["descriptive_support", "provenance_only"],
+      "blocked_roles": ["grounding_by_count", "independence_by_publication_count", "mechanism_from_correlated_volume"]
+    },
+    {
+      "id": "synthesis-inherits-input-failure",
+      "source_pattern": "A review or pooled analysis combines inputs with construct, comparator, measurement, attrition, proxy, design, or bridge failures and presents a stronger conclusion.",
+      "required_gates": ["source_ingress", "inference_audit", "independence"],
+      "allowed_channels": ["descriptive_support", "provenance_only"],
+      "blocked_roles": ["synthesis_repairs_invalid_inputs", "narrower_uncertainty_as_causal_closure", "review_status_as_admission"]
     },
     {
       "id": "premise-breaking-dominance",
-      "source_pattern": "A direct independent result breaks a necessary entity, unity, defect, prediction, or route premise while many downstream papers assume that premise and report associations.",
+      "source_pattern": "A direct independent result breaks a necessary construct, counterfactual, prediction, bridge, or route premise while many downstream papers assume it.",
       "required_gates": ["construct_admission", "causal_admission", "evidence_role_classification", "independence"],
       "allowed_channels": ["disconfirmation", "descriptive_support", "provenance_only"],
-      "blocked_roles": ["downstream_volume_rescues_premise", "association_count_outweighs_premise_failure", "soft_causal_restating_after_failure"]
+      "blocked_roles": ["downstream_volume_rescues_premise", "association_count_outweighs_failure", "soft_causal_restating_after_failure"]
     }
   ]
 }
