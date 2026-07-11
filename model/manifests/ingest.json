@@ -15,7 +15,8 @@
     "ingest/fixtures.json"
   ],
   "domain_modules": [
-    "cartridges/neuroscience.yaml"
+    "cartridges/neuroscience.yaml",
+    "cartridges/neuroscience_fixtures.json"
   ],
   "reachable_modules": [
     {
