@@ -1,0 +1,48 @@
+name: Publish runtime packets
+
+on:
+  push:
+    branches:
+      - "release/**-packets"
+    paths:
+      - ".github/workflows/publish_runtime_packets.yml"
+      - "scripts/publish_runtime_packets.py"
+      - "VERSION"
+      - "model/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release publication branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch immutable release tags
+        run: git fetch --tags --force
+      - name: Generate frozen packets from release tag
+        shell: bash
+        run: |
+          VERSION="$(tr -d '\r\n' < VERSION)"
+          python scripts/publish_runtime_packets.py --version "$VERSION" --source-ref "$VERSION"
+      - name: Commit generated packets to publication branch
+        shell: bash
+        run: |
+          VERSION="$(tr -d '\r\n' < VERSION)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "packets/$VERSION"
+          if git diff --cached --quiet; then
+            echo "Runtime packets already match $VERSION"
+          else
+            git commit -m "Publish $VERSION runtime packets"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
