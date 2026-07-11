@@ -3,6 +3,7 @@
 from __future__ import annotations
 import argparse, copy, hashlib, json, pathlib, re, subprocess, sys
 from typing import Any
+import target_identity_contract as ti
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 CONF=ROOT/"conformance"
@@ -61,7 +62,7 @@ def validate_policy():
 
 def current_hashes():
     subprocess.run([sys.executable,str(BUILDER)],cwd=ROOT,check=True)
-    try: return {"runtime_hash":sha(RUNTIME),"kernel_hash":sha(KERNEL),"cartridge_hash":sha(CARTRIDGE)}
+    try: return {"runtime_hash":sha(RUNTIME),"kernel_hash":sha(KERNEL),"cartridge_hash":sha(CARTRIDGE),"target_identity_contract_hash":ti.target_identity_contract_hash()}
     finally:
         RUNTIME.unlink(missing_ok=True)
         if RUNTIME.parent.exists() and not any(RUNTIME.parent.iterdir()): RUNTIME.parent.rmdir()
@@ -216,7 +217,7 @@ def validate_result(result:dict[str,Any],variants=None):
     for f in ("run_id","fixture_set","fixture_id","variant_id"): req(string(result.get(f)),"RESULT_IDENTITY_REQUIRED",f)
     provider=result.get("provider"); req(isinstance(provider,dict),"PROVIDER_METADATA_REQUIRED","provider")
     for f in ("name","model"): req(string(provider.get(f)),"PROVIDER_METADATA_FIELD",f)
-    for f in ("runtime_hash","kernel_hash","cartridge_hash","fixture_hash"): req(string(provider.get(f)) and re.fullmatch(r"[0-9a-f]{64}",provider[f]) is not None,"PROVIDER_HASH_FIELD",f)
+    for f in ("runtime_hash","kernel_hash","cartridge_hash","fixture_hash","target_identity_contract_hash"): req(string(provider.get(f)) and re.fullmatch(r"[0-9a-f]{64}",provider[f]) is not None,"PROVIDER_HASH_FIELD",f)
     req(isinstance(provider.get("temperature"),(int,float)),"PROVIDER_METADATA_FIELD","temperature"); req(string(provider.get("seed")),"PROVIDER_METADATA_FIELD","seed")
     record=result.get("decision_record"); req(isinstance(record,dict),"DECISION_RECORD_REQUIRED","decision_record"); validate_decision_record(record)
     req(result.get("rendered_answer")==render_answer(record),"RENDERED_ANSWER_DRIFT","rendered answer")
