@@ -6,20 +6,25 @@
     "00_purpose_and_scope.md",
     "kernel/chain_contract.yaml",
     "kernel/physical_continuity.yaml",
+    "kernel/folk_behavior_construct.yaml",
     "kernel/evidence_admission.yaml",
     "kernel/evidence_admission_fixtures.json",
     "ingest/purpose.md",
     "ingest/architecture.yaml",
     "ingest/rules.yaml",
+    "ingest/folk_behavior_extraction_gate.yaml",
     "ingest/physical_extraction_contract.yaml",
     "ingest/failure_routing.yaml",
     "ingest/record_schema.yaml",
-    "ingest/fixtures.json"
+    "ingest/fixtures.json",
+    "ingest/folk_behavior_fixtures.json"
   ],
   "domain_modules": [
     "cartridges/neuroscience.yaml",
     "cartridges/neuroscience_physical_continuity.yaml",
-    "cartridges/neuroscience_fixtures.json"
+    "cartridges/neuroscience_folk_behavior.yaml",
+    "cartridges/neuroscience_fixtures.json",
+    "cartridges/neuroscience_folk_behavior_fixtures.json"
   ],
   "reachable_modules": [
     {
