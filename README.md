@@ -12,30 +12,40 @@ Intervention evidence is neither automatically causal nor automatically non-caus
 
 Construct-indexed work begins `label_dependent`. Proxy or surrogate work begins `proxy_limited`. These restrictions are independent of study design and remain until the exact construct or translation burden closes.
 
+## Physical foundation
+
+Every admitted cause, operation, state, constraint, and transition is physical. Chemistry, biology, and behavior remain organized descriptions of the same physical surface rather than separate causal realms. The physical interactions that sustain an organism belong to the same world that forms stars and drives fusion. Scale changes organization and reachable state, not ontology.
+
+At biological scope, causal explanation binds through metabolically maintained state. Answers identify the physical perturbation, its energetic or material carrier, the change in metabolic maintenance, the biological operation, and the organism-state transition or behavior. Missing segments remain explicit. “Metabolism,” “energy,” “activation,” or “signaling” cannot substitute for a specified carrier and state change.
+
+A decisive intervention can establish an exact effect while its internal metabolic route remains partial. The answer preserves the effect and marks the route open rather than rejecting the effect or inventing a mechanism.
+
 ## Generic kernel and domain cartridges
 
 The shared kernel owns domain-neutral mechanics:
 
-- construct admission
-- target-specific causal admission
-- design and counterfactual classification
-- data-first evidence admission
-- observational and interventional burdens
-- inferential-bridge auditing
-- relation-specific closure and confidence
-- evidence-family weighting
+- universal physical continuity;
+- biological metabolic binding;
+- construct admission;
+- target-specific causal admission;
+- design and counterfactual classification;
+- data-first evidence admission;
+- observational and interventional burdens;
+- inferential-bridge auditing;
+- relation-specific closure and confidence;
+- evidence-family weighting.
 
-Domain cartridges own specialized handles, failure patterns, translation burdens, and regression fixtures. The neuroscience cartridge contains diagnostic folklore, region-as-agent, psychiatric treatment, rating-scale, imaging, biomarker, stimulation, and named-process examples such as “neuroplasticity.” Those cases are not hard-coded into the generic runtime fixtures.
+Domain cartridges own specialized handles, failure patterns, translation burdens, and regression fixtures. The neuroscience cartridge contains diagnostic folklore, region-as-agent, psychiatric treatment, rating-scale, imaging, biomarker, stimulation, and named-process examples such as “neuroplasticity.” It also applies physical continuity to neural tissue, energetic and material support, metabolic maintenance, and organism-state transitions. Those cases are not hard-coded into the generic runtime fixtures.
 
 ## Active structure
 
 | Path | Role |
 |------|------|
 | `model/00_purpose_and_scope.md` | Candidate purpose and operating boundary |
-| `model/kernel/` | Shared physical-chain, construct, causal, and evidence-admission invariants |
-| `model/runtime/` | Question compiler, answerability planner, evidence binder, answer contract, and domain-neutral fixtures |
-| `model/ingest/` | Data-first evidence maintenance, design gates, routing, record schema, and domain-neutral fixtures |
-| `model/cartridges/` | Domain-specific rules, handles, translation vocabulary, and fixtures |
+| `model/kernel/` | Shared physical-chain, metabolic, construct, causal, and evidence-admission invariants |
+| `model/runtime/` | Question compiler, answerability planner, evidence binder, answer contracts, and domain-neutral fixtures |
+| `model/ingest/` | Data-first evidence maintenance, physical-chain extraction, design gates, routing, and record schema |
+| `model/cartridges/` | Domain-specific rules, handles, physical-chain applications, translation vocabulary, and fixtures |
 | `model/manifests/runtime.json` | Authoritative candidate question-runtime load graph |
 | `model/manifests/ingest.json` | Authoritative candidate ingest load graph |
 | `model/manifest.json` | Default-manifest selector only |
@@ -73,10 +83,11 @@ Validate evidence policy, relation-specific causality, generic/domain separation
 python scripts/validate_model_policy.py
 ```
 
-Validate the canonical causal decision-record contract, mutation fixtures, deterministic answer rendering, and validator positive/negative controls:
+Validate semantic decision records, physical continuity, metabolic binding, deterministic rendering, and validator self-tests:
 
 ```bash
 python scripts/validate_conformance.py
+python scripts/validate_physical_continuity.py --fixtures-only
 ```
 
 Run semantic fixtures through a provider adapter that reads JSON on stdin and returns one decision-record JSON object:
@@ -89,7 +100,11 @@ python scripts/run_conformance.py \
   --fixture-set all
 ```
 
-CI validates the conformance harness and any committed result bundles. It does not call external providers. Adoption requires fresh generic and neuroscience provider runs satisfying `conformance/required_runs.json`; a runtime, kernel, cartridge, fixture, or provider-version change invalidates earlier results.
+CI validates both conformance harnesses and any committed result bundles. It does not call external providers. Adoption requires fresh complete result bundles accepted by:
+
+```bash
+python scripts/validate_adoption.py
+```
 
 ## Candidate status
 
