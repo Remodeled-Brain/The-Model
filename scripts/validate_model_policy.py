@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate generic evidence policy and domain-cartridge separation."""
+"""Validate generic evidence policy, physical continuity, and domain-cartridge separation."""
 
 from __future__ import annotations
 
@@ -11,25 +11,30 @@ import validate_repo as vr
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 MODEL = ROOT / "model"
 KERNEL = MODEL / "kernel" / "chain_contract.yaml"
+PHYSICAL_KERNEL = MODEL / "kernel" / "physical_continuity.yaml"
 EVIDENCE = MODEL / "kernel" / "evidence_admission.yaml"
 EVIDENCE_FIXTURES = MODEL / "kernel" / "evidence_admission_fixtures.json"
 COMPILER = MODEL / "runtime" / "question_compiler.yaml"
 PLANNER = MODEL / "runtime" / "answerability_planner.yaml"
 BINDER = MODEL / "runtime" / "evidence_binding_contract.yaml"
 ANSWER = MODEL / "runtime" / "answer_contract.yaml"
+PHYSICAL_ANSWER = MODEL / "runtime" / "physical_answer_contract.yaml"
 RUNTIME_FIXTURES = MODEL / "runtime" / "fixtures.json"
 INGEST_ARCHITECTURE = MODEL / "ingest" / "architecture.yaml"
 INGEST_RULES = MODEL / "ingest" / "rules.yaml"
+PHYSICAL_INGEST = MODEL / "ingest" / "physical_extraction_contract.yaml"
 FAILURE_ROUTING = MODEL / "ingest" / "failure_routing.yaml"
 RECORD_SCHEMA = MODEL / "ingest" / "record_schema.yaml"
 INGEST_FIXTURES = MODEL / "ingest" / "fixtures.json"
 NEURO_CARTRIDGE = MODEL / "cartridges" / "neuroscience.yaml"
+NEURO_PHYSICAL = MODEL / "cartridges" / "neuroscience_physical_continuity.yaml"
 NEURO_FIXTURES = MODEL / "cartridges" / "neuroscience_fixtures.json"
 RUNTIME_MANIFEST = MODEL / "manifests" / "runtime.json"
 INGEST_MANIFEST = MODEL / "manifests" / "ingest.json"
 
 CONSTRUCT_REF = "model/kernel/chain_contract.yaml#chain_contract.construct_admission.dispositions"
 CAUSAL_REF = "model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission.dispositions"
+PHYSICAL_REF = "model/kernel/physical_continuity.yaml#physical_continuity"
 EVIDENCE_REF = "model/kernel/evidence_admission.yaml#evidence_admission"
 ROLE_REF = "model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.evidence_role_classes"
 BODY_REF = "model/runtime/evidence_binding_contract.yaml#evidence_binding_contract.body_of_evidence_assessment.body_verdicts"
@@ -74,12 +79,29 @@ def validate_fixture_shape(path: pathlib.Path, *, modes: bool) -> None:
 
 
 def validate_manifests() -> None:
-    required_sources = {"kernel/evidence_admission.yaml", "kernel/evidence_admission_fixtures.json"}
-    required_domain = {"cartridges/neuroscience.yaml", "cartridges/neuroscience_fixtures.json"}
-    for path in (RUNTIME_MANIFEST, INGEST_MANIFEST):
-        manifest = fixture_data(path)
-        vr.require(required_sources <= set(manifest.get("source_files", [])), f"{path.name}: shared evidence kernel omitted")
-        vr.require(required_domain <= set(manifest.get("domain_modules", [])), f"{path.name}: neuroscience cartridge or fixtures omitted")
+    runtime_required = {
+        "kernel/evidence_admission.yaml",
+        "kernel/evidence_admission_fixtures.json",
+        "kernel/physical_continuity.yaml",
+        "runtime/physical_answer_contract.yaml",
+    }
+    ingest_required = {
+        "kernel/evidence_admission.yaml",
+        "kernel/evidence_admission_fixtures.json",
+        "kernel/physical_continuity.yaml",
+        "ingest/physical_extraction_contract.yaml",
+    }
+    required_domain = {
+        "cartridges/neuroscience.yaml",
+        "cartridges/neuroscience_physical_continuity.yaml",
+        "cartridges/neuroscience_fixtures.json",
+    }
+    runtime = fixture_data(RUNTIME_MANIFEST)
+    ingest = fixture_data(INGEST_MANIFEST)
+    vr.require(runtime_required <= set(runtime.get("source_files", [])), "runtime manifest omits shared evidence or physical kernel")
+    vr.require(ingest_required <= set(ingest.get("source_files", [])), "ingest manifest omits shared evidence or physical kernel")
+    for path, manifest in ((RUNTIME_MANIFEST, runtime), (INGEST_MANIFEST, ingest)):
+        vr.require(required_domain <= set(manifest.get("domain_modules", [])), f"{path.name}: neuroscience cartridge, physical application, or fixtures omitted")
 
 
 def validate_construct_and_causal_kernel() -> None:
@@ -93,6 +115,9 @@ def validate_construct_and_causal_kernel() -> None:
     require_text(
         KERNEL,
         [
+            "physical_continuity_ref: model/kernel/physical_continuity.yaml#physical_continuity",
+            "every_biological_explanation_must_bind_through_metabolically_maintained_state: true",
+            "causal_admission_does_not_imply_mechanistic_closure: true",
             "causal_admission_is_target_relation_specific: true",
             "intervention_status_neither_grants_nor_denies_causality: true",
             "required_tests_by_target:",
@@ -101,16 +126,71 @@ def validate_construct_and_causal_kernel() -> None:
             "endogenous_dependency_or_mechanism:",
             "A decisive controlled intervention can close the exact manipulated",
             "no_intervention_scope_transfer",
+            "no_metabolism_as_magic_operator",
         ],
     )
     require_text(
         PLANNER,
         [
+            PHYSICAL_REF,
+            "physical_chain_planning:",
+            "metabolically maintained state",
             "target_relation_plans:",
             "observational_causal_relation:",
             "intervention_to_outcome:",
             "A decisive intervention must not be rejected merely because it is therapeutic.",
-            "Prediction is required when entailed by the target claim rather than as a universal checkbox.",
+            "Exact intervention causality may coexist with partial internal physical or metabolic route closure.",
+        ],
+    )
+
+
+def validate_physical_continuity() -> None:
+    require_text(
+        PHYSICAL_KERNEL,
+        [
+            "Every admitted cause, operation, state, constraint, and transition is physical.",
+            "forms stars",
+            "Metabolics drives biology",
+            "metabolically maintained state",
+            "causal_admission_distinct_from_mechanistic_closure: true",
+            "no_action_at_a_distance_between_components",
+            "no_metabolism_as_magic_noun",
+        ],
+    )
+    require_text(
+        PHYSICAL_ANSWER,
+        [
+            PHYSICAL_REF,
+            "exact_intervention_effect_with_partial_route: allowed",
+            "mechanism_claim_with_partial_route: forbidden",
+            "metabolism_caused_it",
+        ],
+    )
+    require_text(
+        PHYSICAL_INGEST,
+        [
+            PHYSICAL_REF,
+            "Metabolism or metabolic activity by itself does not close a chain segment.",
+            "unresolved_physical_chain_slots",
+        ],
+    )
+    require_text(
+        ANSWER,
+        [
+            PHYSICAL_REF,
+            "universal_physical_rule:",
+            "biological_metabolic_rule:",
+            "causal_mechanistic_separation_rule:",
+            "action_at_a_distance_between_named_components",
+            "metabolism_as_magic_operator",
+        ],
+    )
+    require_text(
+        NEURO_PHYSICAL,
+        [
+            "Neural tissue has no separate causal currency.",
+            "metabolically maintained tissue",
+            "region_X_activated_then_behavior_changed",
         ],
     )
 
@@ -311,6 +391,7 @@ if __name__ == "__main__":
     try:
         validate_manifests()
         validate_construct_and_causal_kernel()
+        validate_physical_continuity()
         validate_data_first_admission()
         validate_shared_fixtures()
         validate_domain_separation()
