@@ -2,7 +2,7 @@
   "schema_version": "v1",
   "status": "candidate",
   "fixture_set": "generic",
-  "purpose": "Domain-neutral semantic conformance fixtures for data-first causality, physical continuity, metabolic binding, and folk-behavior reconstruction.",
+  "purpose": "Domain-neutral semantic conformance fixtures for data-first causality, physical continuity, metabolic binding, and target-identity reconstruction.",
   "fixtures": [
     {
       "id": "observational-narrative-invariance",
@@ -286,21 +286,24 @@
       ]
     },
     {
-      "id": "folk-behavior-target-reconstruction",
+      "id": "target-identity-reconstruction",
       "critical": true,
       "mutation_type": "scope_separation",
       "variants": [
         {
-          "id": "exact_protocol_measure_vs_folk_target",
+          "id": "exact_protocol_measure_vs_broader_target",
           "input": {
-            "question": "Did intervention X reduce procrastination?",
-            "narrative": "Intervention X reduced procrastination.",
+            "question": "Did intervention X change target T?",
+            "narrative": "Intervention X changed target T.",
+            "speaker_intent": "a general change that persists across ordinary conditions",
             "data": {
               "assigned_object": "complete protocol containing intervention, contact, task selection, reporting, and measurement",
-              "measured_outcome": "reported task initiation and completion under selected study conditions",
-              "folk_label": "procrastination",
-              "construct_unity": "not independently established",
-              "ecological_scope": "protocol-bound",
+              "source_defined_target": "one name grouping initiation delay, completion, self-report, and a composite classification",
+              "measured_outcome": "reported initiation and completion under selected study conditions",
+              "identity_generator": "absent",
+              "operational_equivalence": "not independently established",
+              "heterogeneity_generator": "absent",
+              "transport_scope": "protocol-bound",
               "comparison": "valid only for assignment to the complete protocol",
               "active_component_identity": "not isolated",
               "replication": "absent",
@@ -309,27 +312,27 @@
           },
           "expected": {
             "relations": {
-              "protocol_to_recorded_task_behavior": {
+              "protocol_to_recorded_outcome": {
                 "causal_disposition": "causal_unresolved",
                 "closure_state": "partial",
                 "target_relation": "intervention_to_outcome",
                 "construct_relation": "construct_independent"
               },
-              "intervention_reduces_procrastination": {
+              "intervention_changes_target_t": {
                 "causal_disposition": "causal_rejected",
                 "closure_state": "label_dependent",
                 "target_relation": "intervention_to_outcome",
                 "construct_relation": "construct_indexed"
               }
             },
-            "required_stripped_assertions": ["Intervention X reduced procrastination."],
+            "required_stripped_assertions": ["Intervention X changed target T."],
             "physical_relations": {
-              "protocol_to_recorded_task_behavior": {
+              "protocol_to_recorded_outcome": {
                 "explanatory_scope": "behavioral",
                 "physical_chain.status": "partial",
                 "physical_chain.metabolic_binding.status": "partial"
               },
-              "intervention_reduces_procrastination": {
+              "intervention_changes_target_t": {
                 "explanatory_scope": "behavioral",
                 "physical_chain.status": "partial",
                 "physical_chain.metabolic_binding.status": "partial"
