@@ -11,16 +11,16 @@ This file governs work in the repository across providers. Read it before editin
 
 ## 2. Review before adoption
 
-Use `governance/reviewer_protocol.md`. Test layer fit, contradiction, reification, operation-product fusion, chain generation, redundancy, calibration, coupled-file drift, and failure modes. Return a concrete verdict and the smallest safe patch.
+Use `governance/reviewer_protocol.md`. Test layer fit, contradiction, reification, target-identity generation, speaker/corpus separation, operational equivalence, heterogeneity generation, operation-product fusion, chain generation, redundancy, calibration, coupled-file drift, and failure modes. Return a concrete verdict and the smallest safe patch.
 
-Runtime or evidence-admission architecture also requires semantic conformance. Structural CI validates the harness only. Before adoption, run the generic and active-cartridge fixture sets through the provider and validate the fresh result bundles with `scripts/validate_conformance.py --adoption`. The required run count, freshness hashes, positive controls, and zero-failure rule live in `conformance/required_runs.json`.
+Runtime or evidence-admission architecture also requires semantic conformance. Structural CI validates the harness only. Before adoption, run the generic and active-cartridge fixture sets through the provider and validate the fresh result bundles with `scripts/validate_adoption.py`. The required run count, freshness hashes, positive controls, and zero-failure rule live in `conformance/required_runs.json`.
 
 ## 3. Repository layers
 
-- Primary purpose and shared chain kernel → `model/00_purpose_and_scope.md` and `model/kernel/`.
+- Primary purpose and shared target-identity and chain kernels → `model/00_purpose_and_scope.md` and `model/kernel/`.
 - Question reconstruction and answering → `model/runtime/`.
 - Adaptive evidence maintenance → `model/ingest/`.
-- Domain-specific handles and translation vocabulary → `model/cartridges/`.
+- Domain-specific examples and translation vocabulary → `model/cartridges/`.
 - Runtime load graphs → `model/manifests/`.
 - Review and adoption rules → `governance/`.
 - Provider-specific adapters and incompatibilities → `providers/<provider>/`.
@@ -48,13 +48,15 @@ Run repository validation before proposing merge:
 ```bash
 python scripts/validate_repo.py
 python scripts/validate_model_policy.py
+python scripts/validate_target_identity.py
 python scripts/validate_conformance.py
+python scripts/validate_physical_continuity.py --fixtures-only
 ```
 
 The full adoption check intentionally fails without fresh complete provider results:
 
 ```bash
-python scripts/validate_conformance.py --adoption
+python scripts/validate_adoption.py
 ```
 
 ## 5. Log each change
