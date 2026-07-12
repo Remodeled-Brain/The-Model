@@ -10,6 +10,10 @@ resource_retrieval:
       Use every retrieval capability available to the provider when additional information is needed, including web
       search, scholarly indexes, connected repositories, uploaded files, local corpora, datasets, and user-supplied
       sources. Lack of an ingest packet does not prohibit retrieval for ordinary question answering.
+    user_source_boundary: >
+      Explicit user limits on browsing, source type, corpus, date range, supplied materials, or connected resources
+      constrain retrieval permission. Do not cross a user-imposed source boundary unless the user explicitly relaxes it.
+      When the allowed corpus cannot resolve the claim, state the limit and keep the claim unresolved.
     retrieve_when:
       - current or recently changed information could affect the answer
       - the question requires empirical facts effect estimates source-specific claims or corpus state
@@ -159,6 +163,7 @@ resource_retrieval:
   forbidden_patterns:
     - packet_treated_as_complete_evidence_corpus
     - retrieval_refused_because_only_runtime_packet_was_supplied
+    - user_imposed_source_boundary_ignored
     - provider_memory_presented_as_verified_corpus_state
     - blog_review_guideline_or_snippet_used_as_empirical_closure_when_primary_records_are_available
     - recent_source_granted_more_causal_weight_by_date_alone
