@@ -36,9 +36,25 @@
       ]
     },
     {
+      "id": "neuro-group-classifier-consistency-audit",
+      "mode": "condition",
+      "condition": "The same target has both a distributional or group-effect result and a classifier-performance claim, without any prior determination that one is small or the other is high.",
+      "required": [
+        "run the consistency audit deterministically",
+        "compare empirical overlap and compatible effect-derived separation with classifier performance and uncertainty",
+        "identify any added multivariate information route",
+        "audit nuisance baselines leakage transport and individual assignment stability before deciding whether a discrepancy exists"
+      ],
+      "forbidden": [
+        "skip the audit because small and high thresholds were not crossed",
+        "presume contradiction merely because the metrics differ",
+        "assume multivariate complexity supplies the missing information route"
+      ]
+    },
+    {
       "id": "neuro-small-effect-high-classifier-contradiction",
       "mode": "condition",
-      "condition": "The measured group features show broad or near-total overlap, while a small internally validated multivariate model reports very high classification accuracy.",
+      "condition": "The consistency audit finds broad or near-total overlap in the measured group features while a small internally validated multivariate model reports much higher classification performance.",
       "required": [
         "preserve the measured overlap as positive category-failure evidence",
         "identify the additional multivariate information claimed to produce the accuracy",

@@ -11,8 +11,35 @@ statistical_qualifiers:
     - Strength on one qualifier cannot repair failure on another qualifier.
     - Statistical significance cannot supply practical magnitude, individual separation, calibration, stability, or transport.
     - Missing inputs remain unresolved. Do not replace unavailable distributions or pipeline details with favorable assumptions.
+    - Missing reporting blocks promotion for the affected claim but does not count as disconfirmation.
+    - Observed overlap leakage instability optimism calibration failure or transport failure may provide positive failure evidence for the exact promotion that required the failed relation.
+    - Closure states use only model/kernel/chain_contract.yaml closure_vocabulary. Qualifier bases are orthogonal explanations and never create additional closure states.
     - Use empirical distributions and independent evaluation data before parametric approximations when both are available.
     - No universal sample-size, accuracy, overlap, AUC, calibration, or feature-count cutoff applies across claims.
+
+  qualifier_basis:
+    purpose: >
+      Preserve why a qualifier received its closure state so missing reporting insufficient information invalid design
+      and observed failure do not collapse into one undifferentiated unresolved or negative verdict.
+    allowed:
+      - supported_by_reported_data
+      - missing_reporting
+      - insufficient_independent_information
+      - incompatible_design
+      - observed_overlap
+      - observed_instability
+      - observed_optimism
+      - observed_calibration_failure
+      - observed_transport_failure
+      - observed_multiplicity_failure
+      - not_applicable
+    rules:
+      - Every qualifier status must pair one closure_vocabulary state with one or more allowed basis codes.
+      - Basis codes explain a closure state and cannot be consumed as closure states.
+      - Missing reporting and insufficient independent information ordinarily preserve unresolved for the affected qualifier unless separate observed evidence assigns another state.
+      - Missing reporting is absence of admissible information rather than evidence that the studied relation failed.
+      - Incompatible design or observed failure may support contradicted or another applicable target disposition only for the exact relation whose necessary condition failed.
+      - A reported procedure and an actually executed procedure remain separate. Qualification follows evidence available to the runtime while the basis records reporting limits explicitly.
 
   claim_record:
     required:
@@ -85,7 +112,9 @@ statistical_qualifiers:
       - Multivariate discrimination exceeding univariate separation requires an identified added information route and leakage audit.
 
   classification_information:
-    raw_accuracy_default_status: unresolved_without_context
+    raw_accuracy_default:
+      closure_state: unresolved
+      basis: missing_reporting
     required:
       - independent_test_positive_count
       - independent_test_negative_count
@@ -236,13 +265,17 @@ statistical_qualifiers:
       - calibration_status
       - multiplicity_status
       - transport_status
+      - qualifier_basis_by_status
+      - reported_inputs
+      - unresolved_inputs
+      - observed_failure_evidence
       - admitted_numerical_relation
       - blocked_promotions
-      - unresolved_inputs
     rule: >
-      Return the strongest numerical relation that survives every qualifier required by the claim. Preserve exact
-      observations while blocking individual category causal mechanistic clinical or deployment promotion when the
-      corresponding qualifier fails.
+      Return the strongest numerical relation that survives every qualifier required by the claim. Pair every status
+      with an allowed qualifier basis. Preserve missing reporting as unresolved without turning absence into negative
+      evidence. Preserve exact observations while blocking or contradicting individual category causal mechanistic
+      clinical or deployment promotion when observed evidence breaks the corresponding required qualifier.
 
   forbidden_patterns:
     - one_global_statistical_quality_score
@@ -257,3 +290,5 @@ statistical_qualifiers:
     - calibration_metric_without_proper_score_or_untouched_evaluation
     - selected_best_pipeline_without_search_burden
     - missing_uncertainty_replaced_by_favorable_assumption
+    - missing_reporting_as_disconfirmation
+    - qualifier_basis_used_as_closure_state

@@ -9,6 +9,51 @@ neuroscience_statistics:
     features, site effects, preprocessing, measurement reliability, and label-selected samples commonly create
     apparent individual separation without a stable biological relation.
 
+  refinement_contract:
+    rule: >
+      The shared kernel owns generic qualifier definitions closure states and basis codes. This cartridge may only
+      specialize those qualifiers for neuroscience data structures and failure modes. It cannot redefine a kernel
+      qualifier or create an additional closure state.
+    refinement_map:
+      independent_unit_hierarchy:
+        refines:
+          - information_and_dependence
+      split_and_pipeline_isolation:
+        refines:
+          - pipeline_isolation_and_selection
+          - transport_distribution
+      nuisance_baselines:
+        refines:
+          - classification_information
+          - pipeline_isolation_and_selection
+      measurement_reliability:
+        refines:
+          - magnitude_and_precision
+          - resampling_stability
+      circular_localization:
+        refines:
+          - pipeline_isolation_and_selection
+      group_effect_classifier_consistency:
+        refines:
+          - distributional_separation
+          - classification_information
+          - pipeline_isolation_and_selection
+          - resampling_stability
+          - transport_distribution
+      full_pipeline_permutation:
+        refines:
+          - pipeline_isolation_and_selection
+          - multiplicity_and_researcher_selection
+      imaging_and_signal_specific_checks:
+        refines:
+          - classification_information
+          - resampling_stability
+          - transport_distribution
+      label_selected_sample_rule:
+        refines:
+          - classification_information
+          - transport_distribution
+
   independent_unit_hierarchy:
     possible_units:
       - trial
@@ -95,19 +140,29 @@ neuroscience_statistics:
       nominal test into construction data and blocks localization, separation, and generalized prediction claims.
 
   group_effect_classifier_consistency:
-    trigger: small_univariate_or_group_effect_with_high_reported_classifier_performance
+    activation:
+      deterministic: true
+      requires_both:
+        - distributional_or_group_effect_result_for_the_target
+        - classifier_performance_claim_for_the_same_target
+      rule: >
+        Run this audit whenever both claim types coexist. Do not require a prior judgment that the group effect is small
+        or the classifier performance is high. The audit determines whether any discrepancy exists and what information
+        route could generate it.
     required_audit:
+      - compare_empirical_overlap_or_group_distribution_with_reported_classifier_performance
+      - compare_effect_derived_idealized_separation_only_when_its_assumptions_are_compatible
+      - inspect_classifier_metric_uncertainty_and_independent_test_class_counts
       - identify_whether_classifier_features_are_the_same_measured_variables
       - identify_the_added_multivariate_information_route
-      - compare_against_site_scanner_motion_quality_and_demographic_baselines
-      - inspect_test_class_counts_and_metric_uncertainty
-      - inspect_all_preprocessing_selection_tuning_and_threshold_reuse
+      - compare_against_simple_site_scanner_motion_quality_demographic_and_labeling_route_baselines
+      - inspect_all_preprocessing_selection_tuning_threshold_and_reporting_reuse
       - test_leave_site_scanner_cohort_or_time_out_transport
       - compare_individual_assignment_stability_across_resamples
     rule: >
-      Multivariate prediction may exceed any one univariate effect only through additional measured information. When the
-      added discrimination is not localized and independently validated, the contradiction remains unresolved and the high
-      classifier result cannot rescue broad distributional overlap.
+      Multivariate prediction may exceed any one univariate effect only through additional measured information. The audit
+      does not presume contradiction from unequal metrics. When the added discrimination is not localized and independently
+      validated, the relation remains unresolved and classifier performance cannot rescue broad distributional overlap.
 
   full_pipeline_permutation:
     must_repeat:
@@ -172,6 +227,7 @@ neuroscience_statistics:
     - nuisance_predictability_hidden_by_residualization
     - circular_ROI_or_feature_selection
     - classifier_accuracy_as_biological_separation
-    - small_group_effect_rescued_by_unlocalized_multivariate_accuracy
+    - group_effect_rescued_by_unlocalized_multivariate_accuracy
+    - discretion_gated_consistency_audit
     - post_selection_permutation_as_full_pipeline_null_test
     - unstable_measurement_as_stable_biological_property

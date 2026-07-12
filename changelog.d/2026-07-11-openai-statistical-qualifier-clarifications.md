@@ -1,0 +1,1 @@
+- **[adopted]** Keep statistical qualifier closure states within the canonical vocabulary, distinguish missing reporting from observed failure with orthogonal basis codes, make neuroscience classifier-consistency audits deterministic, and enforce cartridge-to-kernel refinement mappings (OpenAI, 2026-07-11)
