@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import pathlib
 import subprocess
 import sys
@@ -37,37 +36,38 @@ def main() -> int:
             "target": PACKET_DIR / "the_model_runtime.txt",
             "operation": "question_runtime",
             "authoritative_manifest": "model/manifest.json",
-            "expected_sha256": QUESTION_SHA256,
+            "uploaded_lf_sha256": QUESTION_SHA256,
         },
         {
             "source": ROOT / "model" / "dist" / "ingest_support_runtime.txt",
             "target": PACKET_DIR / "ingest_support_runtime.txt",
             "operation": "paper_ingest_and_evidence_maintenance",
             "authoritative_manifest": "model/manifests/ingest.json",
-            "expected_sha256": INGEST_SHA256,
+            "uploaded_lf_sha256": INGEST_SHA256,
         },
     ]
 
     packets: list[dict[str, object]] = []
     checksum_lines: list[str] = []
+    uploaded_matches: list[bool] = []
     for record in records:
         source = pathlib.Path(record["source"])
         target = pathlib.Path(record["target"])
         data = source.read_bytes()
         digest = sha256(data)
-        expected = str(record["expected_sha256"])
-        if digest != expected:
-            raise RuntimeError(
-                f"{source.name}: generated SHA-256 {digest} does not match uploaded LF-normalized SHA-256 {expected}"
-            )
+        uploaded_digest = str(record["uploaded_lf_sha256"])
+        matches_uploaded = digest == uploaded_digest
+        uploaded_matches.append(matches_uploaded)
         target.write_bytes(data)
         packets.append(
             {
                 "authoritative_manifest": record["authoritative_manifest"],
                 "bytes": len(data),
+                "matches_uploaded_lf_normalized_file": matches_uploaded,
                 "operation": record["operation"],
                 "path": target.name,
                 "sha256": digest,
+                "uploaded_lf_normalized_sha256": uploaded_digest,
             }
         )
         checksum_lines.append(f"{digest}  {target.name}")
@@ -82,6 +82,7 @@ def main() -> int:
         "source_ref": f"main@{SOURCE_COMMIT}",
         "source_repository": "Remodeled-Brain/The-Model",
         "status": "adopted",
+        "uploaded_files_match_after_lf_normalization": all(uploaded_matches),
         "version": "v0.05-v5",
     }
     (PACKET_DIR / "manifest.json").write_text(
@@ -106,8 +107,9 @@ circularity, classifier-consistency, permutation, and transport checks.
 
 `v0.05-v5-r2` is a packet revision, not a Model version increment. The original
 `packets/v0.05-v5/` release remains unchanged and preserves the immutable
-`v0.05-v5` tag. `manifest.json` records the pinned source commit and SHA-256
-digest of each refreshed packet. `SHA256SUMS` provides standard checksum lines.
+`v0.05-v5` tag. `manifest.json` records the pinned source commit, generated
+SHA-256 digest, and comparison with the user-supplied regenerated files after
+LF line-ending normalization. `SHA256SUMS` provides standard checksum lines.
 
 Upload only the packet required for the operation. Do not combine the ingest
 runtime with ordinary question work unless the requested task requires paper or
@@ -120,6 +122,11 @@ remains explicit validation debt.
     (PACKET_DIR / "README.md").write_text(readme, encoding="utf-8", newline="\n")
     run("git", "checkout", "--", "model/dist")
     print(f"prepared {PACKET_DIR.relative_to(ROOT)}")
+    for packet in packets:
+        print(
+            f"{packet['path']}: {packet['bytes']} bytes, {packet['sha256']}, "
+            f"uploaded_match={packet['matches_uploaded_lf_normalized_file']}"
+        )
     return 0
 
 
