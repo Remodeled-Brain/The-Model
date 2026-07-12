@@ -1,1 +1,1 @@
-- **[candidate]** Permit recency-biased external retrieval while requiring every retrieved or remembered claim to pass model admission, with explicit effect-size, overlap, and predictive-separation extraction (ChatGPT, 2026-07-11)
+- **[candidate]** Permit recency-biased external retrieval within user-imposed source boundaries while requiring every retrieved or remembered claim to pass model admission, with explicit effect-size, overlap, and predictive-separation extraction (ChatGPT, 2026-07-11)
