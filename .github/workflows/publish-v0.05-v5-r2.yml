@@ -150,3 +150,5 @@ remains explicit validation debt.
           git add packets/v0.05-v5-r2
           git commit -m "Publish refreshed v0.05-v5-r2 runtime packets"
           git push origin HEAD:packet/v0.05-v5-r2
+
+# One-use publication workflow. Remove before merge.
