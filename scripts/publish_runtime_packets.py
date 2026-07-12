@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Publish frozen single-file runtime packets from an immutable release ref.
+"""Publish frozen single-file runtime packets from an immutable source ref.
 
 The normal builders continue to write disposable outputs under model/dist/. This
-script checks out the requested release ref in a temporary worktree, runs those
-builders there, and copies the exact results into packets/<version>/ with a
+script checks out the requested source ref in a temporary worktree, runs those
+builders there, and copies the exact results into packets/<packet-id>/ with a
 provenance manifest and checksums.
 """
 from __future__ import annotations
@@ -64,12 +64,25 @@ def sha256(path: pathlib.Path) -> str:
     return digest.hexdigest()
 
 
-def write_readme(destination: pathlib.Path, version: str, source_ref: str) -> None:
-    text = f"""# The Model {version} runtime packets
+def write_readme(
+    destination: pathlib.Path,
+    *,
+    model_version: str,
+    packet_id: str,
+    source_ref: str,
+    packet_revision: str | None,
+) -> None:
+    revision_line = (
+        f"This is packet revision `{packet_revision}` for Model version `{model_version}`.\n"
+        if packet_revision
+        else f"This packet corresponds to Model version `{model_version}`.\n"
+    )
+    text = f"""# The Model {packet_id} runtime packets
 
 These files are frozen, single-file browser-LLM handoffs generated from the
-immutable `{source_ref}` release ref.
+immutable source ref `{source_ref}`.
 
+{revision_line}
 - `the_model_runtime.txt` is the primary question-reconstruction and answering runtime.
 - `ingest_support_runtime.txt` is the paper-ingest and evidence-maintenance runtime.
 
@@ -87,10 +100,15 @@ particular provider follows it correctly.
     (destination / "README.md").write_text(text, encoding="utf-8", newline="\n")
 
 
-def publish(version: str, source_ref: str) -> pathlib.Path:
+def publish(
+    model_version: str,
+    packet_id: str,
+    source_ref: str,
+    packet_revision: str | None,
+) -> pathlib.Path:
     source_commit = git_value("rev-parse", f"{source_ref}^{{commit}}")
     source_date = git_value("show", "-s", "--format=%cI", source_commit)
-    destination = ROOT / "packets" / version
+    destination = ROOT / "packets" / packet_id
     destination.mkdir(parents=True, exist_ok=True)
 
     temporary_root = pathlib.Path(tempfile.mkdtemp(prefix="the-model-packet-"))
@@ -124,9 +142,10 @@ def publish(version: str, source_ref: str) -> pathlib.Path:
             )
         shutil.rmtree(temporary_root, ignore_errors=True)
 
-    manifest = {
+    manifest: dict[str, Any] = {
         "schema_version": "v1",
-        "version": version,
+        "version": model_version,
+        "packet_id": packet_id,
         "status": "adopted",
         "source_repository": "Remodeled-Brain/The-Model",
         "source_ref": source_ref,
@@ -135,6 +154,8 @@ def publish(version: str, source_ref: str) -> pathlib.Path:
         "packets": records,
         "provider_conformance_certified": False,
     }
+    if packet_revision:
+        manifest["packet_revision"] = packet_revision
     (destination / "manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -146,18 +167,33 @@ def publish(version: str, source_ref: str) -> pathlib.Path:
         encoding="utf-8",
         newline="\n",
     )
-    write_readme(destination, version, source_ref)
+    write_readme(
+        destination,
+        model_version=model_version,
+        packet_id=packet_id,
+        source_ref=source_ref,
+        packet_revision=packet_revision,
+    )
     return destination
 
 
 def main() -> int:
+    default_version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
     parser = argparse.ArgumentParser()
-    parser.add_argument("--version", default=(ROOT / "VERSION").read_text(encoding="utf-8").strip())
+    parser.add_argument("--version", default=default_version)
+    parser.add_argument("--packet-id", default=None)
+    parser.add_argument("--packet-revision", default=None)
     parser.add_argument("--source-ref", default=None)
     args = parser.parse_args()
+    packet_id = args.packet_id or args.version
     source_ref = args.source_ref or args.version
     try:
-        destination = publish(args.version, source_ref)
+        destination = publish(
+            args.version,
+            packet_id,
+            source_ref,
+            args.packet_revision,
+        )
     except (OSError, RuntimeError, subprocess.CalledProcessError) as exc:
         print(f"PACKET PUBLICATION FAILED: {exc}", file=sys.stderr)
         return 1
