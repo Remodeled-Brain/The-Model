@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Validate external-resource retrieval policy, manifest reachability, and quantitative fixtures."""
+"""Validate external-resource retrieval policy, source boundaries, and manifest reachability."""
 from __future__ import annotations
 
 import json
-import math
 import pathlib
 import sys
 from typing import Any
@@ -38,14 +37,6 @@ def load_json(path: pathlib.Path) -> dict[str, Any]:
     return value
 
 
-def normal_cdf(value: float) -> float:
-    return 0.5 * (1.0 + math.erf(value / math.sqrt(2.0)))
-
-
-def overlap_from_standardized_mean_difference(effect: float) -> float:
-    return 2.0 * normal_cdf(-abs(effect) / 2.0)
-
-
 def validate_manifest_reachability() -> None:
     for path in MANIFESTS:
         manifest = load_json(path)
@@ -66,17 +57,18 @@ def validate_policy() -> None:
         "universal_admission_rule:",
         "provider_memory_policy:",
         "quantitative_extraction:",
+        "qualifier_ref: model/kernel/statistical_qualifiers.yaml",
         "premise_rejection_retrieval_scope:",
         "retrieval_to_answer_contract:",
         "Retrieval changes availability, not admissibility.",
         "Provider memory is a lead generator, not admitted evidence.",
         "Do not cross a user-imposed source boundary unless the user explicitly relaxes it.",
-        "overlap_coefficient = 2 * Phi(-abs(d) / 2)",
-        "Statistical significance cannot substitute for magnitude",
+        "Pass those inputs to the shared statistical qualifier kernel.",
         "Premise rejection terminates only retrieval that requires or attempts to restore the failed entity.",
     )
     for fragment in required_fragments:
         require(fragment in text, f"retrieval policy missing required fragment: {fragment}")
+    require("overlap_coefficient =" not in text, "retrieval policy must delegate overlap calculation to statistical qualifiers")
     require("http://" not in text and "https://" not in text, "retrieval policy must remain resource-neutral")
 
 
@@ -92,8 +84,7 @@ def validate_fixtures() -> None:
         "user_source_boundary_controls_retrieval",
         "provider_memory_is_unverified",
         "recent_summary_does_not_outrank_primary_data",
-        "small_standardized_difference_requires_overlap",
-        "incompatible_metric_keeps_overlap_open",
+        "quantitative_retrieval_delegates_qualification",
         "premise_rejection_does_not_stop_narrow_retrieval",
         "downstream_association_cannot_rescue_failed_construct",
     }
@@ -103,32 +94,22 @@ def validate_fixtures() -> None:
         require(isinstance(fixture_id, str) and fixture_id, "retrieval fixture id missing")
         require(fixture_id not in ids, f"duplicate retrieval fixture id: {fixture_id}")
         ids.add(fixture_id)
-        require(isinstance(fixture.get("input"), dict), f"{fixture_id}: input missing")
-        require(isinstance(fixture.get("expected"), dict), f"{fixture_id}: expected missing")
-
-        values = fixture["input"]
-        expected = fixture["expected"]
-        if values.get("effect_metric") == "standardized_mean_difference":
-            require(values.get("approximately_normal") is True, f"{fixture_id}: normality assumption required")
-            require(values.get("equal_variance") is True, f"{fixture_id}: equal-variance assumption required")
-            effect = values.get("effect_value")
-            require(isinstance(effect, (int, float)), f"{fixture_id}: numeric effect required")
-            overlap = overlap_from_standardized_mean_difference(float(effect))
-            lower = expected.get("overlap_coefficient_min")
-            upper = expected.get("overlap_coefficient_max")
-            require(isinstance(lower, (int, float)) and isinstance(upper, (int, float)), f"{fixture_id}: overlap bounds required")
-            require(float(lower) <= overlap <= float(upper), f"{fixture_id}: overlap {overlap:.6f} outside expected range")
-            require(expected.get("statistical_significance_overrides_overlap") is False, f"{fixture_id}: significance must not override overlap")
-
-        if values.get("effect_metric") not in {None, "standardized_mean_difference"}:
-            require(expected.get("compute_normal_overlap_approximation") is False, f"{fixture_id}: incompatible metric used for normal overlap")
+        values = fixture.get("input")
+        expected = fixture.get("expected")
+        require(isinstance(values, dict), f"{fixture_id}: input missing")
+        require(isinstance(expected, dict), f"{fixture_id}: expected missing")
 
         if fixture_id == "user_source_boundary_controls_retrieval":
             require(expected.get("retrieve_outside_supplied_files") is False, f"{fixture_id}: user source boundary must control retrieval")
             require(expected.get("claim_status") == "unresolved", f"{fixture_id}: unresolved claim required when bounded corpus is insufficient")
 
+        if fixture_id == "quantitative_retrieval_delegates_qualification":
+            require(expected.get("delegate_to_statistical_qualifiers") is True, f"{fixture_id}: statistical delegation required")
+            require(expected.get("interpret_evidentiary_weight_inside_retrieval") is False, f"{fixture_id}: retrieval must not interpret statistical weight")
+
     require(required_ids <= ids, f"retrieval fixtures missing: {sorted(required_ids - ids)}")
     raw = FIXTURES.read_text(encoding="utf-8")
+    require("overlap_coefficient" not in raw, "retrieval fixtures must delegate overlap calculation")
     require("http://" not in raw and "https://" not in raw, "retrieval fixtures must remain resource-neutral")
 
 
