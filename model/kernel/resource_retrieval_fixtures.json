@@ -1,0 +1,102 @@
+{
+  "schema_version": "v1",
+  "fixture_set": "resource_retrieval",
+  "fixtures": [
+    {
+      "id": "external_retrieval_is_allowed",
+      "input": {
+        "runtime_packet_supplied": true,
+        "retrieval_tools_available": true,
+        "question_requires_empirical_support": true
+      },
+      "expected": {
+        "retrieve": true,
+        "packet_is_complete_evidence_corpus": false,
+        "retrieved_claims_require_admission": true
+      }
+    },
+    {
+      "id": "provider_memory_is_unverified",
+      "input": {
+        "claim_origin": "provider_memory",
+        "external_verification": false
+      },
+      "expected": {
+        "admission_status": "unverified",
+        "may_generate_search_lead": true,
+        "may_close_identity_or_causality": false
+      }
+    },
+    {
+      "id": "recent_summary_does_not_outrank_primary_data",
+      "input": {
+        "recent_navigation_source_available": true,
+        "older_primary_record_available": true,
+        "claim_type": "empirical"
+      },
+      "expected": {
+        "use_navigation_source_to_locate_records": true,
+        "inspect_primary_record": true,
+        "recency_alone_upgrades_weight": false
+      }
+    },
+    {
+      "id": "small_standardized_difference_requires_overlap",
+      "input": {
+        "effect_metric": "standardized_mean_difference",
+        "effect_value": 0.2,
+        "approximately_normal": true,
+        "equal_variance": true,
+        "statistically_significant": true
+      },
+      "expected": {
+        "overlap_coefficient_min": 0.91,
+        "overlap_coefficient_max": 0.94,
+        "statistical_significance_overrides_overlap": false,
+        "reject_promotions": [
+          "group_average_to_individual_defect",
+          "group_average_to_category_separator",
+          "statistical_to_practical_significance"
+        ]
+      }
+    },
+    {
+      "id": "incompatible_metric_keeps_overlap_open",
+      "input": {
+        "effect_metric": "odds_ratio",
+        "effect_value": 1.2,
+        "distribution_data_available": false
+      },
+      "expected": {
+        "compute_normal_overlap_approximation": false,
+        "overlap_status": "unresolved",
+        "manufacture_separation_from_p_value": false
+      }
+    },
+    {
+      "id": "premise_rejection_does_not_stop_narrow_retrieval",
+      "input": {
+        "construct_disposition": "premise_rejected",
+        "retrieval_purpose": "measure_effect_magnitude_overlap_and_prediction"
+      },
+      "expected": {
+        "continue_retrieval": true,
+        "entity_rescue_search": false,
+        "retain_narrow_observations": true
+      }
+    },
+    {
+      "id": "downstream_association_cannot_rescue_failed_construct",
+      "input": {
+        "construct_disposition": "premise_rejected",
+        "retrieved_relation": "downstream_association",
+        "proposed_use": "restore_failed_entity"
+      },
+      "expected": {
+        "admit_as_construct_rescue": false,
+        "preserve_exact_relation_if_valid": true,
+        "causal_scope_transfer": false
+      }
+    }
+  ]
+}
