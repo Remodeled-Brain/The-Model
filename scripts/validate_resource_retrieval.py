@@ -60,6 +60,7 @@ def validate_policy() -> None:
     text = POLICY.read_text(encoding="utf-8")
     required_fragments = (
         "retrieval_permission:",
+        "user_source_boundary:",
         "freshness_policy:",
         "source_selection:",
         "universal_admission_rule:",
@@ -69,6 +70,7 @@ def validate_policy() -> None:
         "retrieval_to_answer_contract:",
         "Retrieval changes availability, not admissibility.",
         "Provider memory is a lead generator, not admitted evidence.",
+        "Do not cross a user-imposed source boundary unless the user explicitly relaxes it.",
         "overlap_coefficient = 2 * Phi(-abs(d) / 2)",
         "Statistical significance cannot substitute for magnitude",
         "Premise rejection terminates only retrieval that requires or attempts to restore the failed entity.",
@@ -87,6 +89,7 @@ def validate_fixtures() -> None:
     ids: set[str] = set()
     required_ids = {
         "external_retrieval_is_allowed",
+        "user_source_boundary_controls_retrieval",
         "provider_memory_is_unverified",
         "recent_summary_does_not_outrank_primary_data",
         "small_standardized_difference_requires_overlap",
@@ -119,6 +122,10 @@ def validate_fixtures() -> None:
 
         if values.get("effect_metric") not in {None, "standardized_mean_difference"}:
             require(expected.get("compute_normal_overlap_approximation") is False, f"{fixture_id}: incompatible metric used for normal overlap")
+
+        if fixture_id == "user_source_boundary_controls_retrieval":
+            require(expected.get("retrieve_outside_supplied_files") is False, f"{fixture_id}: user source boundary must control retrieval")
+            require(expected.get("claim_status") == "unresolved", f"{fixture_id}: unresolved claim required when bounded corpus is insufficient")
 
     require(required_ids <= ids, f"retrieval fixtures missing: {sorted(required_ids - ids)}")
     raw = FIXTURES.read_text(encoding="utf-8")
