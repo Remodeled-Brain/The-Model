@@ -58,6 +58,7 @@
         "idealized_balanced_accuracy_min": 0.53,
         "idealized_balanced_accuracy_max": 0.55,
         "individual_separator_status": "rejected",
+        "qualifier_basis": "observed_overlap",
         "group_average_relation_preserved": true
       }
     },
@@ -72,8 +73,42 @@
       },
       "expected": {
         "classification_status": "unresolved",
+        "qualifier_basis": "missing_reporting",
+        "counts_as_disconfirmation": false,
         "support_weight_for_raw_accuracy": 0,
         "may_establish_generalized_performance": false
+      }
+    },
+    {
+      "id": "underreported_validation_is_unresolved_not_negative",
+      "input": {
+        "external_validation_claimed": true,
+        "external_confusion_matrix_available": false,
+        "calibration_reported": false,
+        "transport_details_reported": false,
+        "observed_failure_reported": false
+      },
+      "expected": {
+        "classification_status": "unresolved",
+        "transport_status": "unresolved",
+        "qualifier_basis": "missing_reporting",
+        "counts_as_disconfirmation": false,
+        "promotion_blocked": true
+      }
+    },
+    {
+      "id": "observed_external_collapse_is_positive_failure",
+      "input": {
+        "internally_corrected_balanced_accuracy": 0.9,
+        "locked_external_balanced_accuracy": 0.54,
+        "external_uncertainty_resolved": true,
+        "same_target_and_threshold": true
+      },
+      "expected": {
+        "transport_status": "contradicted",
+        "qualifier_basis": "observed_transport_failure",
+        "counts_as_disconfirmation": true,
+        "preserve_internal_0_90_as_generalized_support": false
       }
     },
     {
@@ -99,6 +134,7 @@
       },
       "expected": {
         "pipeline_isolation_status": "failed",
+        "qualifier_basis": "incompatible_design",
         "reported_performance_status": "apparent_or_leaked",
         "nested_label_makes_valid": false
       }
@@ -113,7 +149,8 @@
       "expected": {
         "aggregate_performance_stable": true,
         "individual_assignment_stable": false,
-        "individual_separator_status": "rejected"
+        "individual_separator_status": "rejected",
+        "qualifier_basis": "observed_instability"
       }
     },
     {
@@ -128,6 +165,7 @@
       "expected": {
         "performance_converged": false,
         "small_sample_peak_status": "optimism_evidence",
+        "qualifier_basis": "observed_optimism",
         "preserve_original_0_92_as_weaker_support": false
       }
     },
@@ -158,6 +196,7 @@
       "expected": {
         "discrimination_status": "observed",
         "calibration_status": "unresolved",
+        "qualifier_basis": "missing_reporting",
         "probability_quality_established": false
       }
     },
@@ -171,6 +210,7 @@
       },
       "expected": {
         "selection_burden": "unresolved",
+        "qualifier_basis": "missing_reporting",
         "winner_performance_admitted_as_locked_test": false
       }
     }
