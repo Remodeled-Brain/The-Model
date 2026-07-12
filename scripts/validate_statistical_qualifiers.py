@@ -12,14 +12,16 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 MODEL = ROOT / "model"
 POLICY = MODEL / "kernel" / "statistical_qualifiers.yaml"
 FIXTURES = MODEL / "kernel" / "statistical_qualifier_fixtures.json"
-NEURO = MODEL / "cartridges" / "neuroscience.yaml"
-NEURO_FIXTURES = MODEL / "cartridges" / "neuroscience_fixtures.json"
+NEURO = MODEL / "cartridges" / "neuroscience_statistics.yaml"
+NEURO_FIXTURES = MODEL / "cartridges" / "neuroscience_statistical_fixtures.json"
 MANIFESTS = (
     MODEL / "manifests" / "runtime.json",
     MODEL / "manifests" / "ingest.json",
 )
 POLICY_REF = "kernel/statistical_qualifiers.yaml"
 FIXTURE_REF = "kernel/statistical_qualifier_fixtures.json"
+NEURO_REF = "cartridges/neuroscience_statistics.yaml"
+NEURO_FIXTURE_REF = "cartridges/neuroscience_statistical_fixtures.json"
 
 
 class ValidationError(RuntimeError):
@@ -67,10 +69,15 @@ def validate_manifest_reachability() -> None:
     for path in MANIFESTS:
         manifest = load_json(path)
         sources = manifest.get("source_files")
+        domains = manifest.get("domain_modules")
         require(isinstance(sources, list), f"{path.name}: source_files missing")
+        require(isinstance(domains, list), f"{path.name}: domain_modules missing")
         require(POLICY_REF in sources, f"{path.name}: statistical qualifier policy is not reachable")
         require(FIXTURE_REF in sources, f"{path.name}: statistical qualifier fixtures are not reachable")
         require(sources.index(POLICY_REF) < sources.index(FIXTURE_REF), f"{path.name}: policy must precede fixtures")
+        require(NEURO_REF in domains, f"{path.name}: neuroscience statistical cartridge is not reachable")
+        require(NEURO_FIXTURE_REF in domains, f"{path.name}: neuroscience statistical fixtures are not reachable")
+        require(domains.index(NEURO_REF) < domains.index(NEURO_FIXTURE_REF), f"{path.name}: neuroscience statistical policy must precede fixtures")
 
 
 def validate_policy() -> None:
@@ -160,7 +167,7 @@ def validate_fixtures() -> None:
 def validate_neuroscience_extension() -> None:
     text = NEURO.read_text(encoding="utf-8")
     required_fragments = (
-        "quantitative_neuroscience_policy:",
+        "neuroscience_statistics:",
         "independent_unit_hierarchy:",
         "split_and_pipeline_isolation:",
         "nuisance_baselines:",
@@ -172,11 +179,12 @@ def validate_neuroscience_extension() -> None:
         "voxels_trials_time_points_scans_or_augmented_images_as_independent_population_n",
     )
     for fragment in required_fragments:
-        require(fragment in text, f"neuroscience cartridge missing statistical extension: {fragment}")
+        require(fragment in text, f"neuroscience statistical cartridge missing required fragment: {fragment}")
+    require("http://" not in text and "https://" not in text, "neuroscience statistical cartridge must remain resource-neutral")
 
     data = load_json(NEURO_FIXTURES)
     fixtures = data.get("fixtures")
-    require(isinstance(fixtures, list), "neuroscience fixtures missing")
+    require(isinstance(fixtures, list), "neuroscience statistical fixtures missing")
     fixture_ids = {item.get("id") for item in fixtures if isinstance(item, dict)}
     required_ids = {
         "neuro-classifier-row-leakage",
@@ -184,8 +192,12 @@ def validate_neuroscience_extension() -> None:
         "neuro-small-effect-high-classifier-contradiction",
         "neuro-reliability-ceiling",
         "neuro-full-pipeline-permutation",
+        "neuro-circular-roi-selection",
+        "neuro-pooled-multisite-performance",
     }
     require(required_ids <= fixture_ids, f"neuroscience statistical fixtures missing: {sorted(required_ids - fixture_ids)}")
+    raw = NEURO_FIXTURES.read_text(encoding="utf-8")
+    require("http://" not in raw and "https://" not in raw, "neuroscience statistical fixtures must remain resource-neutral")
 
 
 def main() -> int:
