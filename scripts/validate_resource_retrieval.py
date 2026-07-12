@@ -63,7 +63,8 @@ def validate_policy() -> None:
         "Retrieval changes availability, not admissibility.",
         "Provider memory is a lead generator, not admitted evidence.",
         "Do not cross a user-imposed source boundary unless the user explicitly relaxes it.",
-        "Pass those inputs to the shared statistical qualifier kernel.",
+        "Pass those inputs to the shared",
+        "statistical qualifier kernel.",
         "Premise rejection terminates only retrieval that requires or attempts to restore the failed entity.",
     )
     for fragment in required_fragments:
