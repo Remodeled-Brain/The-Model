@@ -1,0 +1,28 @@
+{
+  "packet_id": "v0.05-v5-r2",
+  "packet_revision": "r2",
+  "packets": [
+    {
+      "authoritative_manifest": "model/manifest.json",
+      "bytes": 231013,
+      "operation": "question_runtime",
+      "path": "the_model_runtime.txt",
+      "sha256": "d176d8e5f4543c8215e1fc4960af204ebe31c6bc86d8a5ac63ba06598006147a"
+    },
+    {
+      "authoritative_manifest": "model/manifests/ingest.json",
+      "bytes": 204086,
+      "operation": "paper_ingest_and_evidence_maintenance",
+      "path": "ingest_support_runtime.txt",
+      "sha256": "629fd90ad90a4717af25947cecd14fa40bb3072597b5db9d4e549387fc1ffa70"
+    }
+  ],
+  "provider_conformance_certified": false,
+  "schema_version": "v1",
+  "source_commit": "c3d6f02536f153a29c995f53c981f46ebbb414bb",
+  "source_commit_date": "2026-07-11T19:23:05-07:00",
+  "source_ref": "c3d6f02536f153a29c995f53c981f46ebbb414bb",
+  "source_repository": "Remodeled-Brain/The-Model",
+  "status": "adopted",
+  "version": "v0.05-v5"
+}
