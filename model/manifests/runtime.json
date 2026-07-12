@@ -13,6 +13,10 @@
     "runtime/question_compiler.yaml",
     "runtime/target_identity_gate.yaml",
     "runtime/answerability_planner.yaml",
+    "kernel/resource_retrieval.yaml",
+    "kernel/resource_retrieval_fixtures.json",
+    "kernel/statistical_qualifiers.yaml",
+    "kernel/statistical_qualifier_fixtures.json",
     "runtime/evidence_binding_contract.yaml",
     "runtime/answer_contract.yaml",
     "runtime/target_identity_answer_contract.yaml",
@@ -23,7 +27,9 @@
   "domain_modules": [
     "cartridges/neuroscience.yaml",
     "cartridges/neuroscience_physical_continuity.yaml",
-    "cartridges/neuroscience_fixtures.json"
+    "cartridges/neuroscience_fixtures.json",
+    "cartridges/neuroscience_statistics.yaml",
+    "cartridges/neuroscience_statistical_fixtures.json"
   ],
   "support_manifests": [
     "manifests/ingest.json"

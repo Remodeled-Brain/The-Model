@@ -1,0 +1,119 @@
+{
+  "schema_version": "v1",
+  "status": "candidate",
+  "domain": "neuroscience statistical qualification",
+  "fixtures": [
+    {
+      "id": "neuro-classifier-row-leakage",
+      "mode": "condition",
+      "condition": "A classifier uses multiple scans or windows per participant and randomly splits rows so the same participant appears in training and test data.",
+      "required": [
+        "identify subject as the independent unit",
+        "classify the reported test performance as leaked",
+        "require grouped splitting by subject and any higher relevant dependency",
+        "recompute uncertainty from independent evaluation subjects"
+      ],
+      "forbidden": [
+        "count scans windows voxels or trials as independent population observations",
+        "treat high row-level accuracy as external prediction",
+        "repair the split by merely lowering evidence weight"
+      ]
+    },
+    {
+      "id": "neuro-nuisance-only-classifier",
+      "mode": "condition",
+      "condition": "A brain-feature classifier predicts a group label, while site scanner motion quality or recruitment metadata alone predict the same label nearly as well.",
+      "required": [
+        "report nuisance-only neural-only and combined performance separately",
+        "treat nuisance discrimination as positive evidence for sample-construction prediction",
+        "require stable added information from neural features under leave-site or equivalent transport",
+        "block biological separator and regional mechanism promotion"
+      ],
+      "forbidden": [
+        "hide nuisance predictability after residualization",
+        "call the classifier a neural signature",
+        "infer biological separation from pooled accuracy"
+      ]
+    },
+    {
+      "id": "neuro-small-effect-high-classifier-contradiction",
+      "mode": "condition",
+      "condition": "The measured group features show broad or near-total overlap, while a small internally validated multivariate model reports very high classification accuracy.",
+      "required": [
+        "preserve the measured overlap as positive category-failure evidence",
+        "identify the additional multivariate information claimed to produce the accuracy",
+        "audit leakage nuisance variables test class counts selection search and assignment stability",
+        "require locked external transport before admitting generalized prediction"
+      ],
+      "forbidden": [
+        "let classifier accuracy rescue the group variables as an individual defect",
+        "assume multivariate complexity explains the discrepancy",
+        "treat internal cross-validation as independent replication"
+      ]
+    },
+    {
+      "id": "neuro-reliability-ceiling",
+      "mode": "condition",
+      "condition": "A neural measurement and target assignment both have limited repeat reliability, but the reported association or classifier is described as a stable individual biological property.",
+      "required": [
+        "extract feature and target repeat reliability",
+        "apply a reliability ceiling only under stated compatible error assumptions",
+        "compare repeated-scan prediction agreement and individual classification stability",
+        "block stable-property promotion when measurement or target assignment is unstable"
+      ],
+      "forbidden": [
+        "use reliability correction to create biological identity",
+        "ignore instability because average group performance is high",
+        "treat one acquisition as a stable trait measurement"
+      ]
+    },
+    {
+      "id": "neuro-full-pipeline-permutation",
+      "mode": "condition",
+      "condition": "A paper reports a significant permutation test after selecting features hyperparameters and thresholds on the true labels, then permutes only the final fitted score.",
+      "required": [
+        "classify the permutation as post-selection and incomplete",
+        "require permutation of the complete discovery pipeline including selection tuning and thresholding",
+        "limit any valid permutation result to the sampled construction",
+        "keep biological identity mechanism and transport separate"
+      ],
+      "forbidden": [
+        "treat the post-selection permutation as a full null test",
+        "infer mechanism from performance beyond shuffled labels",
+        "allow permutation significance to repair leakage"
+      ]
+    },
+    {
+      "id": "neuro-circular-roi-selection",
+      "mode": "condition",
+      "condition": "The same outcome contrast selects regions or connections and tests those selected features in the same observations.",
+      "required": [
+        "classify the localization and performance claims as circular",
+        "require independent selection data or training-only selection inside every split",
+        "preserve only the direct measurements before circular promotion",
+        "block regional source defect and separator claims"
+      ],
+      "forbidden": [
+        "describe the selected map as independently localized",
+        "treat a later classifier on the same selected features as validation",
+        "repair circularity with a smaller p value"
+      ]
+    },
+    {
+      "id": "neuro-pooled-multisite-performance",
+      "mode": "condition",
+      "condition": "A pooled multisite classifier reports good average performance but omits site-specific confusion matrices and leave-site-out testing.",
+      "required": [
+        "classify pooled performance as internal to the sampled site mixture",
+        "require site-specific performance and leave-site scanner cohort or time-out evaluation",
+        "keep between-setting variance and prediction for a new setting unresolved",
+        "block general population and biological signature claims"
+      ],
+      "forbidden": [
+        "treat random pooled folds as site transport",
+        "allow average performance to hide site reversal or collapse",
+        "call the result externally validated"
+      ]
+    }
+  ]
+}

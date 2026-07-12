@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run structural, target-identity, causal, and physical adoption gates."""
+"""Run structural, retrieval, statistical, target-identity, causal, and physical adoption gates."""
 from __future__ import annotations
 
 import pathlib
@@ -13,6 +13,8 @@ def main() -> int:
     results = sys.argv[1:]
     commands = [
         [sys.executable, str(ROOT / "scripts/validate_repo.py")],
+        [sys.executable, str(ROOT / "scripts/validate_resource_retrieval.py")],
+        [sys.executable, str(ROOT / "scripts/validate_statistical_qualifiers.py")],
         [sys.executable, str(ROOT / "scripts/validate_model_policy.py")],
         [sys.executable, str(ROOT / "scripts/validate_target_identity.py")],
         [sys.executable, str(ROOT / "scripts/validate_conformance.py"), *results, "--adoption"],

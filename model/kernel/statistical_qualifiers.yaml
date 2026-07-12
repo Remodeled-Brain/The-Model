@@ -1,0 +1,259 @@
+statistical_qualifiers:
+  status: candidate
+  layer: shared_kernel
+  purpose: >
+    Convert reported numerical results into claim-specific qualifiers for magnitude, precision, separation,
+    dependence, selection optimism, stability, calibration, multiplicity, and transport. These qualifiers constrain
+    promotion of the exact relation. They do not create one aggregate study-quality score.
+
+  governing_rules:
+    - A numerical result is qualified for the claim actually made, not for a paper or model as a whole.
+    - Strength on one qualifier cannot repair failure on another qualifier.
+    - Statistical significance cannot supply practical magnitude, individual separation, calibration, stability, or transport.
+    - Missing inputs remain unresolved. Do not replace unavailable distributions or pipeline details with favorable assumptions.
+    - Use empirical distributions and independent evaluation data before parametric approximations when both are available.
+    - No universal sample-size, accuracy, overlap, AUC, calibration, or feature-count cutoff applies across claims.
+
+  claim_record:
+    required:
+      - exact_numerical_claim
+      - target_relation
+      - measurement_unit
+      - independent_sampling_unit
+      - population_and_sampling_frame
+      - estimator_or_model
+      - evaluation_design
+      - practical_threshold_when_claimed
+    rule: >
+      Remove the headline metric from its narrative wrapper and reconstruct the operation that generated it. Bind every
+      qualifier to the exact outcome, population, threshold, pipeline, and evaluation design.
+
+  information_and_dependence:
+    required_when_available:
+      - nominal_row_count
+      - independent_unit_count
+      - positive_and_negative_evaluation_counts
+      - cluster_count_and_cluster_size
+      - repeated_measurement_structure
+      - family_site_operator_or_time_dependencies
+      - sampling_or_analysis_weights
+      - intraclass_correlation
+    calculations_when_inputs_permit:
+      cluster_design_effect: "1 + (mean_cluster_size - 1) * intraclass_correlation"
+      cluster_effective_n: "nominal_n / cluster_design_effect"
+      weighted_effective_n: "sum(weights)^2 / sum(weights^2)"
+    rules:
+      - Rows measurements trials images windows and augmented copies do not become independent population units by count.
+      - The effective information is bounded by the highest dependency unit relevant to the claim.
+      - When dependence is known but cannot be quantified, effective sample size remains unresolved rather than nominal.
+
+  magnitude_and_precision:
+    required_when_reported_or_derivable:
+      - point_estimate
+      - uncertainty_interval
+      - interval_method
+      - standard_error_or_sampling_distribution
+      - practical_effect_threshold
+      - direction_and_units
+    derived_when_inputs_permit:
+      relative_uncertainty: "confidence_interval_half_width / abs(point_estimate)"
+      threshold_resolution: "confidence_interval_width / practical_effect_threshold"
+    status_rules:
+      - If the interval spans materially opposing directions, direction is unresolved.
+      - If the interval spans trivial and practically consequential effects, practical magnitude is unresolved.
+      - A narrow interval centered near zero establishes a small effect rather than importance.
+      - A point estimate without adequate uncertainty cannot establish the magnitude claimed.
+
+  distributional_separation:
+    required_when_the_claim_entails_individual_or_category_separation:
+      - group_or_class_distributions
+      - variance_or_quantiles
+      - empirical_overlap_when_available
+      - standardized_effect_when_available
+      - out_of_sample_discrimination
+    approximation_when_compatible:
+      assumptions:
+        - approximately_normal_distributions
+        - equal_variance
+        - standardized_mean_difference
+      overlap_coefficient: "2 * Phi(-abs(d) / 2)"
+      idealized_balanced_accuracy: "Phi(abs(d) / 2)"
+    rules:
+      - State every assumption used for a distributional approximation.
+      - Near-total overlap is positive evidence against individual defect category separator or unitary-state promotion.
+      - A group-average displacement may remain valid even when individual assignment fails.
+      - Multivariate discrimination exceeding univariate separation requires an identified added information route and leakage audit.
+
+  classification_information:
+    raw_accuracy_default_status: unresolved_without_context
+    required:
+      - independent_test_positive_count
+      - independent_test_negative_count
+      - confusion_matrix
+      - class_prevalence_in_evaluation_sample
+      - intended_deployment_prevalence
+      - no_information_or_simple_baseline
+      - sensitivity_and_specificity
+      - balanced_accuracy
+      - predictive_values_at_relevant_prevalence
+      - threshold_selection_rule
+      - uncertainty_for_each_claimed_metric
+    derive_when_inputs_permit:
+      - majority_class_accuracy
+      - balanced_accuracy
+      - sensitivity
+      - specificity
+      - positive_and_negative_predictive_value
+      - likelihood_ratios
+      - Matthews_correlation_coefficient
+      - expected_false_positive_and_false_negative_counts_at_deployment_prevalence
+    rules:
+      - Accuracy alone receives no support weight.
+      - Artificially balanced evaluation prevalence cannot be transported into deployment predictive values.
+      - Cross-validation predictions from overlapping training sets do not become independent test observations.
+      - When evaluation class counts cannot estimate the claimed performance with useful precision, performance magnitude is unresolved.
+
+  pipeline_isolation_and_selection:
+    data_dependent_operations:
+      - imputation
+      - normalization_or_scaling
+      - harmonization
+      - outlier_rules
+      - confound_adjustment
+      - feature_construction
+      - feature_selection
+      - dimensionality_reduction
+      - model_family_selection
+      - hyperparameter_tuning
+      - threshold_selection
+      - calibration
+    rules:
+      - Every data-dependent operation must be fitted inside the training portion of each evaluation split.
+      - Any evaluation data used to choose preprocessing features models hyperparameters thresholds or reporting makes that evaluation part of model construction.
+      - Nested evaluation can estimate selection-corrected performance within the sampled population. It does not establish transport.
+      - An unreported or unisolated adaptive search leaves selection optimism unresolved.
+      - Similar aggregate performance across viable pipelines does not establish stable individual assignments.
+
+  optimism_ledger:
+    required_when_available:
+      - apparent_training_or_reused_evaluation_performance
+      - internally_corrected_performance
+      - locked_external_performance
+      - prospective_operational_performance
+    calculations:
+      selection_optimism: "apparent_performance - internally_corrected_performance"
+      transport_loss: "internally_corrected_performance - locked_external_performance"
+      implementation_loss: "locked_external_performance - prospective_operational_performance"
+    rule: >
+      A large drop at any stage is positive evidence that the earlier estimate depended on selection, sampling,
+      environment, or implementation. It is not merely a lower-weight version of the original claim.
+
+  resampling_stability:
+    full_pipeline_requirement: >
+      Repeat the entire data-dependent pipeline across bootstrap samples or repeated development samples. Reusing a fixed
+      selected feature set or tuned pipeline measures conditional variance only and cannot establish construction stability.
+    extract_when_available:
+      - individual_prediction_distribution
+      - classification_flip_rate
+      - coefficient_sign_and_magnitude_stability
+      - feature_selection_frequency
+      - rank_stability
+      - threshold_stability
+      - calibration_parameter_distribution
+      - performance_distribution
+    rules:
+      - Material prediction or classification changes under minor resampling are positive evidence against a stable individual separator.
+      - Stable average performance cannot rescue unstable individual assignments.
+      - Feature recurrence without prediction stability does not establish a stable route.
+
+  learning_curve_and_assurance:
+    required_when_generalized_or_deployment_performance_is_claimed:
+      - performance_across_increasing_training_sizes
+      - uncertainty_across_increasing_training_sizes
+      - calibration_across_increasing_training_sizes
+      - prediction_instability_across_increasing_training_sizes
+      - prespecified_stopping_or_acceptance_criteria
+    preferred_target: "probability_that_performance_lies_in_an_acceptable_range"
+    rules:
+      - A high small-sample estimate that declines with increasing sample size is optimism evidence.
+      - A materially changing learning curve means performance has not converged.
+      - Acceptable expected performance cannot replace an adequate probability of acceptable realized performance.
+
+  calibration_and_proper_scoring:
+    required_when_probabilities_or_risks_are_claimed:
+      - calibration_intercept
+      - calibration_slope
+      - calibration_curve
+      - Brier_score_or_other_proper_score
+      - log_loss_or_other_strictly_proper_score_when_available
+      - threshold_specific_decision_utility_when_action_is_claimed
+    rules:
+      - Discrimination ranking calibration and decision utility are separate relations.
+      - A calibration summary such as expected calibration error cannot establish probability quality by itself.
+      - Recalibration on the evaluation set makes that set part of model construction unless a later untouched test remains.
+
+  multiplicity_and_researcher_selection:
+    required_when_available:
+      - number_of_outcomes
+      - number_of_tests
+      - number_of_subgroups
+      - number_of_time_windows
+      - number_of_models_and_hyperparameter_settings
+      - correction_or_hierarchical_model
+      - preregistration_and_outcome_switching
+      - multiverse_or_specification_results
+    simple_check_when_inputs_permit:
+      expected_null_positives: "number_of_tests * alpha"
+    rules:
+      - A selected positive result from an incompletely reported search space has unresolved selection burden.
+      - Dependent tests and adaptive search prevent naive test-count arithmetic from proving adequate correction.
+      - When specification results exist report sign stability magnitude range and the fraction clearing practical thresholds.
+
+  transport_distribution:
+    required_when_scope_exceeds_one_sample_or_setting:
+      - performance_by_site_cohort_time_operator_device_or_population
+      - between_setting_variance
+      - worst_setting_performance
+      - transport_loss
+      - prediction_interval_for_a_new_setting_when_estimable
+      - prospective_operational_validation_when_use_is_claimed
+    rules:
+      - One external validation establishes performance in one additional setting rather than universal validation.
+      - Generalization requires a distribution of performance across relevant settings or an explicitly bounded target setting.
+      - Pooled performance cannot hide setting-level reversal collapse or severe calibration drift.
+
+  output_record:
+    required:
+      - target_relation
+      - information_status
+      - magnitude_status
+      - precision_status
+      - separation_status
+      - classification_status
+      - pipeline_isolation_status
+      - optimism_status
+      - stability_status
+      - calibration_status
+      - multiplicity_status
+      - transport_status
+      - admitted_numerical_relation
+      - blocked_promotions
+      - unresolved_inputs
+    rule: >
+      Return the strongest numerical relation that survives every qualifier required by the claim. Preserve exact
+      observations while blocking individual category causal mechanistic clinical or deployment promotion when the
+      corresponding qualifier fails.
+
+  forbidden_patterns:
+    - one_global_statistical_quality_score
+    - raw_accuracy_as_validation
+    - nominal_rows_as_independent_sample_size
+    - statistical_significance_as_practical_importance
+    - group_mean_difference_as_individual_separator
+    - internal_cross_validation_as_external_transport
+    - nested_cross_validation_as_deployment_validation
+    - aggregate_performance_as_individual_assignment_stability
+    - one_external_validation_as_universal_validation
+    - calibration_metric_without_proper_score_or_untouched_evaluation
+    - selected_best_pipeline_without_search_burden
+    - missing_uncertainty_replaced_by_favorable_assumption

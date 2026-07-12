@@ -1,0 +1,177 @@
+# Neuroscience-specific statistical and predictive checks
+# Status: CANDIDATE
+neuroscience_statistics:
+  status: candidate
+  layer: domain_cartridge
+  generic_contract_ref: model/kernel/statistical_qualifiers.yaml
+  purpose: >
+    Apply the shared statistical qualifiers to neuroscience data structures where repeated measurements, imaging
+    features, site effects, preprocessing, measurement reliability, and label-selected samples commonly create
+    apparent individual separation without a stable biological relation.
+
+  independent_unit_hierarchy:
+    possible_units:
+      - trial
+      - time_point
+      - voxel_or_vertex
+      - image_or_scan
+      - subject
+      - family
+      - site_or_scanner
+      - cohort
+      - acquisition_period
+    rules:
+      - Voxels trials time points scans or augmented images do not count as independent population observations.
+      - Repeated scans and derived images remain grouped by subject.
+      - Related participants remain grouped by family when familial dependence can cross evaluation splits.
+      - Site scanner cohort or acquisition period becomes the evaluation unit when the claim requires transport across it.
+      - The highest dependency unit relevant to the claim controls effective information and split structure.
+
+  split_and_pipeline_isolation:
+    required_split_when_applicable:
+      - grouped_by_subject
+      - grouped_by_family
+      - leave_site_scanner_cohort_or_time_out
+      - prospective_or_locked_external_dataset
+    operations_that_must_fit_inside_training_data:
+      - motion_or_quality_exclusion_thresholds
+      - spatial_normalization_choices
+      - harmonization
+      - confound_regression
+      - nuisance_residualization
+      - feature_scaling
+      - parcellation_or_ROI_selection
+      - voxel_vertex_or_connection_selection
+      - dimensionality_reduction
+      - model_and_hyperparameter_selection
+      - threshold_selection
+      - calibration
+    rules:
+      - Random row or scan splits are invalid when a subject family site scanner cohort or time dependency crosses folds.
+      - Preprocessing described as unsupervised still belongs inside the split when it uses the evaluation distribution.
+      - Label-aware or outcome-aware preprocessing before splitting makes the reported internal performance leaked.
+      - Nested cross-validation controls adaptive development within the sampled construction. It does not establish biological identity or transport.
+
+  nuisance_baselines:
+    required_when_available:
+      - site_only_model
+      - scanner_only_model
+      - motion_and_image_quality_model
+      - age_sex_and_demographic_model
+      - medication_or_treatment_status_model
+      - recruitment_source_model
+      - diagnostic_instrument_or_labeling_route_model
+      - acquisition_and_preprocessing_metadata_model
+    comparisons:
+      - neural_features_only
+      - nuisance_features_only
+      - neural_plus_nuisance_features
+    rules:
+      - High nuisance-only discrimination is positive evidence that sample construction may be carrying the label relation.
+      - Neural features must add stable out-of-sample information beyond nuisance baselines before receiving neural separation weight.
+      - Residualization cannot erase the need to report nuisance predictability and transport.
+
+  measurement_reliability:
+    required_when_available:
+      - feature_test_retest_reliability
+      - target_or_label_test_retest_reliability
+      - repeated_scan_prediction_agreement
+      - acquisition_and_preprocessing_reliability
+    correlation_ceiling_when_classical_independent_error_assumptions_apply: "sqrt(feature_reliability * target_reliability)"
+    rules:
+      - State assumptions before using an attenuation or reliability ceiling.
+      - A measured relation near or above the reliability-supported ceiling triggers an error-model leakage or dependence audit.
+      - A classifier cannot establish a stable biological property when the input measurement or target assignment is unstable on repeat measurement.
+      - Reliability constrains attainable measured association. It does not create mechanism or identity.
+
+  circular_localization:
+    forbidden_reuse:
+      - use_the_outcome_contrast_to_select_ROIs_then_test_the_same_ROIs_on_the_same_observations
+      - define_features_from_the_full_dataset_before_cross_validation
+      - select_time_windows_frequency_bands_connections_or_components_using_test_labels
+      - use_the_test_set_to_choose_the_final_neural_story
+    rule: >
+      Feature localization and testing require independent data or training-only selection. Circular selection converts the
+      nominal test into construction data and blocks localization, separation, and generalized prediction claims.
+
+  group_effect_classifier_consistency:
+    trigger: small_univariate_or_group_effect_with_high_reported_classifier_performance
+    required_audit:
+      - identify_whether_classifier_features_are_the_same_measured_variables
+      - identify_the_added_multivariate_information_route
+      - compare_against_site_scanner_motion_quality_and_demographic_baselines
+      - inspect_test_class_counts_and_metric_uncertainty
+      - inspect_all_preprocessing_selection_tuning_and_threshold_reuse
+      - test_leave_site_scanner_cohort_or_time_out_transport
+      - compare_individual_assignment_stability_across_resamples
+    rule: >
+      Multivariate prediction may exceed any one univariate effect only through additional measured information. When the
+      added discrimination is not localized and independently validated, the contradiction remains unresolved and the high
+      classifier result cannot rescue broad distributional overlap.
+
+  full_pipeline_permutation:
+    must_repeat:
+      - preprocessing_that_uses_labels_or_group_structure
+      - confound_handling
+      - feature_selection
+      - model_selection
+      - hyperparameter_tuning
+      - threshold_selection
+      - calibration_when_fitted
+    rules:
+      - Permuting labels only after a pipeline has been selected does not test the discovery procedure.
+      - A successful full-pipeline permutation test establishes performance beyond shuffled labels within the sampled construction only.
+      - Permutation success does not establish target identity biological mechanism regional source or transport.
+
+  imaging_and_signal_specific_checks:
+    required_when_applicable:
+      - motion_distribution_by_group
+      - image_quality_distribution_by_group
+      - scanner_and_sequence_distribution_by_group
+      - preprocessing_failure_and_exclusion_flow
+      - harmonization_before_and_after_performance
+      - site_specific_confusion_matrices
+      - repeat_scan_prediction_consistency
+      - feature_or_map_stability_across_pipelines
+    rules:
+      - Pooled performance cannot hide site-specific reversal or collapse.
+      - A stable heatmap or selected region requires stability across resampling pipelines and independent settings.
+      - Imaging separation remains a measured proxy relation until the physical route and organism-level target close.
+
+  label_selected_sample_rule:
+    rule: >
+      Prediction of a diagnosis-selected or rating-threshold-selected label establishes only prediction of that generated
+      label under the tested sampling and measurement procedure. It cannot establish biological unity defect etiology
+      endogenous mechanism or regional dysfunction.
+    required_reporting:
+      - label_generator
+      - instrument_and_threshold
+      - informants_and_adjudication
+      - sampling_and_exclusion_rules
+      - prevalence_and_class_balancing
+      - threshold_perturbation_or_alternative_operationalization_when_available
+
+  output_additions:
+    - highest_independent_unit
+    - dependency_violations
+    - split_level
+    - preprocessing_isolation_status
+    - nuisance_baseline_results
+    - reliability_limits
+    - circularity_status
+    - group_effect_classifier_consistency_status
+    - full_pipeline_permutation_status
+    - site_cohort_and_time_transport_status
+    - biological_promotion_blocks
+
+  forbidden_patterns:
+    - voxels_trials_time_points_scans_or_augmented_images_as_independent_population_n
+    - random_scan_split_with_subject_leakage
+    - pooled_multisite_cross_validation_as_site_transport
+    - global_harmonization_or_confound_regression_before_split
+    - nuisance_predictability_hidden_by_residualization
+    - circular_ROI_or_feature_selection
+    - classifier_accuracy_as_biological_separation
+    - small_group_effect_rescued_by_unlocalized_multivariate_accuracy
+    - post_selection_permutation_as_full_pipeline_null_test
+    - unstable_measurement_as_stable_biological_property

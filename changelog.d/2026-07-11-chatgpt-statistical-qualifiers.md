@@ -1,0 +1,1 @@
+- **[candidate]** Add claim-specific mathematical qualifiers for information, magnitude, precision, separation, classification, optimism, stability, calibration, multiplicity, and transport, with neuroscience-specific dependency, leakage, nuisance, reliability, circularity, and site-transport checks (ChatGPT, 2026-07-11)

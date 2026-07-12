@@ -23,6 +23,10 @@ jobs:
           python-version: "3.12"
       - name: Validate manifests, builds, and fixtures
         run: python scripts/validate_repo.py
+      - name: Validate external retrieval and overlap handling
+        run: python scripts/validate_resource_retrieval.py
+      - name: Validate statistical qualifiers and neuroscience extensions
+        run: python scripts/validate_statistical_qualifiers.py
       - name: Validate premise rejection and evidence weighting
         run: python scripts/validate_model_policy.py
       - name: Validate target identity reconstruction
