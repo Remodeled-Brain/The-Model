@@ -54,36 +54,17 @@
       }
     },
     {
-      "id": "small_standardized_difference_requires_overlap",
+      "id": "quantitative_retrieval_delegates_qualification",
       "input": {
         "effect_metric": "standardized_mean_difference",
         "effect_value": 0.2,
-        "approximately_normal": true,
-        "equal_variance": true,
-        "statistically_significant": true
+        "uncertainty_available": true,
+        "distribution_inputs_available": true
       },
       "expected": {
-        "overlap_coefficient_min": 0.91,
-        "overlap_coefficient_max": 0.94,
-        "statistical_significance_overrides_overlap": false,
-        "reject_promotions": [
-          "group_average_to_individual_defect",
-          "group_average_to_category_separator",
-          "statistical_to_practical_significance"
-        ]
-      }
-    },
-    {
-      "id": "incompatible_metric_keeps_overlap_open",
-      "input": {
-        "effect_metric": "odds_ratio",
-        "effect_value": 1.2,
-        "distribution_data_available": false
-      },
-      "expected": {
-        "compute_normal_overlap_approximation": false,
-        "overlap_status": "unresolved",
-        "manufacture_separation_from_p_value": false
+        "extract_raw_quantitative_inputs": true,
+        "delegate_to_statistical_qualifiers": true,
+        "interpret_evidentiary_weight_inside_retrieval": false
       }
     },
     {
