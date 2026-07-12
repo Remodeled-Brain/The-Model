@@ -10,6 +10,8 @@
     "kernel/target_identity.yaml",
     "kernel/evidence_admission.yaml",
     "kernel/evidence_admission_fixtures.json",
+    "kernel/resource_retrieval.yaml",
+    "kernel/resource_retrieval_fixtures.json",
     "ingest/purpose.md",
     "ingest/architecture.yaml",
     "ingest/rules.yaml",
