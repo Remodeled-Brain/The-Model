@@ -16,6 +16,19 @@
       }
     },
     {
+      "id": "user_source_boundary_controls_retrieval",
+      "input": {
+        "retrieval_tools_available": true,
+        "user_instruction": "use only the supplied files",
+        "supplied_files_resolve_claim": false
+      },
+      "expected": {
+        "retrieve_outside_supplied_files": false,
+        "state_source_limit": true,
+        "claim_status": "unresolved"
+      }
+    },
+    {
       "id": "provider_memory_is_unverified",
       "input": {
         "claim_origin": "provider_memory",
