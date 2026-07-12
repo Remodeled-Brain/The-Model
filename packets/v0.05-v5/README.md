@@ -1,9 +1,7 @@
 # The Model v0.05-v5 runtime packets
 
 These files are frozen, single-file browser-LLM handoffs generated from the
-immutable source ref `v0.05-v5`.
-
-This packet corresponds to Model version `v0.05-v5`.
+immutable `v0.05-v5` release ref.
 
 - `the_model_runtime.txt` is the primary question-reconstruction and answering runtime.
 - `ingest_support_runtime.txt` is the paper-ingest and evidence-maintenance runtime.
