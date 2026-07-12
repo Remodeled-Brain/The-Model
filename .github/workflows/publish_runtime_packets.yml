@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/publish_runtime_packets.yml"
       - "scripts/publish_runtime_packets.py"
+      - "packets/*/release.json"
       - "VERSION"
       - "model/**"
   workflow_dispatch:
@@ -26,23 +27,55 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Fetch immutable release tags
+      - name: Fetch immutable source refs
         run: git fetch --tags --force
-      - name: Generate frozen packets from release tag
+      - name: Resolve packet publication configuration
+        id: config
         shell: bash
         run: |
-          VERSION="$(tr -d '\r\n' < VERSION)"
-          python scripts/publish_runtime_packets.py --version "$VERSION" --source-ref "$VERSION"
+          PACKET_ID="${GITHUB_REF_NAME#release/}"
+          PACKET_ID="${PACKET_ID%-packets}"
+          CONFIG="packets/${PACKET_ID}/release.json"
+          if [[ ! -f "$CONFIG" ]]; then
+            echo "Missing packet publication config: $CONFIG" >&2
+            exit 1
+          fi
+          python - "$CONFIG" >> "$GITHUB_OUTPUT" <<'PY'
+          import json
+          import pathlib
+          import sys
+
+          config = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+          for key in ("model_version", "packet_id", "source_ref"):
+              value = config.get(key)
+              if not isinstance(value, str) or not value:
+                  raise SystemExit(f"missing or invalid {key}")
+              print(f"{key}={value}")
+          revision = config.get("packet_revision")
+          print(f"packet_revision={revision or ''}")
+          PY
+      - name: Generate frozen packets from configured source ref
+        shell: bash
+        run: |
+          args=(
+            --version "${{ steps.config.outputs.model_version }}"
+            --packet-id "${{ steps.config.outputs.packet_id }}"
+            --source-ref "${{ steps.config.outputs.source_ref }}"
+          )
+          if [[ -n "${{ steps.config.outputs.packet_revision }}" ]]; then
+            args+=(--packet-revision "${{ steps.config.outputs.packet_revision }}")
+          fi
+          python scripts/publish_runtime_packets.py "${args[@]}"
       - name: Commit generated packets to publication branch
         shell: bash
         run: |
-          VERSION="$(tr -d '\r\n' < VERSION)"
+          PACKET_ID="${{ steps.config.outputs.packet_id }}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "packets/$VERSION"
+          git add "packets/$PACKET_ID"
           if git diff --cached --quiet; then
-            echo "Runtime packets already match $VERSION"
+            echo "Runtime packets already match $PACKET_ID"
           else
-            git commit -m "Publish $VERSION runtime packets"
+            git commit -m "Publish $PACKET_ID runtime packets"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
