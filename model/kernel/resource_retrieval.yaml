@@ -100,32 +100,25 @@ resource_retrieval:
       bound to a retrieved or user-supplied record and processed through the model.
 
   quantitative_extraction:
+    qualifier_ref: model/kernel/statistical_qualifiers.yaml
     required_when_reported_or_derivable:
       - effect metric and direction
       - effect magnitude
       - uncertainty interval or sampling uncertainty
-      - group variances or distributional spread
+      - group variances quantiles or distributional spread
       - full response distribution when available
-      - distributional overlap
-      - classification discrimination and out-of-sample performance when the claim entails individual separation
-      - baseline distribution
+      - empirical overlap or inputs needed to estimate overlap
+      - classification confusion matrix discrimination calibration and out-of-sample performance
+      - nominal and independent sample units
+      - baseline distribution and prevalence
       - sample and exclusion flow
       - missingness attrition crossover and analysis exclusions
       - practical threshold relevant to the claim
-    significance_rule: >
-      Statistical significance cannot substitute for magnitude distributional separation prediction or practical
-      importance. A precise estimate near zero remains near zero.
-    overlap_rule: >
-      When a standardized mean difference and compatible distributional assumptions are available, estimate and
-      report distributional overlap rather than presenting the group mean difference alone. Under equal-variance
-      approximately normal distributions, overlap_coefficient = 2 * Phi(-abs(d) / 2). State the assumptions and do
-      not use this approximation for incompatible metrics or distributions.
-    incompatible_metric_behavior: >
-      When direct overlap cannot be computed, report the available distribution quantiles classification metrics or
-      variance-relative magnitude and mark overlap unresolved. Do not manufacture separation from a p value.
-    interpretation_rule: >
-      Near-total overlap is positive evidence against promotion from a group-average difference to an individual
-      defect state diagnostic separator unitary biological identity or practically discriminating route.
+      - preprocessing selection tuning validation and transport design
+    rule: >
+      Retrieval extracts the numerical inputs and the operations that generated them. Pass those inputs to the shared
+      statistical qualifier kernel. Do not calculate evidentiary or causal weight from a p value headline metric or
+      source interpretation inside retrieval.
 
   premise_rejection_retrieval_scope:
     stop:
@@ -168,6 +161,5 @@ resource_retrieval:
     - blog_review_guideline_or_snippet_used_as_empirical_closure_when_primary_records_are_available
     - recent_source_granted_more_causal_weight_by_date_alone
     - source_conclusion_imported_without_data_extraction
-    - statistical_significance_used_to_hide_small_effect_or_near_total_overlap
-    - group_average_difference_promoted_to_individual_defect_or_category_separator
+    - p_value_or_headline_metric_interpreted_inside_retrieval
     - failed_construct_rescued_with_downstream_retrieved_associations
