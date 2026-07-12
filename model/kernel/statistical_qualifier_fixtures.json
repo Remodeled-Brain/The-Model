@@ -1,0 +1,178 @@
+{
+  "schema_version": "v1",
+  "fixture_set": "statistical_qualifiers",
+  "fixtures": [
+    {
+      "id": "nominal_rows_do_not_create_independent_n",
+      "input": {
+        "rows": 12000,
+        "subjects": 120,
+        "repeated_measurements_per_subject": 100,
+        "claim_scope": "population_classification"
+      },
+      "expected": {
+        "independent_unit": "subject",
+        "independent_n": 120,
+        "use_rows_as_population_n": false
+      }
+    },
+    {
+      "id": "cluster_design_effect_reduces_information",
+      "input": {
+        "nominal_n": 500,
+        "mean_cluster_size": 5,
+        "intraclass_correlation": 0.25
+      },
+      "expected": {
+        "design_effect": 2.0,
+        "effective_n": 250.0,
+        "nominal_n_controls_precision": false
+      }
+    },
+    {
+      "id": "tiny_precise_effect_remains_tiny",
+      "input": {
+        "point_estimate": 0.08,
+        "confidence_interval": [0.05, 0.11],
+        "practical_threshold": 0.5,
+        "statistically_significant": true
+      },
+      "expected": {
+        "direction_resolved": true,
+        "practical_magnitude_status": "below_threshold",
+        "statistical_significance_upgrades_importance": false
+      }
+    },
+    {
+      "id": "small_group_effect_blocks_individual_separator",
+      "input": {
+        "effect_metric": "standardized_mean_difference",
+        "effect_value": 0.2,
+        "approximately_normal": true,
+        "equal_variance": true,
+        "claim": "individual_category_separator"
+      },
+      "expected": {
+        "overlap_coefficient_min": 0.91,
+        "overlap_coefficient_max": 0.94,
+        "idealized_balanced_accuracy_min": 0.53,
+        "idealized_balanced_accuracy_max": 0.55,
+        "individual_separator_status": "rejected",
+        "group_average_relation_preserved": true
+      }
+    },
+    {
+      "id": "raw_accuracy_without_confusion_matrix_is_unresolved",
+      "input": {
+        "reported_accuracy": 0.9,
+        "test_n": 40,
+        "confusion_matrix_available": false,
+        "deployment_prevalence_available": false,
+        "uncertainty_available": false
+      },
+      "expected": {
+        "classification_status": "unresolved",
+        "support_weight_for_raw_accuracy": 0,
+        "may_establish_generalized_performance": false
+      }
+    },
+    {
+      "id": "balanced_case_control_accuracy_does_not_supply_deployment_ppv",
+      "input": {
+        "evaluation_prevalence": 0.5,
+        "deployment_prevalence": 0.05,
+        "sensitivity": 0.8,
+        "specificity": 0.8
+      },
+      "expected": {
+        "deployment_positive_predictive_value_min": 0.16,
+        "deployment_positive_predictive_value_max": 0.18,
+        "transport_evaluation_ppv_directly": false
+      }
+    },
+    {
+      "id": "global_preprocessing_invalidates_internal_test",
+      "input": {
+        "preprocessing_fitted_before_split": true,
+        "feature_selection_fitted_before_split": true,
+        "reported_cross_validation": true
+      },
+      "expected": {
+        "pipeline_isolation_status": "failed",
+        "reported_performance_status": "apparent_or_leaked",
+        "nested_label_makes_valid": false
+      }
+    },
+    {
+      "id": "stable_average_cannot_rescue_unstable_people",
+      "input": {
+        "mean_auc_across_bootstraps": 0.78,
+        "auc_standard_deviation": 0.01,
+        "individual_classification_flip_rate": 0.38
+      },
+      "expected": {
+        "aggregate_performance_stable": true,
+        "individual_assignment_stable": false,
+        "individual_separator_status": "rejected"
+      }
+    },
+    {
+      "id": "small_sample_peak_that_declines_is_optimism_evidence",
+      "input": {
+        "learning_curve": [
+          {"n": 40, "balanced_accuracy": 0.92},
+          {"n": 100, "balanced_accuracy": 0.78},
+          {"n": 400, "balanced_accuracy": 0.62}
+        ]
+      },
+      "expected": {
+        "performance_converged": false,
+        "small_sample_peak_status": "optimism_evidence",
+        "preserve_original_0_92_as_weaker_support": false
+      }
+    },
+    {
+      "id": "one_external_setting_does_not_establish_transport_distribution",
+      "input": {
+        "internal_balanced_accuracy": 0.8,
+        "external_settings": [
+          {"setting": "site_b", "balanced_accuracy": 0.75}
+        ],
+        "claimed_scope": "general_population"
+      },
+      "expected": {
+        "transport_status": "one_additional_setting_only",
+        "universal_validation": false,
+        "prediction_interval_for_new_setting": "unresolved"
+      }
+    },
+    {
+      "id": "good_discrimination_does_not_supply_calibration",
+      "input": {
+        "auc": 0.86,
+        "calibration_intercept": null,
+        "calibration_slope": null,
+        "proper_score": null,
+        "probability_claim": true
+      },
+      "expected": {
+        "discrimination_status": "observed",
+        "calibration_status": "unresolved",
+        "probability_quality_established": false
+      }
+    },
+    {
+      "id": "selected_winner_from_unreported_search_has_unresolved_optimism",
+      "input": {
+        "reported_final_model_count": 1,
+        "candidate_models_reported": false,
+        "hyperparameter_search_reported": false,
+        "evaluation_reused_for_selection": "unknown"
+      },
+      "expected": {
+        "selection_burden": "unresolved",
+        "winner_performance_admitted_as_locked_test": false
+      }
+    }
+  ]
+}
