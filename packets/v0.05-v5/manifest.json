@@ -1,5 +1,4 @@
 {
-  "packet_id": "v0.05-v5",
   "packets": [
     {
       "authoritative_manifest": "model/manifest.json",
