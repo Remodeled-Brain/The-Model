@@ -15,6 +15,8 @@
     "ingest/rules.yaml",
     "kernel/resource_retrieval.yaml",
     "kernel/resource_retrieval_fixtures.json",
+    "kernel/statistical_qualifiers.yaml",
+    "kernel/statistical_qualifier_fixtures.json",
     "ingest/target_identity_extraction.yaml",
     "ingest/target_identity_record_schema.yaml",
     "ingest/physical_extraction_contract.yaml",
@@ -26,7 +28,9 @@
   "domain_modules": [
     "cartridges/neuroscience.yaml",
     "cartridges/neuroscience_physical_continuity.yaml",
-    "cartridges/neuroscience_fixtures.json"
+    "cartridges/neuroscience_fixtures.json",
+    "cartridges/neuroscience_statistics.yaml",
+    "cartridges/neuroscience_statistical_fixtures.json"
   ],
   "reachable_modules": [
     {
