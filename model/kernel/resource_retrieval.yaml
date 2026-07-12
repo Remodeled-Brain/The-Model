@@ -1,0 +1,168 @@
+resource_retrieval:
+  status: candidate
+  layer: shared_kernel
+  purpose: >
+    Permit active use of external resources while preventing retrieved text, provider memory, and source authority
+    from bypassing target-identity, evidence-admission, bridge, physical-chain, and causal checks.
+
+  retrieval_permission:
+    rule: >
+      Use every retrieval capability available to the provider when additional information is needed, including web
+      search, scholarly indexes, connected repositories, uploaded files, local corpora, datasets, and user-supplied
+      sources. Lack of an ingest packet does not prohibit retrieval for ordinary question answering.
+    retrieve_when:
+      - current or recently changed information could affect the answer
+      - the question requires empirical facts effect estimates source-specific claims or corpus state
+      - target identity depends on how sources select measure threshold reconstruct or aggregate the target
+      - an open counterfactual bridge route physical-chain segment or disconfirmation condition may be resolved
+      - a broad claim can be tested against exact quantitative observations
+    unavailable_behavior:
+      - state that retrieval was unavailable
+      - distinguish provider memory from retrieved evidence
+      - do not represent remembered corpus claims as verified
+
+  freshness_policy:
+    default_discovery_order:
+      - search the most recent 12 months first
+      - expand to the preceding 24 months when needed
+      - retrieve older primary sources required to identify the original measurement method dataset claim or route
+      - walk forward to later replications nulls disconfirmation methodological corrections and changed classifications
+    rule: >
+      Apply a strong recency bias to discovery of the current empirical state. Recency does not increase evidentiary
+      or causal weight by itself. Older direct measurements may remain more probative than recent reviews summaries
+      commentary or consensus statements.
+    current_state_requirement: >
+      When the question asks what is currently known, retrieve enough recent material to test whether the older
+      account remains current rather than repeating the provider's training-era summary.
+
+  source_selection:
+    preferred_for_empirical_claims:
+      - primary reports containing the actual observations methods and analysis
+      - datasets protocols registrations supplements and correction notices
+      - independent replications null results disconfirmation studies and methodological audits
+      - later work that tests transport prediction specificity and route discrimination
+    navigation_only_by_default:
+      - reviews
+      - meta-analyses without inspection of input validity
+      - guidelines
+      - textbooks
+      - institutional explainers
+      - news articles
+      - blogs
+      - press releases
+      - search-result snippets
+    navigation_rule: >
+      Navigation sources may locate vocabulary primary studies datasets disputes and source trees. They do not supply
+      empirical closure when the underlying records are available. A claim about a navigation source itself may use
+      that source as the direct object of analysis.
+    diversity_rule: >
+      Prefer independent evidence families and distinct operationalizations. Multiple sources that repeat the same
+      cohort instrument pipeline threshold database or inferential bridge remain one assumption family.
+
+  universal_admission_rule:
+    rule: >
+      Every assertion obtained through retrieval must pass the same target-identity construct exact-relation design
+      data counterfactual bridge physical-chain metabolic-binding and causal-admission checks as any other evidence.
+      Retrieval changes availability, not admissibility.
+    source_authority_does_not_upgrade:
+      - publication venue
+      - peer review
+      - author reputation
+      - citation volume
+      - review or meta-analysis status
+      - guideline or consensus status
+      - institutional source
+      - search ranking
+      - recency alone
+    no_smuggling_rule: >
+      No factual or causal claim may enter the answer as background knowledge merely because it is familiar widely
+      repeated biologically plausible or present in a retrieved summary. Record its provenance extract the actual
+      observation and admit only the relation that survives the runtime.
+
+  provider_memory_policy:
+    classification: unverified_retrieval_source
+    allowed_uses:
+      - generate candidate search terms
+      - identify possible source trees datasets methods alternative routes and disconfirmation tests
+      - supply explicitly marked provisional context when retrieval is unavailable and the user accepts that limit
+    forbidden_uses:
+      - close target identity
+      - establish corpus state
+      - supply an effect magnitude distribution overlap or predictive result
+      - close a causal bridge physical segment metabolic relation mechanism or scale translation
+      - rescue a rejected premise
+    rule: >
+      Provider memory is a lead generator, not admitted evidence. Claims drawn from memory remain unverified until
+      bound to a retrieved or user-supplied record and processed through the model.
+
+  quantitative_extraction:
+    required_when_reported_or_derivable:
+      - effect metric and direction
+      - effect magnitude
+      - uncertainty interval or sampling uncertainty
+      - group variances or distributional spread
+      - full response distribution when available
+      - distributional overlap
+      - classification discrimination and out-of-sample performance when the claim entails individual separation
+      - baseline distribution
+      - sample and exclusion flow
+      - missingness attrition crossover and analysis exclusions
+      - practical threshold relevant to the claim
+    significance_rule: >
+      Statistical significance cannot substitute for magnitude distributional separation prediction or practical
+      importance. A precise estimate near zero remains near zero.
+    overlap_rule: >
+      When a standardized mean difference and compatible distributional assumptions are available, estimate and
+      report distributional overlap rather than presenting the group mean difference alone. Under equal-variance
+      approximately normal distributions, overlap_coefficient = 2 * Phi(-abs(d) / 2). State the assumptions and do
+      not use this approximation for incompatible metrics or distributions.
+    incompatible_metric_behavior: >
+      When direct overlap cannot be computed, report the available distribution quantiles classification metrics or
+      variance-relative magnitude and mark overlap unresolved. Do not manufacture separation from a p value.
+    interpretation_rule: >
+      Near-total overlap is positive evidence against promotion from a group-average difference to an individual
+      defect state diagnostic separator unitary biological identity or practically discriminating route.
+
+  premise_rejection_retrieval_scope:
+    stop:
+      - searches that presuppose the rejected entity
+      - searches whose purpose is to rescue the failed construct through downstream associations treatments regions or named processes
+      - entity-level mechanism retrieval that requires the rejected identity
+    continue:
+      - retrieval of exact measured relations at their measured scope
+      - premise-breaking and category-failure evidence
+      - effect magnitude overlap heterogeneity and predictive-separation evidence
+      - alternative target reconstruction from independently measured variables
+      - disconfirmation null reversal and route-discrimination evidence
+      - source-tree retrieval needed to audit how the failed claim was constructed
+    rule: >
+      Premise rejection terminates only retrieval that requires or attempts to restore the failed entity. It does not
+      terminate retrieval needed to answer the source question through narrower observations or positive failure evidence.
+
+  retrieval_to_answer_contract:
+    required_record:
+      - retrieval_available
+      - retrieval_used
+      - retrieval_date_or_cutoff
+      - freshness_window_searched
+      - source_types_consulted
+      - primary_records_inspected
+      - claims_extracted
+      - admission_status_by_claim
+      - navigation_only_sources
+      - provider_memory_claims_remaining_unverified
+      - access_or_freshness_limits
+    answer_rule: >
+      Cite or otherwise identify the records supporting material empirical claims. State material retrieval limits.
+      Do not expose the full internal audit unless useful, but never present an unadmitted retrieved claim as fact.
+
+  forbidden_patterns:
+    - packet_treated_as_complete_evidence_corpus
+    - retrieval_refused_because_only_runtime_packet_was_supplied
+    - provider_memory_presented_as_verified_corpus_state
+    - blog_review_guideline_or_snippet_used_as_empirical_closure_when_primary_records_are_available
+    - recent_source_granted_more_causal_weight_by_date_alone
+    - source_conclusion_imported_without_data_extraction
+    - statistical_significance_used_to_hide_small_effect_or_near_total_overlap
+    - group_average_difference_promoted_to_individual_defect_or_category_separator
+    - failed_construct_rescued_with_downstream_retrieved_associations
