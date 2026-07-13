@@ -22,7 +22,7 @@ ingest_architecture:
       - treat_publication_count_as_independent_weight
       - treat_a_proposed_repair_as_completed_evidence
 
-  phase_0_data_design_and_generator_extraction:
+  phase_0_data_and_design:
     purpose: Extract the actual observations, classify what causal contrast the design can expose, and fingerprint the generators that produced each target relation.
     required_outputs:
       - design_mode
@@ -50,7 +50,7 @@ ingest_architecture:
       - Missing generator information blocks an independence claim but does not erase a valid observation.
       - Generator fingerprints are relation-specific rather than paper-global.
 
-  phase_A_presumption_bridge_and_family_audit:
+  phase_A_presumption_and_audit:
     purpose: Assign the most restrictive applicable initial state, expose every inferential bridge, and identify inherited generator dependencies.
     required_outputs:
       - presumptive_class
@@ -91,7 +91,7 @@ ingest_architecture:
       - prediction_or_route_discrimination_when_required
       - proxy_translation
       - scale_translation
-      - relation_specific_independence
+      - independence
       - generator_family_independence
       - disconfirmation
     outputs:
