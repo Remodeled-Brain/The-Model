@@ -1,0 +1,1 @@
+- **[candidate]** Add an evolution domain cartridge separating measured population relations from selection, adaptation, function, homology, optimality, and transport promotions, with physical-continuity bindings and balanced regression fixtures (OpenAI, 2026-07-13)

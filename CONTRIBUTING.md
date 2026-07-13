@@ -50,6 +50,7 @@ python scripts/validate_repo.py
 python scripts/validate_resource_retrieval.py
 python scripts/validate_statistical_qualifiers.py
 python scripts/validate_model_policy.py
+python scripts/validate_evolution_cartridge.py
 python scripts/validate_target_identity.py
 python scripts/validate_conformance.py
 python scripts/validate_physical_continuity.py --fixtures-only

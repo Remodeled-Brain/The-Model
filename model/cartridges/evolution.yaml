@@ -1,0 +1,577 @@
+# Evolution domain cartridge
+# Status: CANDIDATE
+#
+# This cartridge refines the shared target-identity, evidence-admission, causal,
+# physical-continuity, and statistical contracts for evolutionary biology.
+# It creates no new disposition, closure state, evidence role, or causal currency.
+
+evolution_cartridge:
+  status: candidate
+  layer: domain_cartridge
+  domain: evolutionary biology
+  purpose: >
+    Make evolutionary relations auditable while preserving exact measured population,
+    lineage, trait, sequence, molecular, and intervention relations. Selection, fitness,
+    adaptation, function, homology, conservation, optimality, and gene-for language may
+    organize a question but cannot generate its target or causal path by name.
+
+  generic_contracts:
+    target_identity: model/kernel/target_identity.yaml#target_identity
+    construct_admission: model/kernel/chain_contract.yaml#chain_contract.construct_admission
+    causal_admission: model/kernel/chain_contract.yaml#chain_contract.causal_claim_admission
+    evidence_admission: model/kernel/evidence_admission.yaml#evidence_admission
+    evidence_binding: model/runtime/evidence_binding_contract.yaml#evidence_binding_contract
+    statistical_qualifiers: model/kernel/statistical_qualifiers.yaml
+  fixture_ref: model/cartridges/evolution_fixtures.json
+  fills:
+    - model/runtime/question_compiler.yaml handle_categories
+    - model/ingest/rules.yaml domain_instances
+
+  refinement_contract:
+    rule: >
+      The shared kernel owns identity dispositions, construct dispositions, causal
+      dispositions, closure states, evidence roles, physical continuity, and generic
+      statistical qualifiers. This cartridge supplies evolutionary generators,
+      alternatives, bridge burdens, translations, and regression cases only.
+    prohibited:
+      - new_identity_disposition
+      - new_construct_disposition
+      - new_causal_disposition
+      - new_closure_state
+      - lexical_term_as_automatic_verdict
+      - evidence_failure_rewritten_as_identity_failure
+      - current_role_rewritten_as_historical_origin
+      - population_level_product_rewritten_as_process
+      - cartridge_rule_overriding_generic_positive_control
+      - domain_assumption_leaking_into_shared_kernel
+
+  handle_inspection:
+    rule: >
+      Surface vocabulary triggers inspection only. A conventional term may remain as
+      bounded shorthand when its generator, conditions, model or measurement procedure,
+      uncertainty, and transport scope are recoverable. Vocabulary alone cannot assign
+      identity, construct, evidence, or causal status.
+    cue_families:
+      selection:
+        - natural selection
+        - sexual selection
+        - purifying selection
+        - selection pressure
+        - selected for
+      fitness:
+        - fitness
+        - fitness benefit
+        - fitness cost
+        - survival of the fittest
+      adaptation_and_function:
+        - adaptation
+        - adaptive
+        - exaptation
+        - evolved for
+        - function is to
+        - designed for
+      agency:
+        - evolution invented
+        - species wanted
+        - organism tried to
+      historical_relation:
+        - homologous
+        - conserved
+        - ancient
+        - fundamental
+      optimality:
+        - optimal
+        - best possible
+        - perfectly adapted
+      genotype_purpose:
+        - gene for
+        - allele for
+        - genetic program
+        - blueprint
+
+  evolutionary_change:
+    definition: >
+      Evolutionary change is a measured change across generations in the composition,
+      transmission, or persistence distribution of materially carried biological
+      lineages or populations.
+    candidate_route_families:
+      variation_generation:
+        - mutation
+        - recombination
+        - gene_conversion
+        - horizontal_transfer
+        - chromosome_or_copy_number_change
+      transmission_and_movement:
+        - vertical_transmission
+        - segregation
+        - transmission_distortion
+        - migration_or_gene_flow
+        - introgression
+      finite_sampling_and_demography:
+        - drift
+        - bottleneck
+        - founder_event
+        - reproductive_skew
+        - population_structure
+      differential_persistence_or_reproduction:
+        - viability_difference
+        - mating_or_fecundity_difference
+        - transmission_difference
+        - lineage_persistence_difference
+      modifiers_and_dependencies:
+        - linkage
+        - recombination_rate
+        - mutation_bias
+        - pleiotropy
+        - developmental_constraint
+        - environmental_change
+        - frequency_dependence
+    route_rule: >
+      A measured composition change does not identify which route generated it.
+      Bottlenecks, linkage, clonal interference, and background selection often name
+      coupled conditions or products rather than independent causal currencies.
+    defaults:
+      selection: unassigned
+      adaptation: unassigned
+      progress_or_optimization: unassigned
+
+  relation_separation:
+    required:
+      - population_or_lineage_boundary
+      - material_or_reproduced_carrier
+      - transmitted_variant_or_composition_metric
+      - measured_trait_or_state
+      - conditional_fitness_quantity
+      - frequency_or_composition_change
+      - differential_persistence_or_reproduction_relation
+      - current_causal_role
+      - historical_adaptation_relation
+      - etiological_or_selected_effect_function
+      - conservation_relation
+      - homology_relation
+      - genotype_to_measured_outcome_relation
+      - model_defined_optimum
+      - source_to_target_transport_relation
+    rule: >
+      Each relation receives its own identity, construct, causal, evidence, physical,
+      and transport record. Closure on one relation cannot transfer to another.
+
+  target_generators:
+    population_composition_change:
+      generator: >
+        Population or lineage boundary, material or reproduced unit, composition metric,
+        timepoints or generations, sampling and assay procedure, and uncertainty.
+      identity_when_generated: generated_identity_conditional
+      construct_when_generated: admitted
+      ordinary_causal_disposition: not_a_causal_question
+      guard: >
+        Frequency or trait-distribution change is a product. It cannot identify mutation,
+        migration, drift, selection, transmission distortion, or demography by itself.
+
+    conditional_fitness_quantity:
+      generator: >
+        A formal quantity or measurement procedure bound to a defined type, population
+        or competition structure, environment, time horizon, denominator, comparator,
+        and uncertainty.
+      recognized_non_equivalent_generators:
+        - absolute_descendant_output
+        - relative_descendant_output
+        - lifetime_reproductive_success
+        - Malthusian_growth_rate
+        - invasion_fitness_under_a_model
+        - inclusive_fitness_under_a_genealogical_and_social_model
+        - constructed_composite_fitness_index
+      identity_mapping:
+        formal_or_measured_quantity_with_conditions: generated_identity_conditional
+        reproducible_composite_index: constructed_measurement_identity
+        multiple_non_equivalent_quantities_compressed_as_one: grouping_handle_only
+        no_recoverable_quantity_or_conditions: identity_unresolved
+      guard: >
+        A fitness quantity is model-bound or measurement-bound. It is not an intrinsic
+        essence and cannot explain the physical generators of its own value.
+
+    differential_persistence_or_reproduction:
+      generator: >
+        Defined variants or types, explicit regime, population structure, time window,
+        comparator, measured descendant contribution or persistence, and uncertainty.
+      identity_when_generated: generated_identity_conditional
+      construct_when_generated: admitted
+      possible_causal_targets:
+        - observational_causal_relation
+        - intervention_to_outcome
+        - endogenous_dependency_or_mechanism
+      guard: >
+        Frequency change is a possible product. Selection attribution requires
+        discrimination from realistic alternative routes.
+
+    historical_adaptation:
+      generator: >
+        Specified trait or state, lineage and time interval, proposed historical regime,
+        differential-persistence relation, and claimed origin or maintenance relation.
+      identity_when_generated: generated_identity_conditional
+      construct_when_generated: admitted
+      causal_target: etiology_or_origin
+      evidence_rule: >
+        A generated historical target can receive causal_rejected or causal_unresolved.
+        Missing historical support does not become identity failure.
+      guard: >
+        Current utility, present perturbability, conservation, prevalence, elegance,
+        and story coherence do not establish historical origin by selection.
+
+    current_causal_role:
+      generator: >
+        Defined current system, component or trait state, perturbation or dependency,
+        measurable output, timing, conditions, and comparator.
+      identity_when_generated: generated_identity_conditional
+      construct_when_generated: admitted
+      guard: >
+        Current causal role does not establish historical origin or selected-effect
+        function.
+
+    etiological_function:
+      generator: >
+        A specified current effect plus the historical claim that differential
+        persistence or reproduction because of that effect explains origin or maintenance.
+      identity_when_generated: generated_identity_conditional
+      construct_when_generated: admitted
+      causal_target: etiology_or_origin
+      guard: >
+        Current-role evidence and selected-effect evidence remain separate and cannot
+        borrow closure from one another.
+
+    conservation_relation:
+      generator: >
+        Defined characters or sequence positions, sampling frame, alignment or
+        correspondence method, comparison set, phylogenetic depth, threshold or model,
+        and uncertainty.
+      identity_when_generated: generated_identity_conditional
+      construct_when_generated: admitted
+      ordinary_causal_disposition: not_a_causal_question
+      guard: >
+        Conservation alone does not establish current function, purifying selection,
+        adaptation, importance, or ancient control.
+
+    homology_relation:
+      generator: >
+        Defined character correspondence, lineage set, reconstruction model, applicable
+        structural, developmental, positional, or genetic criteria, uncertainty, and
+        tested alternatives.
+      identity_when_generated: generated_identity_conditional
+      construct_when_generated: admitted
+      ordinary_causal_disposition: not_a_causal_question
+      guard: >
+        Similarity is a measured relation. Homology is a historical continuity relation.
+        Similarity alone cannot supply it.
+
+    genotype_to_measured_outcome:
+      generator: >
+        Defined variant or locus, genotype measurement, outcome measurement, population
+        and environment, effect distribution, uncertainty, and analysis procedure.
+      identity_when_generated: generated_identity_conditional
+      construct_when_generated: admitted
+      separate_targets:
+        - association
+        - prediction
+        - molecular_dependency
+        - developmental_route
+        - organism_level_effect
+        - historical_maintenance
+      guard: >
+        Association, prediction, perturbation, mechanism, organism effect, and historical
+        maintenance are separate relations.
+
+    model_defined_optimum:
+      generator: >
+        Explicit objective or loss, feasible set, constraints, variables, model,
+        comparator, uncertainty, and sensitivity to alternative objectives or constraints.
+      identity_rule: >
+        Assign the canonical identity disposition from the actual generator. An equation
+        or model-defined state may be generated_identity_conditional. An algorithmic
+        index may be constructed_measurement_identity. The word optimal cannot decide it.
+      guard: >
+        Best among observed alternatives, local optimum, equilibrium, and global optimum
+        are non-equivalent.
+
+    transport_relation:
+      generator: >
+        Explicit source and target populations, regimes, environments, demographic
+        structures, timescales, measurement constructions, and carried variables.
+      identity_when_generated: generated_identity_conditional
+      construct_when_generated: admitted
+      causal_target: cross_scale_translation
+      guard: >
+        Source-scope success remains valid when transport fails.
+
+  claim_burden_matrix:
+    descriptive_population_change:
+      required:
+        - population_or_lineage_boundary
+        - composition_metric_or_trait_distribution
+        - timepoints_or_generations
+        - sampling_and_assay
+        - uncertainty_and_missingness
+      not_required:
+        - drift_budget
+        - selection_test
+        - adaptation_history
+        - full_intracellular_mechanism
+
+    conditional_fitness_measurement:
+      required:
+        - exact_fitness_generator
+        - type_definition
+        - environment_and_regime
+        - population_or_competition_structure
+        - time_horizon_and_denominator
+        - measurement_or_model_procedure
+        - comparator_and_uncertainty
+      additional_for_response_across_generations:
+        - transmission_or_heritability_relation
+        - population_process
+      guard: >
+        Heritability is not required to define every conditional fitness quantity.
+
+    selection_attribution:
+      required:
+        - generated_differential_persistence_relation
+        - temporal_order
+        - explicit_physical_regime
+        - measured_descendant_contribution_or_persistence
+        - realistic_alternative_route_audit
+        - population_structure_and_demography
+        - practical_magnitude_and_uncertainty
+        - replication_or_equivalent_internal_strength
+      alternatives_when_applicable:
+        - drift
+        - migration_or_gene_flow
+        - transmission_distortion
+        - mutation_bias
+        - linkage_or_hitchhiking
+        - demographic_change
+        - assay_or_sampling_artifact
+
+    drift_or_neutral_attribution:
+      required:
+        - explicit_population_model
+        - finite_sampling_or_transmission_process
+        - population_size_or_model_specific_information
+        - temporal_and_distributional_fit
+        - selection_and_migration_alternatives
+        - uncertainty_and_power
+      guard: >
+        Failure to detect selection does not establish neutrality.
+
+    direct_experimental_evolution:
+      required:
+        - characterized_starting_population_or_ancestral_state
+        - explicit_regime_and_control
+        - independent_replicate_lineages
+        - population_size_structure_and_bottlenecks
+        - transmission_and_sampling_procedure
+        - timepoints_and_outcome_distribution
+        - genomic_or_trait_tracking_appropriate_to_claim
+        - contamination_and_cross_lineage_audit
+      conditional_requirements:
+        new_mutation_route_claimed:
+          - target_appropriate_mutation_supply_model
+          - mutation_rate_and_target_size
+          - standing_variation_excluded_or_bounded
+        standing_variation_route_claimed:
+          - starting_frequency_and_haplotype_structure
+          - recombination_and_linkage
+      not_universally_required:
+        - locked_clonal_ancestor
+        - phylogenetic_reconstruction_of_natural_lineage
+        - simple_mutation_supply_formula
+        - measured_tradeoff_unless_cost_or_optimality_claimed
+
+    historical_adaptation:
+      required:
+        - generated_trait_and_lineage_relation
+        - heritable_or_reproduced_variation_at_claimed_resolution
+        - historical_order_and_time
+        - independent_evidence_for_the_proposed_regime
+        - differential_persistence_relation_or_discriminating_prediction
+        - comparative_or_phylogenetic_support_appropriate_to_claim
+        - realistic_alternatives
+        - independent_evidence_families
+      resolution_sensitive:
+        exact_molecular_origin_claim:
+          - specific_variant_or_path
+          - accessibility_or_supply_model
+          - carrier_and_transmission
+        phenotype_level_shaping_claim:
+          - heritable_trait_variation
+          - population_and_regime_history
+          - comparative_or_experimental_discrimination
+      guard: >
+        Exact originating mutation is not required for every phenotype-level claim.
+
+    current_causal_role:
+      required:
+        - system_definition
+        - exact_manipulation_or_dependency
+        - valid_comparator
+        - temporal_order
+        - outcome_distribution_and_practical_magnitude
+        - specificity_and_alternative_routes
+        - condition_scope
+      physical_rule: >
+        Exact intervention causality may coexist with open intermediate mechanism slots.
+
+    etiological_function:
+      required:
+        - current_effect_defined
+        - historical_adaptation_burden_closed
+        - evidence_that_the_effect_explains_differential_persistence
+        - alternatives_to_selected_effect_history
+
+    homology:
+      required:
+        - character_definition
+        - correspondence_criteria
+        - reconstruction_model_and_uncertainty
+        - alternative_topologies_or_character_histories
+        - applicable_discordance_audit
+      possible_discordance:
+        - convergence
+        - parallelism
+        - reversal
+        - incomplete_lineage_sorting
+        - introgression
+        - horizontal_transfer
+      guard: >
+        Audit only routes that can bear on the claimed character and lineage relation.
+
+    conservation_to_constraint_or_selection:
+      required:
+        - generated_conservation_relation
+        - mutation_and_recombination_context
+        - comparative_model
+        - neutral_or_alternative_model
+        - ascertainment_and_alignment_audit
+        - uncertainty_and_multiple_testing
+      separate_burdens:
+        current_causal_role: direct_dependency_or_perturbation_evidence
+        purifying_selection: comparative_or_population_genetic_discrimination
+        historical_adaptation: historical_adaptation_burden
+
+    optimality:
+      required:
+        - explicit_objective_or_loss
+        - feasible_set
+        - physical_developmental_and_genetic_constraints
+        - comparator_and_alternatives
+        - local_vs_global_scope
+        - sensitivity_to_objective_and_constraint_choice
+        - measured_cost_currency_when_cost_is_claimed
+
+    transport:
+      required:
+        - source_relation_and_conditions
+        - target_relation_and_conditions
+        - carried_variable
+        - population_and_demographic_differences
+        - environmental_and_regime_differences
+        - measurement_equivalence
+        - timescale_compatibility
+        - direct_transport_evidence_or_discriminating_test
+
+  statistical_refinements:
+    refinement_rule: >
+      Apply the shared statistical qualifier vocabulary. These checks create no new
+      qualifier or closure state.
+    independent_unit_hierarchy:
+      possible_units:
+        - observation_or_assay
+        - individual
+        - family_or_pedigree
+        - deme_or_population
+        - replicate_lineage
+        - environment_or_regime
+        - generation
+        - species_or_phylogenetic_branch
+      rule: >
+        The highest dependency unit relevant to the claim controls effective
+        information. Individuals from one population, generations from one lineage,
+        and species linked by one phylogeny are not automatically independent replicates.
+    required_when_applicable:
+      population_structure_and_relatedness:
+        - ancestry_and_relatedness
+        - mating_structure
+        - migration
+        - stratification
+        - cryptic_structure
+      linkage_and_haplotype:
+        - linkage_disequilibrium
+        - recombination
+        - hitchhiking
+        - background_selection
+        - haplotype_structure
+      ascertainment_and_measurement:
+        - variant_discovery_ascertainment
+        - survivor_or_extant_lineage_bias
+        - alignment_and_missing_character_rules
+        - phenotype_measurement_invariance
+      model_and_multiplicity:
+        - alternative_demographic_models
+        - alternative_selection_models
+        - model_selection_uncertainty
+        - genome_wide_or_character_wide_multiplicity
+        - simulation_calibration
+    phylogenetic_dependence_rule: >
+      Comparative analyses must model shared ancestry or justify independence. Species
+      count is not independent sample size by default.
+    null_and_equivalence_rule: >
+      Failure to reject selection, effect, or difference does not establish neutrality,
+      equivalence, or no function.
+    transport_rule: >
+      Within-population, within-lineage, within-regime, or within-phylogeny fit does not
+      establish transport elsewhere.
+
+  evidence_routing:
+    rule: >
+      Bind every observation or closed bridge to its exact target relation. When a broad
+      evolutionary claim fails, preserve narrower measurements and use existing evidence
+      roles and closure states. Do not invent evolution-specific support classes.
+    canonical_roles:
+      descriptive_only:
+        - measured_frequency_change
+        - measured_conservation
+        - measured_similarity
+      segment_supporting:
+        - bounded_variant_to_molecular_output_relation
+        - one_historical_chain_segment
+      route_discriminating:
+        - replicated_regime_reversal
+        - alternative_demographic_model_test
+      route_closing:
+        - direct_dependency_under_stated_conditions
+        - controlled_differential_descendant_output
+      premise_breaking:
+        - current_role_without_historical_origin
+        - convergence_breaking_similarity_to_homology
+      non_probative:
+        - story_coherence
+        - selection_as_agent
+        - conservation_therefore_importance
+    preservation_rule: >
+      Identity or causal failure at a broad target cannot erase an exact measurement,
+      constructed quantity, intervention relation, or source-scope result that survives.
+
+  terminology_guard:
+    reject_as_complete_explanation:
+      - selection
+      - selection_pressure
+      - fitness
+      - adaptation
+      - function
+      - homology
+      - conservation
+      - gene_for
+      - optimal
+      - evolvability
+    rule: >
+      These terms may remain as shorthand only when they point to a recoverable generator
+      and retain its conditions. They cannot supply a missing physical route, historical
+      bridge, causal contrast, or transport relation.

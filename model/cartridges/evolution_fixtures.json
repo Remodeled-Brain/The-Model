@@ -1,0 +1,381 @@
+{
+  "schema_version": "v1",
+  "status": "candidate",
+  "domain": "evolutionary biology",
+  "purpose": "Balanced regressions separating exact measurements, target identity, causal attribution, physical continuity, historical inference, and transport.",
+  "fixtures": [
+    {
+      "id": "evo-descriptive-frequency-change",
+      "mode": "question",
+      "source_question": "Did allele A increase from 0.20 to 0.45 over ten generations in this sampled population?",
+      "expected_targets": [
+        {"target": "measured_frequency_change", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "not_a_causal_question", "evidence_role": "descriptive_only"}
+      ],
+      "required": [
+        "answer from the population boundary assay timepoints sampling uncertainty and missingness",
+        "preserve the measured change without imposing selection drift or adaptation",
+        "state the exact population and time scope"
+      ],
+      "forbidden": [
+        "require a drift budget merely to report the measured change",
+        "infer selection from the direction of change",
+        "erase the observation because the generator is unknown"
+      ]
+    },
+    {
+      "id": "evo-selection-attribution-with-open-alternatives",
+      "mode": "condition",
+      "condition": "A study defines allele A, an environmental regime, and a frequency increase, then attributes the change to selection without testing drift, migration, transmission distortion, linkage, or demographic change.",
+      "expected_targets": [
+        {"target": "measured_frequency_change", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "not_a_causal_question", "evidence_role": "descriptive_only"},
+        {"target": "selection_generated_frequency_change", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_rejected", "evidence_role": "non_probative"}
+      ],
+      "required": [
+        "preserve the frequency trajectory",
+        "keep target identity separate from failed causal attribution",
+        "reject the selection conclusion because necessary alternatives remain open"
+      ],
+      "forbidden": [
+        "classify the frequency measurement as identity failure",
+        "soften the failed claim into may have contributed",
+        "treat frequency change as the selection process"
+      ]
+    },
+    {
+      "id": "evo-manipulated-regime-selection-positive-control",
+      "mode": "condition",
+      "condition": "Independent replicate lineages begin from a characterized population. A resource regime is manipulated, descendant output is measured, drift and contamination are bounded, and the direction reverses when the regime reverses.",
+      "expected_targets": [
+        {"target": "regime_to_differential_descendant_output", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_admitted", "evidence_role": "route_closing"},
+        {"target": "transport_to_unmanipulated_natural_populations", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_unresolved", "evidence_role": "non_probative"}
+      ],
+      "required": [
+        "admit exact regime to descendant-output causality when the intervention burden closes",
+        "preserve open internal molecular segments without denying the effect",
+        "keep natural-population transport separate"
+      ],
+      "forbidden": [
+        "reject the effect because the internal route is partial",
+        "generalize to universal fitness or adaptation",
+        "require a clonal ancestor when the starting population is characterized"
+      ]
+    },
+    {
+      "id": "evo-drift-positive-control",
+      "mode": "condition",
+      "condition": "Replicate neutral markers are propagated through controlled finite bottlenecks with no measured fitness differences or migration, and variance matches a preregistered finite-sampling model across independent lineages.",
+      "expected_targets": [
+        {"target": "finite_sampling_to_marker_frequency_variance", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_admitted", "evidence_role": "route_closing"}
+      ],
+      "required": [
+        "permit exact drift causality at the tested population and transmission scope",
+        "bind the claim to the bottleneck model and marker conditions",
+        "report uncertainty and model deviations"
+      ],
+      "forbidden": [
+        "force the result into adaptation",
+        "treat drift as unexplained randomness",
+        "transport the model to unrelated populations"
+      ]
+    },
+    {
+      "id": "evo-neutrality-from-nonsignificance",
+      "mode": "condition",
+      "condition": "A selection test is nonsignificant and the authors conclude the trait is neutral without an equivalence margin, power analysis, model comparison, or positive drift discrimination.",
+      "expected_targets": [
+        {"target": "neutrality_of_trait_relation", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_rejected", "evidence_role": "non_probative"}
+      ],
+      "required": [
+        "preserve the estimate and uncertainty",
+        "reject neutrality as a conclusion from failure to reject selection",
+        "require positive model discrimination appropriate to the claim"
+      ],
+      "forbidden": [
+        "translate nonsignificance into no selection",
+        "treat absence of detection as evidence of neutrality",
+        "erase the measured estimate"
+      ]
+    },
+    {
+      "id": "evo-fitness-formal-shortcut-positive-control",
+      "mode": "condition",
+      "condition": "A paper reports invasion fitness defined by an explicit dynamical model, resident state, mutant type, environment, timescale, and uncertainty.",
+      "expected_targets": [
+        {"target": "model_defined_invasion_fitness", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "not_a_causal_question", "evidence_role": "descriptive_only"}
+      ],
+      "required": [
+        "permit fitness as bounded shorthand for the recoverable quantity",
+        "retain the model conditions and uncertainty",
+        "keep it separate from other fitness generators and historical adaptation"
+      ],
+      "forbidden": [
+        "reject fitness because the word appears on a cue list",
+        "treat it as an intrinsic property outside the model",
+        "merge invasion fitness with lifetime reproductive success"
+      ]
+    },
+    {
+      "id": "evo-fitness-without-generator",
+      "mode": "question",
+      "source_question": "Why did this allele spread? Because it had higher fitness.",
+      "expected_targets": [
+        {"target": "higher_fitness", "identity_disposition": "identity_unresolved", "construct_disposition": "underspecified", "causal_disposition": "causal_rejected", "evidence_role": "non_probative"}
+      ],
+      "required": [
+        "state that higher fitness supplies neither a defined quantity nor a physical generator",
+        "identify the missing type environment time population comparator and measurement",
+        "preserve any separately supplied frequency observation"
+      ],
+      "forbidden": [
+        "accept fitness as an intrinsic cause",
+        "replace it with survival of the fittest",
+        "invent a selective regime"
+      ]
+    },
+    {
+      "id": "evo-current-role-origin-separation",
+      "mode": "condition",
+      "condition": "A controlled perturbation establishes that trait T changes current output Y, and the same result is used to claim T originally evolved for Y.",
+      "expected_targets": [
+        {"target": "current_trait_role_T_to_Y", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_admitted", "evidence_role": "route_closing"},
+        {"target": "historical_origin_of_T_for_Y", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_rejected", "evidence_role": "non_probative"}
+      ],
+      "required": [
+        "admit the exact current perturbation relation when its burden closes",
+        "reject transfer from current role to historical origin",
+        "preserve open regime phylogeny and alternative-route burdens"
+      ],
+      "forbidden": [
+        "erase the current effect because origin fails",
+        "use current usefulness as historical evidence",
+        "call present dependency the selected effect"
+      ]
+    },
+    {
+      "id": "evo-historical-adaptation-positive-control",
+      "mode": "condition",
+      "condition": "A phenotype-level historical claim has reproducible heritable variation, independent evidence of the past regime, temporal ordering, comparative support, replicated differential-persistence predictions, and tests against drift, correlated selection, constraint, and exaptation.",
+      "expected_targets": [
+        {"target": "historical_adaptation_of_trait_under_regime", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_admitted", "evidence_role": "route_closing"}
+      ],
+      "required": [
+        "permit causal admission when all applicable historical burdens close",
+        "keep the claim at the supported lineage trait regime and time resolution",
+        "avoid requiring an exact nucleotide for a phenotype-level claim"
+      ],
+      "forbidden": [
+        "reject all historical inference categorically",
+        "require a molecular path beyond the claimed resolution",
+        "promote the result to optimal design"
+      ]
+    },
+    {
+      "id": "evo-conservation-descriptive-only",
+      "mode": "condition",
+      "condition": "A sequence is conserved under a stated alignment and sampling method, and the paper concludes it is important, functional, and adaptive.",
+      "expected_targets": [
+        {"target": "measured_sequence_conservation", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "not_a_causal_question", "evidence_role": "descriptive_only"},
+        {"target": "current_function_from_conservation", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_rejected", "evidence_role": "non_probative"},
+        {"target": "historical_adaptation_from_conservation", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_rejected", "evidence_role": "non_probative"}
+      ],
+      "required": [
+        "preserve the conservation relation",
+        "separate current function purifying selection and adaptation",
+        "require direct dependency evidence for function and comparative discrimination for selection"
+      ],
+      "forbidden": [
+        "erase conservation",
+        "allow conservation to supply importance or adaptation",
+        "compress all targets into one verdict"
+      ]
+    },
+    {
+      "id": "evo-similarity-without-homology",
+      "mode": "condition",
+      "condition": "Two species show a similar structure under a stated measurement, and similarity is used as proof of homology and common selective origin.",
+      "expected_targets": [
+        {"target": "measured_structural_similarity", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "not_a_causal_question", "evidence_role": "descriptive_only"},
+        {"target": "homology_relation", "identity_disposition": "identity_unresolved", "construct_disposition": "underspecified", "causal_disposition": "not_a_causal_question", "evidence_role": "non_probative"},
+        {"target": "common_selective_origin", "identity_disposition": "identity_unresolved", "construct_disposition": "underspecified", "causal_disposition": "causal_rejected", "evidence_role": "non_probative"}
+      ],
+      "required": [
+        "preserve similarity",
+        "require correspondence reconstruction and applicable discordance tests for homology",
+        "keep homology and shared selective regime separate"
+      ],
+      "forbidden": [
+        "treat similarity as common ancestry or shared function",
+        "erase the similarity observation",
+        "require irrelevant discordance audits mechanically"
+      ]
+    },
+    {
+      "id": "evo-homology-reconstruction-positive-control",
+      "mode": "condition",
+      "condition": "A homology claim specifies characters, developmental and positional correspondence, phylogenetic reconstruction with uncertainty, alternative histories, and applicable convergence, reversal, introgression, or lineage-sorting tests.",
+      "expected_targets": [
+        {"target": "conditional_homology_relation", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "not_a_causal_question", "evidence_role": "descriptive_only"}
+      ],
+      "required": [
+        "admit homology at the stated character lineage model and uncertainty scope",
+        "preserve alternative histories and discordance limits",
+        "keep shared function and selective regime separate"
+      ],
+      "forbidden": [
+        "require optimality for homology",
+        "translate homology into identical mechanism",
+        "erase uncertainty because one topology is preferred"
+      ]
+    },
+    {
+      "id": "evo-experimental-evolution-standing-variation",
+      "mode": "condition",
+      "condition": "Replicated experimental populations begin with characterized standing variation, undergo a controlled regime, and show repeatable haplotype and phenotype shifts with bounded contamination and drift.",
+      "expected_targets": [
+        {"target": "regime_specific_evolution_from_standing_variation", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_admitted", "evidence_role": "route_closing"}
+      ],
+      "required": [
+        "admit the exact regime-specific relation when intervention and population burdens close",
+        "extract starting frequencies linkage recombination and replicate-lineage structure",
+        "avoid imposing a new-mutation supply calculation"
+      ],
+      "forbidden": [
+        "require a locked clonal ancestor",
+        "require a mutation-supply calculation for standing variation",
+        "transport the result to natural populations automatically"
+      ]
+    },
+    {
+      "id": "evo-laboratory-to-natural-transport",
+      "mode": "condition",
+      "condition": "A controlled laboratory regime produces repeatable adaptation, and the result is claimed to establish the same effect and magnitude in wild populations.",
+      "expected_targets": [
+        {"target": "laboratory_regime_adaptation", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_admitted", "evidence_role": "route_closing"},
+        {"target": "transport_to_wild_populations", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_unresolved", "evidence_role": "non_probative"}
+      ],
+      "required": [
+        "preserve the laboratory result",
+        "separate environment demography population structure timescale and regime transport",
+        "require direct transport evidence before transferring magnitude"
+      ],
+      "forbidden": [
+        "erase the lab result because transport is open",
+        "treat ecological plausibility as transport evidence",
+        "transfer the laboratory coefficient unchanged"
+      ]
+    },
+    {
+      "id": "evo-gene-association-versus-gene-for",
+      "mode": "condition",
+      "condition": "A variant is associated with a complex behavior with a reported effect distribution and heterogeneity, then described as a gene for the behavior.",
+      "expected_targets": [
+        {"target": "variant_behavior_association", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "not_a_causal_question", "evidence_role": "descriptive_only"},
+        {"target": "gene_for_behavior_object", "identity_disposition": "premise_rejected", "construct_disposition": "premise_rejected", "causal_disposition": "causal_rejected", "evidence_role": "non_probative"}
+      ],
+      "required": [
+        "preserve association population environment effect distribution and uncertainty",
+        "reject the residual purpose or essence supplied by gene-for phrasing",
+        "keep prediction mechanism organism effect and historical maintenance separate"
+      ],
+      "forbidden": [
+        "erase the association",
+        "treat association as mechanism",
+        "infer a unitary behavioral object from gene-for language"
+      ]
+    },
+    {
+      "id": "evo-direct-molecular-effect-positive-control",
+      "mode": "condition",
+      "condition": "A controlled edit changes a specified binding interaction, rescue restores it, downstream molecular output changes with timing and specificity, and no historical function claim is made.",
+      "expected_targets": [
+        {"target": "edited_binding_relation_to_molecular_output", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_admitted", "evidence_role": "route_closing"},
+        {"target": "historical_selected_effect", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_unresolved", "evidence_role": "non_probative"}
+      ],
+      "required": [
+        "admit the exact edited molecular relation when manipulation rescue timing and specificity close",
+        "preserve open organism-level and historical routes",
+        "avoid calling partial downstream mechanics a complete mechanism"
+      ],
+      "forbidden": [
+        "require phylogenetic reconstruction for the molecular intervention effect",
+        "promote the effect to historical function",
+        "reject exact causality because broader meaning is open"
+      ]
+    },
+    {
+      "id": "evo-optimum-model-positive-control",
+      "mode": "condition",
+      "condition": "A model defines an objective, feasible set, physical and developmental constraints, uncertainty, and a local optimum tested against alternative objectives and constraints.",
+      "expected_targets": [
+        {"target": "model_defined_local_optimum", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "not_a_causal_question", "evidence_role": "descriptive_only"}
+      ],
+      "required": [
+        "admit the model-defined local optimum at its model and feasible-set scope",
+        "report sensitivity to objective and constraint choices",
+        "keep optimality separate from adaptation history and global perfection"
+      ],
+      "forbidden": [
+        "reject all optimality language categorically",
+        "call a local optimum best possible globally",
+        "use the optimum as proof of historical selection"
+      ]
+    },
+    {
+      "id": "evo-phylogenetic-pseudoreplication",
+      "mode": "condition",
+      "condition": "A comparative study treats 200 species as independent observations despite one shared phylogeny and reports a precise trait-environment association.",
+      "expected_targets": [
+        {"target": "cross_species_trait_environment_relation", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_unresolved", "evidence_role": "segment_supporting"}
+      ],
+      "required": [
+        "model shared ancestry or justify independence",
+        "qualify information precision and transport by phylogenetic dependence",
+        "preserve measured species data while limiting causal claims"
+      ],
+      "forbidden": [
+        "use nominal species count as independent sample size",
+        "treat phylogenetic correction as automatic causal closure",
+        "erase data because independence is imperfect"
+      ]
+    },
+    {
+      "id": "evo-lineage-pseudoreplication",
+      "mode": "condition",
+      "condition": "Thousands of measurements across generations come from one experimental lineage and are treated as thousands of independent evolutionary replicates.",
+      "expected_targets": [
+        {"target": "within_lineage_time_series_relation", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "not_a_causal_question", "evidence_role": "descriptive_only"},
+        {"target": "replicated_regime_effect", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_rejected", "evidence_role": "non_probative"}
+      ],
+      "required": [
+        "treat replicate lineage or population as the relevant independent unit",
+        "preserve the within-lineage trajectory",
+        "reject precision and replication claims based on repeated measurements alone"
+      ],
+      "forbidden": [
+        "count generations or assays as independent populations",
+        "erase the time series",
+        "call one lineage independent replication"
+      ]
+    },
+    {
+      "id": "evo-convergent-output-different-routes",
+      "mode": "condition",
+      "condition": "Two lineages reach a similar phenotype through different measured genetic and developmental routes, and the shared phenotype is used to assert one homologous mechanism and one adaptation.",
+      "expected_targets": [
+        {"target": "similar_phenotypic_output", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "not_a_causal_question", "evidence_role": "descriptive_only"},
+        {"target": "shared_mechanism", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_rejected", "evidence_role": "premise_breaking"},
+        {"target": "shared_historical_adaptation", "identity_disposition": "generated_identity_conditional", "construct_disposition": "admitted", "causal_disposition": "causal_rejected", "evidence_role": "premise_breaking"}
+      ],
+      "required": [
+        "preserve convergent output while separating route identity and history",
+        "treat route divergence as premise-breaking for one shared mechanism",
+        "require lineage-specific historical audits"
+      ],
+      "forbidden": [
+        "use the same phenotype to supply homology or common origin",
+        "erase convergence because the shared story fails",
+        "compress distinct routes into one target"
+      ]
+    }
+  ]
+}

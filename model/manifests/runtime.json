@@ -29,7 +29,10 @@
     "cartridges/neuroscience_physical_continuity.yaml",
     "cartridges/neuroscience_fixtures.json",
     "cartridges/neuroscience_statistics.yaml",
-    "cartridges/neuroscience_statistical_fixtures.json"
+    "cartridges/neuroscience_statistical_fixtures.json",
+    "cartridges/evolution.yaml",
+    "cartridges/evolution_physical_continuity.yaml",
+    "cartridges/evolution_fixtures.json"
   ],
   "support_manifests": [
     "manifests/ingest.json"

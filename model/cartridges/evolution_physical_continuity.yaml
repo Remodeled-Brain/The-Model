@@ -1,0 +1,228 @@
+# Evolution physical-continuity cartridge
+# Status: CANDIDATE
+#
+# This file applies the shared physical-continuity contract to evolutionary claims.
+# It does not create a population-level force or repeat the relation compiler.
+
+evolution_physical_continuity:
+  status: candidate
+  layer: evolution_cartridge
+  purpose: >
+    Keep population, lineage, transmission, drift, selection, adaptation, and function
+    claims on the same physical surface as carrier replication, organism maintenance,
+    reproduction, death, movement, and environmental constraint.
+
+  generic_refs:
+    - model/kernel/physical_continuity.yaml#physical_continuity
+    - model/kernel/chain_contract.yaml#chain_contract
+    - model/runtime/physical_answer_contract.yaml
+    - model/ingest/physical_extraction_contract.yaml
+
+  refinement_contract:
+    rule: >
+      The shared kernel owns physical continuity and biological metabolic binding.
+      This cartridge supplies evolutionary chain templates, claim-sensitive stopping
+      points, and recurrent population-level chain breaks only.
+    prohibited:
+      - selection_as_force
+      - fitness_as_substance
+      - population_average_as_physical_operator
+      - metabolism_as_replacement_operator
+      - full_intracellular_route_required_for_every_descriptive_population_relation
+      - open_mechanism_filled_by_evolutionary_vocabulary
+
+  population_level_binding:
+    rule: >
+      Population and lineage relations are aggregates of materially carried and
+      metabolically maintained organism, cell, or replicator events. The aggregate
+      relation is real at its scale, but it does not add a force acting above those
+      events.
+    shortest_scale_rule: >
+      A descriptive population-composition relation may stop at a defined carrier,
+      sampling boundary, transmission interval, and measured distribution. A causal,
+      mechanistic, functional, or historical claim must expose the additional physical
+      and metabolic segments required by that exact target.
+    open_segment_rule: >
+      Preserve exact population, lineage, molecular, or intervention relations when
+      intermediate physical or metabolic segments remain open. Mark those segments
+      explicitly and prohibit mechanism language until they close.
+
+  carrier_and_transmission:
+    carrier_rule: >
+      Identify the material or physically reproduced state whose continuity is claimed.
+      DNA sequence, chromosome structure, cytoplasmic element, prion state, or
+      transgenerational chromatin state is admissible only at the transmission scope
+      actually demonstrated.
+    required_fields:
+      - carrier_or_reproduced_state
+      - replication_or_reconstruction_operation
+      - transmission_boundary
+      - error_or_variation_process
+      - timing_or_generation
+      - population_or_lineage_boundary
+      - uncertainty_and_unobserved_routes
+    carrier_phenotype_separation: >
+      Carrier transmission and phenotype expression are different chains. A sequence
+      can change without an expressed phenotype claim. A phenotype, function, cost, or
+      organism-state claim additionally requires expression, development, maintenance,
+      and consequence at the relevant biological scale.
+
+  chain_templates:
+    mutation_or_recombination_to_transmitted_change:
+      sequence:
+        - physical_or_chemical_change_to_carrier
+        - altered_replication_repair_or_recombination_state
+        - segregation_or_transmission
+        - descendant_carrier_distribution
+        - measured_population_or_lineage_change
+      guard: >
+        Mutation, recombination, or repair language cannot replace the measured carrier
+        change and transmission path.
+
+    migration_or_gene_flow:
+      sequence:
+        - physical_movement_of_organisms_cells_or_carriers
+        - entry_into_defined_population_boundary
+        - reproduction_or_transmission
+        - changed_composition_distribution
+      guard: >
+        Gene flow is not an abstract mixing operator. Identify the moved carrier,
+        boundary, timing, and descendant contribution.
+
+    finite_sampling_or_drift:
+      sequence:
+        - finite_reproductive_or_transmission_events
+        - unequal_descendant_representation_under_defined_sampling_process
+        - composition_change_across_generations
+      guard: >
+        Drift is a model-bound stochastic route, not unexplained randomness. State the
+        population process, sampling assumptions, and competing routes.
+
+    differential_persistence_or_reproduction:
+      sequence:
+        - explicit_physical_environment_or_regime
+        - exposure_or_constraint_on_organism_cell_or_replicator
+        - change_in_metabolically_maintained_state_or_reproductive_transition
+        - differential_survival_reproduction_or_transmission
+        - differential_descendant_contribution
+        - population_or_lineage_composition_change
+      guard: >
+        Selection pressure, fitness, and adaptation cannot fill any segment. The regime,
+        carried change, maintained-state consequence, and descendant contribution must
+        be specified at the resolution claimed.
+
+    current_trait_role:
+      sequence:
+        - defined_trait_or_component_state
+        - physical_manipulation_or_natural_dependency
+        - metabolic_or_material_state_change
+        - biological_operation
+        - measured_system_or_organism_state_outcome
+      guard: >
+        Closing this chain establishes only the current role under tested conditions.
+        Historical origin remains a separate chain.
+
+    historical_adaptation:
+      sequence:
+        - heritable_or_reproduced_variation_at_claimed_resolution
+        - historical_regime_or_constraint
+        - differential_persistence_or_reproduction_relation
+        - transmission_across_generations
+        - lineage_or_population_change
+        - persistence_or_recurrence_of_the_trait_relation
+      joins:
+        - regime_precedes_and_bears_on_differential_outcome
+        - differential_outcome_bears_on_descendant_contribution
+        - transmitted_change_matches_the_trait_or_state_claimed
+        - historical_and_current_measurements_are_transport_compatible
+      guard: >
+        Current utility, present perturbability, conservation, or prevalence cannot
+        stand in for these historical joins.
+
+  claim_sensitive_physical_burden:
+    descriptive_population_or_lineage_relation:
+      required:
+        - material_or_reproduced_unit
+        - population_or_lineage_boundary
+        - time_or_generation
+        - sampling_and_measurement_operation
+        - observed_distribution_and_uncertainty
+      may_remain_open:
+        - intracellular_expression_route
+        - organism_state_consequence
+        - historical_causal_route
+
+    exact_intervention_or_regime_effect:
+      required:
+        - physical_intervention_or_regime
+        - manipulated_or_exposed_unit
+        - comparator
+        - timing
+        - measured_descendant_or_organism_outcome
+        - explicit_open_internal_segments
+      rule: >
+        Exact causality may close for the manipulated relation while the internal
+        molecular or metabolic route remains partial. Preserve that separation.
+
+    phenotype_mechanism_or_organism_effect:
+      required:
+        - carrier_or_source_state
+        - expression_or_developmental_route
+        - energetic_or_material_carrier
+        - metabolically_maintained_state_change
+        - biological_operation
+        - organism_state_or_reproductive_consequence
+        - timing_and_conditions
+
+    cost_constraint_or_optimality:
+      required:
+        - physical_or_biological_cost_currency
+        - maintained_state_or_resource_dependency
+        - feasible_alternatives
+        - constraint_surface
+        - comparator_and_conditions
+      guard: >
+        Cost, constraint, and optimum are not supplied by a trait's persistence or by
+        failure to observe an alternative.
+
+  multi_generation_join_checks:
+    - upstream_carrier_state_matches_downstream_transmitted_unit
+    - generation_boundary_is_explicit
+    - descendant_contribution_is_measured_or_marked_open
+    - population_boundary_remains_stable_or_change_is_modeled
+    - regime_timing_matches_the_claimed_differential_outcome
+    - phenotype_measurement_is_comparable_across_generations
+    - source_population_to_target_population_transport_is_explicit
+    - no_average_or_rate_supplies_a_missing_individual_or_carrier_operation
+
+  common_chain_breaks:
+    - frequency_changed_therefore_selection_acted
+    - trait_is_useful_therefore_it_evolved_for_that_use
+    - conserved_therefore_functional_or_adaptive
+    - gene_named_therefore_phenotype_mechanism_closed
+    - fitness_named_as_cause_of_descendant_output
+    - selection_pressure_named_without_physical_regime
+    - mutation_rate_named_without_carrier_target_or_population_model
+    - population_average_changed_therefore_every_individual_changed
+    - present_expression_route_assumed_to_be_historical_origin_route
+    - metabolic_cost_asserted_without_currency
+    - neutral_or_drift_claim_from_failure_to_detect_selection
+    - laboratory_regime_transferred_to_natural_population_without_bridge
+
+  terminology_guard:
+    reject_as_physical_segment:
+      - selection
+      - selection_pressure
+      - fitness
+      - adaptation
+      - function
+      - evolvability
+      - constraint
+      - optimization
+      - inheritance
+      - mutation_rate
+      - population_pressure
+    translation_rule: >
+      Translate each term into the physical carrier, variation or transmission
+      operation, environmental condition, maintained-state consequence, descendant
+      contribution, and measured population relation that the source actually supports.
