@@ -1,0 +1,275 @@
+generator_family_synthesis:
+  status: candidate
+  layer: evidence_maintenance
+  purpose: >
+    Reconstruct the generators shared across a literature, collapse dependent outputs into relation-specific evidence
+    families, preserve what recurrence within a family can establish, and emit an operational repair ledger for every
+    failed or unresolved bridge. The unit of synthesis is the independent constraint path, not the paper.
+
+  scope:
+    applies_to:
+      - every_ingested_source_for_fingerprinting
+      - any_synthesis_review_or_meta_analysis
+      - any_claim_supported_by_multiple_sources
+      - any_claim_whose_support_invokes_publication_volume_consensus_or_replication
+      - any_claim_considered_for_promotion
+    cannot:
+      - treat_publication_count_as_independent_weight
+      - treat_different_samples_as_independent_when_they_share_the_load_bearing_generator
+      - pool_non_equivalent_targets_to_manufacture_convergence
+      - use_family_collapse_to_erase_valid_within_family_information
+      - infer_social_independence_from_different_author_lists
+      - issue_generic_more_research_recommendations
+      - represent_a_proposed_repair_as_completed_evidence
+
+  operating_rule: >
+    Weight generators rather than outputs. A source adds independent weight only when it contributes a constraint path
+    whose success and failure are not jointly controlled by the same load-bearing construct, measurement, cohort,
+    intervention, comparator, task, pipeline, model lineage, or inferential bridge as the sources already supporting
+    that exact target relation.
+
+  trigger_policy:
+    fingerprint_mode:
+      frequency: every_source
+      cost: mandatory
+      output: generator_fingerprint
+    family_audit_mode:
+      trigger_any:
+        - second_source_bears_on_an_existing_target_relation
+        - shared_generator_key_detected
+        - replication_or_convergence_claimed
+        - publication_volume_or_consensus_invoked
+      output: provisional_family_assignment
+    full_collapse_mode:
+      trigger_any:
+        - source_design_is_synthesis
+        - meta_analysis_or_systematic_review
+        - three_or_more_sources_bear_on_the_same_target_relation
+        - promotion_candidate
+        - rapid_literature_expansion
+        - premise_breaking_evidence_conflicts_with_a_large_descendant_literature
+      outputs:
+        - family_graph
+        - collapsed_weighting_units
+        - independent_constraint_paths
+        - synthesis_repair_ledger
+
+  generator_fingerprint:
+    required_for: every_source
+    relation_specific: true
+    required_fields:
+      - target_relation_identity
+      - target_selection_generator
+      - grouping_or_construct_generator
+      - measured_substrate
+      - measured_variable
+      - measurement_or_proxy_generator
+      - sampling_frame
+      - cohort_or_dataset_lineage
+      - exposure_or_intervention_generator
+      - comparator_or_counterfactual_generator
+      - outcome_generator
+      - instrument_or_task_generator
+      - analytical_pipeline_and_model_lineage
+      - inferential_bridge_dependencies
+      - transport_conditions
+      - disconfirmation_exposure
+    missing_rule: Record missing rather than infer independence.
+    paper_global_status_forbidden: true
+    rule: >
+      One paper may belong to different families for different target relations. Independence, recurrence, and family
+      assignment are emitted per relation and per bridge, never as a single global paper-quality label.
+
+  family_edge_types:
+    exact_source_or_sample_overlap:
+      effect: hard_dependency
+    shared_cohort_or_dataset:
+      effect: hard_dependency_for_population_and_sampling_claims
+    shared_construct_or_grouping_rule:
+      effect: inherited_construct_dependency
+    shared_measurement_proxy_instrument_or_task:
+      effect: inherited_measurement_dependency
+    shared_intervention_exposure_or_comparator:
+      effect: inherited_counterfactual_dependency
+    shared_pipeline_model_or_feature_construction:
+      effect: inherited_analytic_dependency
+    shared_inferential_bridge:
+      effect: inherited_bridge_dependency
+    shared_lab_author_or_funding_lineage:
+      effect: provenance_flag_only_unless_an_operational_dependency_is_identified
+    shared_theoretical_prior:
+      effect: shared_prior_flag
+      rule: >
+        A shared prior discounts confirmations only when it controls target construction, measurement, analysis, or
+        interpretation. It does not symmetrically discount a direct failure of that prior.
+
+  family_assignment:
+    collapse_test: >
+      Collapse sources for the exact target relation when a single failure in a shared load-bearing generator could
+      invalidate their apparent convergence, or when the same generator could jointly produce their positive result.
+    non_collapse_test: >
+      Keep distinct weighting units only when the sources reach the same operationally equivalent target through
+      materially independent selection, measurement, intervention or exposure, analysis, and inferential bridge paths.
+    unresolved_rule: >
+      When independence cannot be established, retain the observations but assign provisional_shared_family rather than
+      independent_convergence.
+    target_equivalence_required: true
+    different_operationalizations_rule: >
+      Different operationalizations do not create convergence unless an explicit translation demonstrates that they
+      bear on the same target relation. Otherwise report parallel bounded relations.
+
+  within_family_information:
+    may_add:
+      - precision_for_the_family_specific_estimate
+      - condition_and_boundary_mapping
+      - measurement_reliability_information
+      - heterogeneity_characterization
+      - reproducibility_of_the_shared_operation
+      - method_failure_or_stability_information
+      - adverse_or_opposing_outcome_information
+    cannot_add_by_recurrence_alone:
+      - construct_escape
+      - proxy_to_mechanism_translation
+      - independent_replication
+      - transport_beyond_the_shared_population_or_apparatus
+      - causal_direction
+      - endogenous_route_identity
+      - cross_scale_closure
+      - practical_importance
+
+  cross_family_accumulation:
+    required_conditions:
+      - operationally_equivalent_target_relation
+      - distinct_load_bearing_generators
+      - relation_specific_independence
+      - bridge_compatibility
+      - no_shared_unresolved_premise_controlling_all_families
+    output: independent_constraint_path_count
+    rule: >
+      Cross-family agreement increases weight only for the exact relation jointly exposed. It cannot transfer closure to
+      construct validity, etiology, mechanism, prediction, transport, or scale unless those paths are independently closed.
+
+  failure_asymmetry:
+    rule: >
+      Shared-prior confirmations are discounted according to their operational dependence. A direct, valid failure of a
+      necessary shared premise is not discounted merely because it arose inside the same intellectual lineage. Premise
+      failure propagates to descendant claims that require the failed premise.
+    required_outputs:
+      - shared_prior_confirmations
+      - premise_breaking_results
+      - descendant_claims_affected
+      - propagation_scope
+    forbidden:
+      - symmetric_discounting_of_confirmation_and_failure
+      - downstream_volume_rescuing_a_broken_premise
+
+  synthesis_runtime:
+    sequence:
+      - reconstruct_exact_target_relations
+      - fingerprint_each_source_per_relation
+      - build_typed_dependency_graph
+      - test_operational_equivalence_before_pooling
+      - collapse_relation_specific_families
+      - preserve_within_family_estimates_and_heterogeneity
+      - count_independent_constraint_paths
+      - audit_shared_unresolved_bridges
+      - propagate_valid_premise_failures
+      - emit_strongest_surviving_claim
+      - emit_repair_ledger
+    required_outputs:
+      - raw_source_count
+      - eligible_source_count
+      - target_relation_map
+      - family_graph
+      - family_count_by_target_relation
+      - collapsed_weighting_units
+      - independent_constraint_path_count
+      - route_discriminating_test_count
+      - premise_breaking_result_count
+      - within_family_recurrence_summary
+      - family_specific_effects_and_heterogeneity
+      - shared_unresolved_bridges
+      - transport_boundaries
+      - strongest_surviving_claim
+      - synthesis_repair_ledger
+    reporting_rule: >
+      Report raw paper count and collapsed evidentiary structure together. Never present the collapsed count as a
+      corrected sample size or convert the family audit into a generic numerical quality score.
+
+  repair_ledger:
+    purpose: >
+      Convert each failed or unresolved relation into a bounded instruction describing the minimal observation,
+      comparison, perturbation, translation, or independent generator needed to change its status.
+    required_for:
+      - every_failed_gate
+      - every_unresolved_load_bearing_bridge
+      - every_promotion_block
+      - every_synthesis_level_shared_dependency
+    disposition_enum:
+      - repairable_within_family
+      - requires_new_generator_family
+      - requires_target_reconstruction
+      - requires_direct_measurement_or_translation
+      - requires_valid_counterfactual
+      - requires_route_discrimination
+      - requires_transport_test
+      - not_repairable_by_more_of_same
+      - currently_non_executable
+    per_item_required_fields:
+      - repair_id
+      - target_relation
+      - blocked_claim
+      - failed_gate_or_bridge
+      - exact_missing_dependency
+      - current_retained_evidence
+      - why_current_generator_cannot_close_it
+      - repair_disposition
+      - minimal_required_operation
+      - required_comparator_or_counterfactual
+      - required_measurement_and_scale
+      - required_independence_from_existing_families
+      - pass_observation
+      - disconfirming_observation
+      - residual_scope_limits_after_pass
+      - priority_basis
+    instruction_rule: >
+      Instructions must name an executable evidentiary change. They must specify what must be measured or manipulated,
+      against which comparator, through which independent route, and what result would close or break the relation.
+    priority_rule: >
+      Prioritize repairs by bottleneck leverage: the number and importance of downstream claims whose status would change
+      if the dependency closed or failed. Ease, novelty, prestige, and publication value do not set priority.
+    guards:
+      - do_not_prescribe_more_sample_size_when_the_missing_dependency_is_construct_measurement_direction_or_route
+      - do_not_claim_that_external_validation_repairs_construct_identity
+      - do_not_claim_that_a_new_dataset_repairs_a_shared_proxy_translation
+      - do_not_claim_that_precision_repairs_practical_triviality
+      - do_not_allow_one_pass_to_close_unrelated_bridges
+      - do_not_name_a_specific_study_or_resource_as_the_required_fix
+      - do_not_invent_feasibility
+      - mark_currently_non_executable_when_no_operational_test_can_be_specified
+
+  answer_rendering:
+    compact_fields:
+      - what_the_literature_actually_contains
+      - how_many_generator_families_it_contains
+      - what_each_family_adds
+      - which_dependencies_all_families_share
+      - which tests_can_change_the_claim
+    required_distinction: >
+      A failure report states why the current evidence stops. A repair instruction states the smallest operational change
+      that could move or defeat the claim. The two outputs remain linked but are never conflated.
+
+  invariants:
+    fingerprint_every_output: true
+    collapse_families_at_synthesis: true
+    audit_generators_before_pooling: true
+    weight_generators_not_outputs: true
+    independence_is_relation_specific: true
+    within_family_recurrence_is_not_independent_confirmation: true
+    different_operationalization_requires_translation_before_convergence: true
+    shared_uncertainty_is_inherited: true
+    shared_prior_failures_outrank_descendant_confirmation_volume: true
+    repair_instruction_is_not_evidence: true
+    repair_instruction_must_be_executable_and_disconfirmable: true
+    generic_more_research_output_forbidden: true
+    no_generic_quality_score: true
