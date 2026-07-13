@@ -1,7 +1,7 @@
 {
-  "schema_version": "v4",
+  "schema_version": "v5",
   "status": "candidate",
-  "purpose": "Domain-neutral conformance contracts for data-first ingest, design-specific admission, and relation-level failure routing.",
+  "purpose": "Domain-neutral conformance contracts for data-first ingest, design-specific admission, relation-level failure routing, generator-family collapse, and operational repair instructions.",
   "execution_scope": {
     "ci": "validates structure, manifest inclusion, and required fields",
     "semantic": "provider runs apply ingest to the source pattern and compare the record with this contract"
@@ -100,23 +100,51 @@
     {
       "id": "correlated-volume",
       "source_pattern": "Many papers repeat a small association using shared cohorts, datasets, instruments, interventions, comparators, outcomes, pipelines, or inferential bridges.",
-      "required_gates": ["independence", "inference_audit", "practical_significance"],
-      "allowed_channels": ["descriptive_support", "provenance_only"],
-      "blocked_roles": ["grounding_by_count", "independence_by_publication_count", "mechanism_from_correlated_volume"]
+      "required_gates": ["generator_fingerprinting", "family_assignment", "independence", "inference_audit", "practical_significance"],
+      "allowed_channels": ["descriptive_support", "method_support", "provenance_only"],
+      "blocked_roles": ["grounding_by_count", "independence_by_publication_count", "mechanism_from_correlated_volume", "raw_paper_count_as_constraint_path_count"]
     },
     {
       "id": "synthesis-inherits-input-failure",
       "source_pattern": "A review or pooled analysis combines inputs with construct, comparator, measurement, attrition, proxy, design, or bridge failures and presents a stronger conclusion.",
-      "required_gates": ["source_ingress", "inference_audit", "independence"],
-      "allowed_channels": ["descriptive_support", "provenance_only"],
-      "blocked_roles": ["synthesis_repairs_invalid_inputs", "narrower_uncertainty_as_causal_closure", "review_status_as_admission"]
+      "required_gates": ["source_ingress", "generator_fingerprinting", "family_collapse", "inference_audit", "independence", "repair_ledger"],
+      "allowed_channels": ["descriptive_support", "method_support", "provenance_only"],
+      "blocked_roles": ["synthesis_repairs_invalid_inputs", "narrower_uncertainty_as_causal_closure", "review_status_as_admission", "pooling_shared_failure_as_convergence"]
     },
     {
       "id": "premise-breaking-dominance",
       "source_pattern": "A direct independent result breaks a necessary construct, counterfactual, prediction, bridge, or route premise while many downstream papers assume it.",
-      "required_gates": ["construct_admission", "causal_admission", "evidence_role_classification", "independence"],
+      "required_gates": ["construct_admission", "causal_admission", "generator_fingerprinting", "family_collapse", "evidence_role_classification", "independence", "premise_failure_propagation"],
       "allowed_channels": ["disconfirmation", "descriptive_support", "provenance_only"],
-      "blocked_roles": ["downstream_volume_rescues_premise", "association_count_outweighs_failure", "soft_causal_restating_after_failure"]
+      "blocked_roles": ["downstream_volume_rescues_premise", "association_count_outweighs_failure", "soft_causal_restating_after_failure", "symmetric_discounting_of_shared_prior_failure"]
+    },
+    {
+      "id": "independent-family-convergence",
+      "source_pattern": "Several studies reach the same operationally equivalent target relation through distinct sampling, measurement, intervention or exposure, analysis, and bridge paths, with no shared unresolved premise controlling the result.",
+      "required_gates": ["generator_fingerprinting", "target_equivalence", "family_assignment", "family_collapse", "independence", "cross_family_accumulation"],
+      "allowed_channels": ["mechanistic_grounded", "route_partial", "descriptive_support"],
+      "blocked_roles": ["scope_transfer_beyond_jointly_exposed_relation", "non_equivalent_operationalizations_pooled_as_convergence"]
+    },
+    {
+      "id": "within-family-recurrence-retains-information",
+      "source_pattern": "A large family of studies repeats one operation across new samples and conditions, improving precision and mapping heterogeneity while leaving the shared construct, proxy, and inferential bridge unchanged.",
+      "required_gates": ["generator_fingerprinting", "family_assignment", "family_collapse", "within_family_information"],
+      "allowed_channels": ["descriptive_support", "method_support", "provenance_only"],
+      "blocked_roles": ["within_family_precision_as_construct_escape", "within_family_recurrence_as_independent_replication", "new_sample_as_proxy_translation"]
+    },
+    {
+      "id": "operational-repair-instruction",
+      "source_pattern": "A claim fails because all supporting studies share an untranslated proxy and postdictive case-control design. The audit must explain the failure and specify the minimal independent prospective measurement and comparator capable of closing or disconfirming the relation.",
+      "required_gates": ["generator_fingerprinting", "family_collapse", "proxy_translation", "temporality", "repair_ledger"],
+      "allowed_channels": ["proxy_only", "descriptive_support", "method_support", "provenance_only"],
+      "blocked_roles": ["generic_more_research", "larger_sample_as_proxy_repair", "proposed_repair_as_existing_evidence", "repair_without_disconfirming_observation"]
+    },
+    {
+      "id": "target-reconstruction-before-repair",
+      "source_pattern": "A literature uses one name for several non-equivalent operational targets, so no new experiment can repair the broad claim until the target relations are separated and generated independently.",
+      "required_gates": ["target_identity", "generator_fingerprinting", "target_equivalence", "family_collapse", "repair_ledger"],
+      "allowed_channels": ["label_dependent_observation", "descriptive_support", "provenance_only"],
+      "blocked_roles": ["pooled_broad_target", "generic_replication_request", "repair_design_before_target_reconstruction"]
     }
   ]
 }
