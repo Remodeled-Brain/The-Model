@@ -13,6 +13,7 @@
     "ingest/purpose.md",
     "ingest/architecture.yaml",
     "ingest/rules.yaml",
+    "ingest/generator_family_synthesis.yaml",
     "kernel/resource_retrieval.yaml",
     "kernel/resource_retrieval_fixtures.json",
     "kernel/statistical_qualifiers.yaml",
@@ -46,5 +47,5 @@
   "build": {
     "dist/ingest_support_runtime.txt": "scripts/build_master_prompt.py model/manifests/ingest.json"
   },
-  "note": "Adopted v0.05 v5 adaptive evidence-maintenance runtime."
+  "note": "Adopted v0.05 v5 adaptive evidence-maintenance runtime with a candidate generator-family synthesis extension pending semantic conformance."
 }
