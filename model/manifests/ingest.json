@@ -14,7 +14,6 @@
     "ingest/architecture.yaml",
     "ingest/rules.yaml",
     "ingest/generator_family_synthesis.yaml",
-    "ingest/generator_family_record_extension.yaml",
     "kernel/resource_retrieval.yaml",
     "kernel/resource_retrieval_fixtures.json",
     "kernel/statistical_qualifiers.yaml",
@@ -24,6 +23,7 @@
     "ingest/physical_extraction_contract.yaml",
     "ingest/failure_routing.yaml",
     "ingest/record_schema.yaml",
+    "ingest/generator_family_record_extension.yaml",
     "ingest/fixtures.json",
     "ingest/target_identity_fixtures.json"
   ],
