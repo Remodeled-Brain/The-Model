@@ -3,9 +3,12 @@ ingest_architecture:
   layer: evidence_maintenance
   purpose: >
     Convert a source into a provenance-bound relation-level record whose admissible scope is generated from the
-    actual data, design, construct dependence, measurement distance, and exposed chain rather than the source narrative.
+    actual data, design, construct dependence, measurement distance, exposed chain, generator lineage, and independent
+    constraint contribution rather than the source narrative or publication count.
 
   evidence_admission_ref: model/kernel/evidence_admission.yaml#evidence_admission
+  generator_family_synthesis_ref: model/ingest/generator_family_synthesis.yaml#generator_family_synthesis
+  generator_family_record_ref: model/ingest/generator_family_record_extension.yaml#generator_family_record_extension
 
   boundary:
     consumes: paper_or_source
@@ -16,9 +19,11 @@ ingest_architecture:
       - determine_the_final_answer_shape
       - write_canonical_claim_state_without_adoption
       - treat_source_conclusions_as_admitted_evidence
+      - treat_publication_count_as_independent_weight
+      - treat_a_proposed_repair_as_completed_evidence
 
-  phase_0_data_and_design:
-    purpose: Extract the actual observations and classify what causal contrast the design can expose.
+  phase_0_data_design_and_generator_extraction:
+    purpose: Extract the actual observations, classify what causal contrast the design can expose, and fingerprint the generators that produced each target relation.
     required_outputs:
       - design_mode
       - construct_relation
@@ -35,15 +40,18 @@ ingest_architecture:
       - sample_flow_attrition_and_missingness
       - measurement_validity_and_noise
       - analysis_integrity
+      - generator_fingerprints_by_target_relation
     rules:
       - The actual data outrank the abstract discussion and conclusion.
       - Observational work begins descriptive or more restricted.
       - Intervention work begins unresolved and may earn causality for the exact manipulated relation.
       - Intervention naming neither grants nor denies causality.
       - Construct dependence and proxy distance remain separate restrictions.
+      - Missing generator information blocks an independence claim but does not erase a valid observation.
+      - Generator fingerprints are relation-specific rather than paper-global.
 
-  phase_A_presumption_and_audit:
-    purpose: Assign the most restrictive applicable initial state and expose every inferential bridge.
+  phase_A_presumption_bridge_and_family_audit:
+    purpose: Assign the most restrictive applicable initial state, expose every inferential bridge, and identify inherited generator dependencies.
     required_outputs:
       - presumptive_class
       - presumed_closure_state
@@ -53,6 +61,8 @@ ingest_architecture:
       - stripped_assertions
       - bridge_ledger
       - shared_assumption_families
+      - provisional_family_assignments
+      - unresolved_independence_fields
     routing:
       construct_indexed: label_dependent
       proxy_or_surrogate: proxy_limited
@@ -63,6 +73,9 @@ ingest_architecture:
       - Missing evidence preserves the restrictive state for the affected relation.
       - One local pass cannot upgrade the whole record.
       - Every increase from observation to cause mechanism effectiveness or named process requires a bridge.
+      - A second source bearing on the same relation triggers family assignment.
+      - Shared generators are typed by construct measurement cohort intervention comparator task pipeline model and bridge dependence.
+      - Shared authorship laboratory or funding is provenance only unless an operational dependency is identified.
 
   phase_B_relation_validation:
     purpose: Test each target relation using the burden appropriate to its design and claimed scope.
@@ -78,7 +91,8 @@ ingest_architecture:
       - prediction_or_route_discrimination_when_required
       - proxy_translation
       - scale_translation
-      - independence
+      - relation_specific_independence
+      - generator_family_independence
       - disconfirmation
     outputs:
       - data_supported_scope
@@ -89,6 +103,7 @@ ingest_architecture:
       - final_closure_state_by_target
       - support_channels
       - blocked_roles
+      - repair_ledger_items
 
   phase_C_binding_eligibility:
     purpose: Determine which exact relations the audited record may support.
@@ -100,11 +115,84 @@ ingest_architecture:
       - Proxy relations remain proxy_limited until physical translation closes.
       - Construct-indexed relations remain label_dependent until construct escape closes.
       - Narrative strength cannot exceed data-supported scope.
+      - A repair instruction cannot upgrade binding eligibility.
     outputs:
       - eligible_binding_relations
       - forbidden_binding_relations
       - evidence_role_class
       - non_probative_for
+
+  phase_D_cross_record_synthesis:
+    purpose: Collapse dependent outputs into relation-specific generator families and identify the independent constraint paths available to synthesis.
+    trigger_any:
+      - design_mode_is_synthesis
+      - meta_analysis_or_systematic_review
+      - three_or_more_sources_bear_on_the_same_target_relation
+      - replication_convergence_consensus_or_publication_volume_is_invoked
+      - claim_is_a_promotion_candidate
+      - rapid_literature_expansion
+      - premise_breaking_result_conflicts_with_descendant_literature
+    sequence:
+      - test_target_operational_equivalence
+      - build_typed_generator_dependency_graph
+      - collapse_relation_specific_families
+      - preserve_within_family_precision_heterogeneity_and_method_information
+      - count_independent_constraint_paths
+      - audit_shared_unresolved_bridges
+      - propagate_valid_premise_failures
+      - emit_strongest_surviving_claim
+      - emit_synthesis_repair_ledger
+    outputs:
+      - raw_source_count
+      - eligible_source_count
+      - family_graph
+      - family_count_by_target_relation
+      - collapsed_weighting_units
+      - independent_constraint_path_count
+      - route_discriminating_test_count
+      - premise_breaking_result_count
+      - within_family_recurrence_summary
+      - family_specific_effects_and_heterogeneity
+      - shared_unresolved_bridges
+      - transport_boundaries
+      - strongest_surviving_claim
+      - synthesis_repair_ledger
+    rules:
+      - Weight generators rather than outputs.
+      - Within-family recurrence may improve precision or map conditions but cannot repair the generator it repeats.
+      - Different operationalizations require explicit translation before they can count as convergence.
+      - Shared-prior confirmations are discounted while direct valid failures of a necessary prior propagate to dependent descendants.
+      - Raw source count and independent constraint path count remain separate.
+      - Family collapse never erases valid bounded observations.
+
+  repair_instruction_runtime:
+    trigger_any:
+      - failed_gate
+      - unresolved_load_bearing_bridge
+      - blocked_promotion
+      - synthesis_level_shared_dependency
+    required_outputs:
+      - target_relation
+      - blocked_claim
+      - failed_gate_or_bridge
+      - exact_missing_dependency
+      - current_retained_evidence
+      - why_current_generator_cannot_close_it
+      - repair_disposition
+      - minimal_required_operation
+      - required_comparator_or_counterfactual
+      - required_measurement_and_scale
+      - required_independence_from_existing_families
+      - pass_observation
+      - disconfirming_observation
+      - residual_scope_limits_after_pass
+      - priority_basis
+    rules:
+      - The instruction must specify an executable evidentiary change and a possible disconfirming result.
+      - Generic more research language is invalid.
+      - Larger samples cannot repair construct measurement direction route or translation failures by themselves.
+      - Repair priority follows downstream bottleneck leverage rather than ease novelty or prestige.
+      - Proposed repairs remain non-evidentiary until a new source passes ordinary admission.
 
   write_boundary:
     allowed:
@@ -115,6 +203,8 @@ ingest_architecture:
       - stripped_assertions
       - bridge_ledger
       - shared_assumption_families
+      - generator_fingerprints
+      - provisional_family_assignments
       - relation_level_gate_results
       - evidence
       - provenance
@@ -122,6 +212,10 @@ ingest_architecture:
       - disconfirmation_notes
       - method_notes
       - missing_route_notes
+      - family_graphs
+      - collapsed_weighting_units
+      - independent_constraint_path_summaries
+      - repair_ledgers
       - promotion_candidates
       - promotion_gate_results
     canonical_integration: serialized_explicit_adoption_only
@@ -134,6 +228,7 @@ ingest_architecture:
 
   invariants:
     phase_0_before_phase_A_before_phase_B_before_phase_C: true
+    phase_D_runs_only_after_relation_level_records_exist: true
     actual_data_outranks_source_narrative: true
     observational_defaults_to_noncausal: true
     intervention_is_evaluated_for_exact_target_relation: true
@@ -145,3 +240,11 @@ ingest_architecture:
     named_process_language_cannot_supply_measured_process: true
     failed_gate_preserves_restrictive_state_for_affected_relation: true
     support_note_count_cannot_create_grounding: true
+    fingerprint_every_source: true
+    independence_is_relation_specific: true
+    family_collapse_precedes_synthesis_weighting: true
+    publication_count_cannot_supply_independence: true
+    within_family_recurrence_cannot_repair_shared_generator_failure: true
+    premise_failure_is_not_symmetrically_discounted_with_shared_prior_confirmation: true
+    repair_instruction_is_not_evidence: true
+    generic_more_research_output_is_forbidden: true
