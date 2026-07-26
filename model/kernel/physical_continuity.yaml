@@ -44,6 +44,35 @@ physical_continuity:
       operators by name. Each must resolve into a specified physical variable, carrier, constraint,
       state change, and downstream dependency.
 
+  electrochemical_conduction_guard:
+    default_role: motive_force_and_transmission
+    rule: >
+      Treat electrochemical gradients, membrane-potential changes, and propagating ionic flux as motive-force and
+      transmission layers by default. Attribute outcome-specific causal organization to them only when controlled or
+      otherwise discriminating variation in their magnitude, polarity, waveform, timing, or spatial configuration
+      changes which state transition occurs, with substrate organization, metabolic support, boundary conditions, and
+      prior state held constant or separately bounded.
+    discriminating_dimensions:
+      - magnitude
+      - polarity
+      - waveform
+      - timing
+      - spatial_configuration
+    conditions_to_hold_or_bound:
+      - substrate_organization
+      - metabolic_support
+      - boundary_conditions
+      - prior_state
+    preservation_rule: >
+      When patterned electrical variation passes this discrimination burden, preserve its demonstrated partial or full
+      causal contribution to the exact state transition under the tested conditions. Do not erase that contribution
+      merely because electrochemical conduction is also a motive-force or transmission layer, and do not transfer it
+      to untested endogenous organization, etiology, transport, or sole-cause claims.
+    default_limit: >
+      Voltage, firing, or ionic-flux magnitude, presence, propagation, or covariation alone establishes at most the
+      measured conduction or transmission relation. It does not establish the outcome-specific organization that
+      differentiates which transition occurs.
+
   shortest_sufficient_chain:
     required_order:
       - physical_perturbation_or_constraint
@@ -112,3 +141,4 @@ physical_continuity:
     - no_named_process_as_physical_segment
     - no_mechanism_claim_with_open_metabolic_binding
     - no_fabricated_path_to_avoid_an_unresolved_slot
+    - no_electrochemical_conduction_as_outcome_specific_author_by_default

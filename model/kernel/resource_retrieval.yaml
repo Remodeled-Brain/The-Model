@@ -27,9 +27,9 @@ resource_retrieval:
 
   freshness_policy:
     default_discovery_order:
-      - search the most recent 12 months first
-      - expand to the preceding 24 months when needed
-      - retrieve older primary sources required to identify the original measurement method dataset claim or route
+      - search the most recent 12 months first within the allowed source boundary
+      - expand to the preceding 24 months next when needed
+      - continue backward only when older sources may contribute uniquely probative observations methods datasets disconfirmation or physical-route evidence
       - walk forward to later replications nulls disconfirmation methodological corrections and changed classifications
     rule: >
       Apply a strong recency bias to discovery of the current empirical state. Recency does not increase evidentiary
@@ -38,6 +38,34 @@ resource_retrieval:
     current_state_requirement: >
       When the question asks what is currently known, retrieve enough recent material to test whether the older
       account remains current rather than repeating the provider's training-era summary.
+
+  ahistorical_reconstruction_rule:
+    rule: >
+      Build the Model's tenets from the strongest evidence currently available that survives admission and from stable
+      physical relations. Do not inherit explanatory architecture from foundational papers, canonical theories,
+      disciplinary chronology, or citation lineage. Within the allowed source boundary, apply a hard recent-first
+      discovery order to locate the current empirical and methodological record. Recency controls retrieval order,
+      never evidentiary weight. Follow older source trees when they contribute uniquely probative observations,
+      methods, datasets, disconfirmation, or physical-route evidence, and test every retained contribution against the
+      subsequent record. Citation lineage may establish provenance or expose inherited assumptions; it cannot supply
+      architecture by inheritance.
+    architecture_inputs:
+      - admitted_current_evidence
+      - stable_physical_relations
+    lineage_uses:
+      - provenance
+      - locating_source_trees
+      - exposing_inherited_assumptions
+    lineage_cannot_supply:
+      - target_identity
+      - explanatory_architecture
+      - causal_weight
+      - bridge_closure
+      - physical_route_closure
+    older_source_follow_rule: >
+      Continue backward when an older source may add a uniquely probative observation, method, dataset,
+      disconfirmation, or physical-route contribution. Retain it only at the scope that survives ordinary admission
+      and testing against the later record.
 
   source_selection:
     preferred_for_empirical_claims:
@@ -78,6 +106,10 @@ resource_retrieval:
       - institutional source
       - search ranking
       - recency alone
+      - foundational status
+      - canonical theory status
+      - disciplinary chronology
+      - citation lineage
     no_smuggling_rule: >
       No factual or causal claim may enter the answer as background knowledge merely because it is familiar widely
       repeated biologically plausible or present in a retrieved summary. Record its provenance extract the actual
@@ -160,6 +192,9 @@ resource_retrieval:
     - provider_memory_presented_as_verified_corpus_state
     - blog_review_guideline_or_snippet_used_as_empirical_closure_when_primary_records_are_available
     - recent_source_granted_more_causal_weight_by_date_alone
+    - foundational_paper_or_canonical_theory_used_as_inherited_architecture
+    - citation_lineage_used_as_explanatory_or_causal_closure
+    - uniquely_probative_older_evidence_excluded_by_recent_first_discovery
     - source_conclusion_imported_without_data_extraction
     - p_value_or_headline_metric_interpreted_inside_retrieval
     - failed_construct_rescued_with_downstream_retrieved_associations

@@ -26,6 +26,21 @@ neuroscience_physical_continuity:
       relation and mark the route partial. Do not fill the gap with activation, signaling, regulation,
       processing, network change, plasticity, attention, or a region name.
 
+  electrochemical_guard:
+    generic_ref: model/kernel/physical_continuity.yaml#physical_continuity.electrochemical_conduction_guard
+    default_rule: >
+      Membrane voltage, spikes or firing, field changes, and propagating ionic current are motive-force and
+      transmission observations by default. Their presence, magnitude, or downstream covariation does not by itself
+      establish the outcome-specific organization that differentiates a neural or organism-state transition.
+    causal_contribution_rule: >
+      Preserve an exact partial or full causal contribution when controlled or otherwise discriminating variation in
+      electrical magnitude, polarity, waveform, timing, or spatial configuration changes which state transition occurs
+      while substrate organization, metabolic support, boundary conditions, and prior state are held constant or
+      separately bounded.
+    scope_guard: >
+      A passed electrical-pattern discrimination can close the exact tested pattern-to-transition relation. It does not
+      by itself establish a sole cause, the untreated endogenous route, etiology, transport, or complete mechanism.
+
   common_chain_breaks:
     - region_X_activated_then_behavior_changed
     - neurotransmitter_level_changed_then_faculty_improved
@@ -34,6 +49,7 @@ neuroscience_physical_continuity:
     - stimulation_worked_therefore_region_is_the_endogenous_controller
     - metabolic_activity_increased_therefore_the_named_process_occurred
     - conserved_region_named_as_source_without_the_maintained_state_dependency
+    - voltage_firing_or_ionic_flux_named_as_outcome_specific_author_without_pattern_discrimination
 
   required_neuroscience_fields:
     - manipulated_or_observed_physical_variable
