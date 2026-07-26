@@ -20,6 +20,8 @@ FAIL = CONF / 'physical_selftests/fail'
 RUNTIME_MANIFEST = MODEL / 'manifests/runtime.json'
 INGEST_MANIFEST = MODEL / 'manifests/ingest.json'
 PHYSICAL_FILES = (MODEL / 'kernel/physical_continuity.yaml', MODEL / 'runtime/physical_answer_contract.yaml', MODEL / 'ingest/physical_extraction_contract.yaml', MODEL / 'cartridges/neuroscience_physical_continuity.yaml')
+NEURO_RUNTIME_FIXTURES = MODEL / 'cartridges/neuroscience_fixtures.json'
+NEURO_SEMANTIC_FIXTURES = CONF / 'fixtures/neuroscience.json'
 EXPLANATORY_SCOPE = {'physical', 'chemical', 'biological', 'behavioral', 'cross_scale', 'descriptive_noncausal'}
 CHAIN_STATUS = {'closed', 'partial', 'not_required'}
 BIOLOGICAL_SCOPES = {'biological', 'behavioral', 'cross_scale'}
@@ -89,11 +91,63 @@ def validate_policy() -> None:
     req({'kernel/physical_continuity.yaml', 'ingest/physical_extraction_contract.yaml'} <= set(ingest.get('source_files', [])), 'PHYSICAL_INGEST_MODULE_NOT_LOADED', ingest.get('name', '?'))
     for manifest in (runtime, ingest):
         req('cartridges/neuroscience_physical_continuity.yaml' in manifest.get('domain_modules', []), 'NEURO_PHYSICAL_MODULE_NOT_LOADED', manifest.get('name', '?'))
-    fragments = {PHYSICAL_FILES[0]: ['Every admitted cause, operation, state, constraint, and transition is physical.', 'Metabolics drives biology', 'causal_admission_distinct_from_mechanistic_closure: true', 'no_action_at_a_distance_between_components'], PHYSICAL_FILES[1]: ['exact_intervention_effect_with_partial_route: allowed', 'mechanism_claim_with_partial_route: forbidden', 'metabolism_caused_it'], PHYSICAL_FILES[2]: ['Metabolism or metabolic activity by itself does not close a chain segment.', 'unresolved_physical_chain_slots'], PHYSICAL_FILES[3]: ['Neural tissue has no separate causal currency.', 'metabolically maintained tissue', 'region_X_activated_then_behavior_changed']}
+    fragments = {
+        PHYSICAL_FILES[0]: [
+            'Every admitted cause, operation, state, constraint, and transition is physical.',
+            'Metabolics drives biology',
+            'causal_admission_distinct_from_mechanistic_closure: true',
+            'electrochemical_conduction_guard:',
+            'default_role: motive_force_and_transmission',
+            'no_action_at_a_distance_between_components',
+        ],
+        PHYSICAL_FILES[1]: [
+            'exact_intervention_effect_with_partial_route: allowed',
+            'mechanism_claim_with_partial_route: forbidden',
+            'metabolism_caused_it',
+        ],
+        PHYSICAL_FILES[2]: [
+            'Metabolism or metabolic activity by itself does not close a chain segment.',
+            'unresolved_physical_chain_slots',
+        ],
+        PHYSICAL_FILES[3]: [
+            'Neural tissue has no separate causal currency.',
+            'metabolically maintained tissue',
+            'electrochemical_guard:',
+            'Preserve an exact partial or full causal contribution',
+            'region_X_activated_then_behavior_changed',
+        ],
+    }
     for path, required in fragments.items():
         text = path.read_text(encoding='utf-8')
         for fragment in required:
             req(fragment in text, 'PHYSICAL_POLICY_FRAGMENT_MISSING', f'{path.relative_to(ROOT)}: {fragment}')
+    runtime_fixtures = vc.load(NEURO_RUNTIME_FIXTURES).get('fixtures', [])
+    runtime_ids = {fixture.get('id') for fixture in runtime_fixtures if isinstance(fixture, dict)}
+    req(
+        {
+            'neuro-electrochemical-conduction-default',
+            'neuro-patterned-electrical-discrimination-positive-control',
+        } <= runtime_ids,
+        'ELECTROCHEMICAL_RUNTIME_FIXTURES_MISSING',
+        str(runtime_ids),
+    )
+    semantic_fixtures = vc.load(NEURO_SEMANTIC_FIXTURES).get('fixtures', [])
+    semantic = next(
+        (
+            fixture
+            for fixture in semantic_fixtures
+            if isinstance(fixture, dict) and fixture.get('id') == 'electrochemical-pattern-data-sensitivity'
+        ),
+        None,
+    )
+    req(isinstance(semantic, dict), 'ELECTROCHEMICAL_SEMANTIC_FIXTURE_MISSING', str(NEURO_SEMANTIC_FIXTURES))
+    req(semantic.get('mutation_type') == 'data_sensitivity', 'ELECTROCHEMICAL_FIXTURE_NOT_DATA_SENSITIVE', str(semantic))
+    variant_ids = {variant.get('id') for variant in semantic.get('variants', []) if isinstance(variant, dict)}
+    req(
+        {'conduction_without_pattern_discrimination', 'controlled_pattern_changes_transition'} <= variant_ids,
+        'ELECTROCHEMICAL_FIXTURE_VARIANTS_MISSING',
+        str(variant_ids),
+    )
 
 def validate_physical_chain(relation: dict[str, Any]) -> None:
     relation_id = relation['id']

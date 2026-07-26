@@ -53,6 +53,7 @@ def validate_policy() -> None:
         "retrieval_permission:",
         "user_source_boundary:",
         "freshness_policy:",
+        "ahistorical_reconstruction_rule:",
         "source_selection:",
         "universal_admission_rule:",
         "provider_memory_policy:",
@@ -66,6 +67,11 @@ def validate_policy() -> None:
         "Pass those inputs to the shared",
         "statistical qualifier kernel.",
         "Premise rejection terminates only retrieval that requires or attempts to restore the failed entity.",
+        "Do not inherit explanatory architecture from foundational papers, canonical theories,",
+        "Recency controls retrieval order,",
+        "never evidentiary weight.",
+        "it cannot supply",
+        "architecture by inheritance.",
     )
     for fragment in required_fragments:
         require(fragment in text, f"retrieval policy missing required fragment: {fragment}")
@@ -85,6 +91,8 @@ def validate_fixtures() -> None:
         "user_source_boundary_controls_retrieval",
         "provider_memory_is_unverified",
         "recent_summary_does_not_outrank_primary_data",
+        "foundational_authority_cannot_supply_architecture",
+        "older_unique_evidence_survives_recent_first_discovery",
         "quantitative_retrieval_delegates_qualification",
         "premise_rejection_does_not_stop_narrow_retrieval",
         "downstream_association_cannot_rescue_failed_construct",
@@ -107,6 +115,15 @@ def validate_fixtures() -> None:
         if fixture_id == "quantitative_retrieval_delegates_qualification":
             require(expected.get("delegate_to_statistical_qualifiers") is True, f"{fixture_id}: statistical delegation required")
             require(expected.get("interpret_evidentiary_weight_inside_retrieval") is False, f"{fixture_id}: retrieval must not interpret statistical weight")
+
+        if fixture_id == "foundational_authority_cannot_supply_architecture":
+            require(expected.get("inherit_architecture") is False, f"{fixture_id}: architecture inheritance must be forbidden")
+            require(expected.get("test_retained_contributions_against_subsequent_record") is True, f"{fixture_id}: subsequent-record test required")
+
+        if fixture_id == "older_unique_evidence_survives_recent_first_discovery":
+            require(expected.get("retrieve_older_source") is True, f"{fixture_id}: uniquely probative older evidence must be retrieved")
+            require(expected.get("exclude_for_age_alone") is False, f"{fixture_id}: older evidence cannot be excluded by age alone")
+            require(expected.get("recency_alone_upgrades_weight") is False, f"{fixture_id}: recency cannot control weight")
 
     require(required_ids <= ids, f"retrieval fixtures missing: {sorted(required_ids - ids)}")
     raw = FIXTURES.read_text(encoding="utf-8")

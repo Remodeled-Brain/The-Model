@@ -184,6 +184,38 @@
         "use the exact effect to validate the broader label",
         "infer endogenous regional control from intervention leverage"
       ]
+    },
+    {
+      "id": "neuro-electrochemical-conduction-default",
+      "mode": "condition",
+      "condition": "Membrane voltage, firing rate, or propagating ionic flux covaries with a neural or behavioral transition, but magnitude, polarity, waveform, timing, and spatial pattern are not independently varied and substrate organization, metabolic support, boundary conditions, or prior state remain unbounded.",
+      "required": [
+        "preserve the measured voltage firing or ionic-flux relation at its exact scale",
+        "classify electrochemical change as motive-force or transmission by default",
+        "keep outcome-specific causal organization unresolved",
+        "identify the unbounded pattern and condition discriminators"
+      ],
+      "forbidden": [
+        "treat voltage firing or ionic flux as the outcome-specific causal author by default",
+        "infer which state transition was selected from conduction or covariation alone",
+        "erase the measured conduction relation because broader authorship remains open"
+      ]
+    },
+    {
+      "id": "neuro-patterned-electrical-discrimination-positive-control",
+      "mode": "condition",
+      "condition": "A controlled intervention varies electrical magnitude, polarity, waveform, timing, or spatial configuration and reproducibly changes which exact state transition occurs while substrate organization, metabolic support, boundary conditions, and prior state are held constant or separately bounded.",
+      "required": [
+        "permit causal admission for the exact patterned-electrical-intervention-to-transition relation when its full intervention burden closes",
+        "preserve patterned electrical variation as a partial or full causal contribution under the tested conditions",
+        "separate the exact causal contribution from sole-cause endogenous-route etiology transport and complete-mechanism claims",
+        "expose any open physical or metabolic route segments"
+      ],
+      "forbidden": [
+        "reject the exact causal contribution merely because electrical conduction is also a motive-force or transmission layer",
+        "promote the exact patterned effect into complete causal authorship",
+        "hide unmeasured metabolic or downstream dependencies"
+      ]
     }
   ]
 }

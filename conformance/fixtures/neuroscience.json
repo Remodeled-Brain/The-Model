@@ -269,6 +269,83 @@
           }
         }
       ]
+    },
+    {
+      "id": "electrochemical-pattern-data-sensitivity",
+      "critical": true,
+      "mutation_type": "data_sensitivity",
+      "variants": [
+        {
+          "id": "conduction_without_pattern_discrimination",
+          "input": {
+            "question": "Did the electrical activity determine which organism-state transition occurred?",
+            "narrative": "The firing and ionic flux determined the outcome.",
+            "data": {
+              "measurement": "membrane voltage firing rate and propagating ionic flux covaried with the transition",
+              "pattern_variation": "magnitude polarity waveform timing and spatial configuration were not independently varied",
+              "substrate_organization": "unbounded",
+              "metabolic_support": "unbounded",
+              "boundary_conditions": "unbounded",
+              "prior_state": "unbounded",
+              "counterfactual": "no discriminator for which transition occurred"
+            }
+          },
+          "expected": {
+            "relations": {
+              "electrical_pattern_to_state_transition": {
+                "causal_disposition": "causal_unresolved",
+                "closure_state": "descriptive_only",
+                "target_relation": "endogenous_dependency"
+              }
+            },
+            "required_stripped_assertions": ["The firing and ionic flux determined the outcome."],
+            "physical_relations": {
+              "electrical_pattern_to_state_transition": {
+                "explanatory_scope": "behavioral",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        },
+        {
+          "id": "controlled_pattern_changes_transition",
+          "input": {
+            "question": "Did the controlled electrical pattern cause the exact organism-state transition?",
+            "narrative": "The controlled electrical pattern changed which transition occurred.",
+            "data": {
+              "manipulation": "magnitude polarity waveform timing and spatial configuration varied under a prespecified protocol",
+              "outcome": "which exact organism-state transition occurred",
+              "comparison": "valid controlled counterfactual",
+              "substrate_organization": "held constant",
+              "metabolic_support": "separately measured and bounded",
+              "boundary_conditions": "held constant",
+              "prior_state": "stratified and bounded",
+              "effect": "large consistent specific and independently replicated",
+              "durability": "matched the claim",
+              "attrition": "negligible",
+              "intermediate_metabolic_route": "partially measured"
+            }
+          },
+          "expected": {
+            "relations": {
+              "electrical_pattern_to_state_transition": {
+                "causal_disposition": "causal_admitted",
+                "closure_state": "closed",
+                "target_relation": "intervention_to_outcome"
+              }
+            },
+            "required_stripped_assertions": [],
+            "physical_relations": {
+              "electrical_pattern_to_state_transition": {
+                "explanatory_scope": "behavioral",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
     }
   ]
 }

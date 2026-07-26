@@ -54,6 +54,36 @@
       }
     },
     {
+      "id": "foundational_authority_cannot_supply_architecture",
+      "input": {
+        "source_role": "foundational paper or canonical theory",
+        "citation_lineage_available": true,
+        "later_empirical_and_methodological_record_available": true,
+        "proposed_use": "inherit explanatory architecture"
+      },
+      "expected": {
+        "inherit_architecture": false,
+        "use_lineage_for_provenance_or_assumption_audit": true,
+        "test_retained_contributions_against_subsequent_record": true,
+        "architecture_inputs": ["admitted_current_evidence", "stable_physical_relations"]
+      }
+    },
+    {
+      "id": "older_unique_evidence_survives_recent_first_discovery",
+      "input": {
+        "recent_first_search_completed": true,
+        "older_source_within_allowed_boundary": true,
+        "older_unique_contribution": "method dataset disconfirmation or physical-route evidence",
+        "subsequent_record_available": true
+      },
+      "expected": {
+        "retrieve_older_source": true,
+        "test_against_subsequent_record": true,
+        "recency_alone_upgrades_weight": false,
+        "exclude_for_age_alone": false
+      }
+    },
+    {
       "id": "quantitative_retrieval_delegates_qualification",
       "input": {
         "effect_metric": "standardized_mean_difference",
