@@ -1,0 +1,1 @@
+- **[candidate]** Discover conformance fixture sets and active cartridge bundles generically, require runtime/ingest registration parity, and hash an explicitly manifest-declared physical-continuity subset without filename inference; structural enforcement takes effect if this infrastructure is merged, while cartridge content remains separately unadopted (OpenAI, 2026-07-26)

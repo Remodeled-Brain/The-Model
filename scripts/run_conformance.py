@@ -13,7 +13,6 @@ BUILDER=ROOT/"scripts/build_master_prompt.py"
 RUNTIME_MANIFEST=MODEL/"manifests/runtime.json"
 RUNTIME_OUTPUT=MODEL/"dist/the_model_runtime.txt"
 KERNEL=MODEL/"kernel/chain_contract.yaml"
-CARTRIDGE=MODEL/"cartridges/neuroscience.yaml"
 SCHEMA=ROOT/"conformance/decision_record.schema.json"
 
 def sha_bytes(value:bytes)->str: return hashlib.sha256(value).hexdigest()
@@ -22,7 +21,10 @@ def catalogs():
     rows=[]
     for path in vc.FIXTURE_FILES:
         data=vc.load(path)
-        for fixture in data["fixtures"]: rows.append((data["fixture_set"],fixture,path))
+        fixture_set=vc.fixture_set_name(path)
+        fixtures=data.get("fixtures")
+        vc.req(isinstance(fixtures,list) and fixtures,"FIXTURES_REQUIRED",str(path))
+        for fixture in fixtures: rows.append((fixture_set,fixture,path))
     return rows
 def build_runtime()->str:
     subprocess.run([sys.executable,str(BUILDER)],cwd=ROOT,check=True)
@@ -38,10 +40,13 @@ def call_provider(command:list[str],payload:dict[str,Any])->dict[str,Any]:
     if not isinstance(value,dict): raise RuntimeError("provider must return a decision-record object")
     return value
 def main()->int:
+    try: fixture_sets=vc.fixture_set_names()
+    except vc.ConformanceError as e:
+        print(f"CONFORMANCE RUN FAILED [{e.code}]: {e.message}",file=sys.stderr); return 1
     p=argparse.ArgumentParser()
     p.add_argument("--provider-command",required=True,help="command reading fixture payload JSON on stdin")
     p.add_argument("--provider-name",required=True); p.add_argument("--model-id",required=True)
-    p.add_argument("--fixture-set",choices=("generic","neuroscience","all"),default="all")
+    p.add_argument("--fixture-set",choices=(*fixture_sets,"all"),default="all")
     p.add_argument("--fixture-id",action="append",default=[])
     p.add_argument("--output-dir",type=pathlib.Path,default=ROOT/"conformance/results")
     p.add_argument("--temperature",type=float,default=0.0); p.add_argument("--seed",default="unspecified")
@@ -53,7 +58,7 @@ def main()->int:
     generated=[]
     try:
         runtime=build_runtime(); schema=vc.load(SCHEMA)
-        runtime_hash=sha_bytes(runtime.encode()); kernel_hash=sha_file(KERNEL); cartridge_hash=sha_file(CARTRIDGE)
+        runtime_hash=sha_bytes(runtime.encode()); kernel_hash=sha_file(KERNEL); cartridge_hash=vc.cartridge_bundle_hash()
         selected=[]
         for fixture_set,fixture,path in catalogs():
             if args.fixture_set!="all" and fixture_set!=args.fixture_set: continue

@@ -134,8 +134,15 @@
             }
           },
           "expected": {
+            "target_identities": {
+              "outcome_y": {
+                "identity_disposition": "generated_identity_conditional",
+                "mapped_construct_disposition": "admitted"
+              }
+            },
             "relations": {
               "intervention_to_outcome": {
+                "target_identity_id": "outcome_y",
                 "causal_disposition": "causal_admitted",
                 "closure_state": "closed",
                 "target_relation": "intervention_to_outcome"
@@ -311,14 +318,26 @@
             }
           },
           "expected": {
+            "target_identities": {
+              "protocol_recorded_outcome": {
+                "identity_disposition": "constructed_measurement_identity",
+                "mapped_construct_disposition": "admitted"
+              },
+              "target_t": {
+                "identity_disposition": "grouping_handle_only",
+                "mapped_construct_disposition": "grouping_handle_only"
+              }
+            },
             "relations": {
               "protocol_to_recorded_outcome": {
+                "target_identity_id": "protocol_recorded_outcome",
                 "causal_disposition": "causal_unresolved",
                 "closure_state": "partial",
                 "target_relation": "intervention_to_outcome",
                 "construct_relation": "construct_independent"
               },
               "intervention_changes_target_t": {
+                "target_identity_id": "target_t",
                 "causal_disposition": "causal_rejected",
                 "closure_state": "label_dependent",
                 "target_relation": "intervention_to_outcome",

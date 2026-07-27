@@ -80,6 +80,14 @@ python scripts/validate_conformance.py
 python scripts/validate_physical_continuity.py
 ```
 
+Fixture sets are discovered from JSON files under `conformance/fixtures/`. The
+adoption policy must enumerate exactly the discovered fixture-set names. Active
+domain modules are read from `domain_modules`, and the physical subset is
+declared explicitly in `physical_continuity_modules`, in both the runtime and
+ingest manifests. Both ordered declarations must agree across the two manifests.
+Adding a cartridge therefore requires manifest and fixture registration rather
+than domain-specific runner logic.
+
 ## Mutation fixtures
 
 Narrative invariance holds the data constant and changes only the source interpretation. The relation disposition, closure state, explanatory scope, physical-chain status, and metabolic-binding status must remain unchanged.
@@ -92,9 +100,9 @@ Physical-chain fixtures hold a component-to-outcome narrative against missing ca
 
 ## Adoption requirement
 
-Structural CI proves that the schemas, fixtures, validators, renderer, target-identity modules, physical-continuity modules, and self-tests remain consistent. It does not prove a provider follows them. Candidate adoption requires fresh provider result bundles satisfying `required_runs.json`. Runtime, kernel, cartridge, fixture, physical-contract, or provider-version changes invalidate earlier results.
+Structural CI proves that the schemas, fixtures, validators, renderer, target-identity modules, physical-continuity modules, and self-tests remain consistent. It does not prove a provider follows them. These structural checks take effect when the infrastructure is merged; the infrastructure is not a dormant candidate validator. Candidate Model or cartridge adoption still requires fresh provider result bundles satisfying `required_runs.json`. Runtime, kernel, cartridge, fixture, physical-contract, or provider-version changes invalidate earlier results.
 
-The strict adoption check verifies current hashes and requires the configured number of complete independent runs for every critical generic and neuroscience variant:
+The strict adoption check verifies current hashes and requires the configured number of complete independent runs for every critical variant in every discovered and configured fixture set:
 
 ```bash
 python scripts/validate_adoption.py
