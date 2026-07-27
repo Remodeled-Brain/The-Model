@@ -1,0 +1,1 @@
+- **candidate** Added relation-specific generator fingerprinting, evidence-family collapse, independent-constraint-path synthesis, asymmetric shared-prior failure handling, and operational repair ledgers so meta-analysis weights generators rather than paper volume and reports what evidence would close or defeat each failed bridge. (OpenAI, 2026-07-13)

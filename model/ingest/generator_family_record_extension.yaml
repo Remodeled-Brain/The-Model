@@ -1,0 +1,181 @@
+generator_family_record_extension:
+  status: candidate
+  layer: support_layer
+  extends: model/ingest/record_schema.yaml#ingest_record_schema
+  contract_ref: model/ingest/generator_family_synthesis.yaml#generator_family_synthesis
+  purpose: >
+    Add relation-specific generator fingerprints, family-collapse outputs, and repair instructions to the canonical ingest
+    record without replacing or weakening any existing evidence-admission field.
+
+  generator_fingerprint:
+    required: true
+    cardinality: one_or_more_per_target_relation
+    required_fields:
+      - fingerprint_id
+      - target_relation_identity
+      - target_selection_generator
+      - grouping_or_construct_generator
+      - measured_substrate
+      - measured_variable
+      - measurement_or_proxy_generator
+      - sampling_frame
+      - cohort_or_dataset_lineage
+      - exposure_or_intervention_generator
+      - comparator_or_counterfactual_generator
+      - outcome_generator
+      - instrument_or_task_generator
+      - analytical_pipeline_and_model_lineage
+      - inferential_bridge_dependencies
+      - transport_conditions
+      - disconfirmation_exposure
+      - missing_generator_fields
+    missing_value_rule: Missing generator information blocks an independence claim but does not erase the source observation.
+
+  provisional_family_assignment:
+    required_when:
+      - another_record_bears_on_the_same_target_relation
+      - shared_generator_key_detected
+      - replication_or_convergence_claimed
+    required_fields:
+      - target_relation_identity
+      - evidence_family_id
+      - family_assignment_status
+      - shared_generator_edges
+      - load_bearing_shared_dependencies
+      - independence_status
+      - assignment_basis
+      - unresolved_independence_fields
+    family_assignment_status_enum:
+      - independent_family
+      - shared_family
+      - provisional_shared_family
+      - non_equivalent_target
+      - insufficient_information
+
+  family_synthesis:
+    required_when:
+      - design_mode_is_synthesis
+      - three_or_more_sources_bear_on_the_same_target_relation
+      - source_invokes_meta_analysis_systematic_review_consensus_or_publication_volume
+      - claim_is_a_promotion_candidate
+      - premise_breaking_result_conflicts_with_descendant_literature
+    required_fields:
+      - synthesis_id
+      - exact_target_relations
+      - raw_source_count
+      - eligible_source_count
+      - family_graph
+      - family_count_by_target_relation
+      - collapsed_weighting_units
+      - independent_constraint_paths
+      - independent_constraint_path_count
+      - route_discriminating_test_count
+      - premise_breaking_result_count
+      - within_family_recurrence_summary
+      - family_specific_effects_and_heterogeneity
+      - shared_unresolved_bridges
+      - transport_boundaries
+      - descendant_claims_affected_by_premise_failure
+      - strongest_surviving_claim
+      - synthesis_repair_ledger
+    family_graph_edge_fields:
+      - source_record_ids
+      - target_relation_identity
+      - edge_type
+      - shared_generator
+      - load_bearing_status
+      - scope
+      - evidence
+    collapsed_weighting_unit_fields:
+      - weighting_unit_id
+      - target_relation_identity
+      - member_record_ids
+      - shared_generator_basis
+      - within_family_information_retained
+      - closure_not_added_by_recurrence
+      - family_specific_limit
+
+  repair_ledger:
+    required_when:
+      - any_gate_fails
+      - any_load_bearing_bridge_is_unresolved
+      - promotion_status_is_blocked
+      - family_synthesis_has_shared_unresolved_dependency
+    per_item_required_fields:
+      - repair_id
+      - target_relation
+      - blocked_claim
+      - failed_gate_or_bridge
+      - exact_missing_dependency
+      - current_retained_evidence
+      - why_current_generator_cannot_close_it
+      - repair_disposition
+      - minimal_required_operation
+      - required_comparator_or_counterfactual
+      - required_measurement_and_scale
+      - required_independence_from_existing_families
+      - pass_observation
+      - disconfirming_observation
+      - residual_scope_limits_after_pass
+      - priority_basis
+    repair_disposition_enum:
+      - repairable_within_family
+      - requires_new_generator_family
+      - requires_target_reconstruction
+      - requires_direct_measurement_or_translation
+      - requires_valid_counterfactual
+      - requires_route_discrimination
+      - requires_transport_test
+      - not_repairable_by_more_of_same
+      - currently_non_executable
+    validation_rules:
+      - minimal_required_operation_must_be_operational
+      - pass_observation_and_disconfirming_observation_must_both_be_present
+      - required_independence_must_name_the_existing_family_dependency_to_escape
+      - residual_scope_limits_cannot_be_empty
+      - proposed_repair_cannot_change_current_admission_status
+      - generic_more_research_language_is_invalid
+
+  output_extension:
+    required_fields:
+      - generator_fingerprints
+      - family_assignment_status
+      - independent_constraint_path_count
+      - family_collapse_status
+      - repair_ledger
+    optional_fields:
+      - family_synthesis
+      - premise_failure_propagation
+      - compact_instructional_summary
+
+  body_weight_extension:
+    fields:
+      - relation_specific_family_count
+      - independent_constraint_path_count
+      - within_family_recurrence_count
+      - shared_generator_dependencies
+      - shared_unresolved_bridges
+      - premise_breaking_results
+    rule: >
+      Keep these fields separate. Do not add them into a numerical score or allow raw source count to substitute for
+      independent constraint paths.
+
+  lifecycle:
+    append_only: true
+    family_reassignment_requires:
+      - new_generator_information
+      - explicit_supersession_record
+      - preservation_of_prior_assignment_and_basis
+    repair_completion_requires:
+      - a_new_ingest_record
+      - ordinary_evidence_admission
+      - explicit_link_to_repair_id
+
+  invariants:
+    extension_cannot_weaken_base_schema: true
+    generator_fingerprint_is_relation_specific: true
+    missing_generator_data_never_implies_independence: true
+    family_collapse_preserves_valid_observations: true
+    raw_count_and_independent_path_count_remain_separate: true
+    repair_ledger_does_not_promote_claims: true
+    repair_completion_requires_new_evidence: true
