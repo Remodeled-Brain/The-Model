@@ -19,7 +19,11 @@ PASS = CONF / 'selftests/pass'
 FAIL = CONF / 'physical_selftests/fail'
 RUNTIME_MANIFEST = MODEL / 'manifests/runtime.json'
 INGEST_MANIFEST = MODEL / 'manifests/ingest.json'
-PHYSICAL_FILES = (MODEL / 'kernel/physical_continuity.yaml', MODEL / 'runtime/physical_answer_contract.yaml', MODEL / 'ingest/physical_extraction_contract.yaml', MODEL / 'cartridges/neuroscience_physical_continuity.yaml')
+BASE_PHYSICAL_FILES = (
+    MODEL / 'kernel/physical_continuity.yaml',
+    MODEL / 'runtime/physical_answer_contract.yaml',
+    MODEL / 'ingest/physical_extraction_contract.yaml',
+)
 EXPLANATORY_SCOPE = {'physical', 'chemical', 'biological', 'behavioral', 'cross_scale', 'descriptive_noncausal'}
 CHAIN_STATUS = {'closed', 'partial', 'not_required'}
 BIOLOGICAL_SCOPES = {'biological', 'behavioral', 'cross_scale'}
@@ -68,9 +72,23 @@ def set_path(root: Any, path: str, value: Any) -> None:
     else:
         target[last] = value
 
+def active_domain_physical_files() -> tuple[pathlib.Path, ...]:
+    manifest = vc.load(RUNTIME_MANIFEST)
+    names = manifest.get('domain_modules')
+    req(isinstance(names, list), 'DOMAIN_MODULES_REQUIRED', str(RUNTIME_MANIFEST))
+    selected = [name for name in names if vc.string(name) and name.endswith('_physical_continuity.yaml')]
+    req(bool(selected), 'DOMAIN_PHYSICAL_MODULE_REQUIRED', str(RUNTIME_MANIFEST))
+    paths = tuple((MODEL / name).resolve() for name in selected)
+    for name, path in zip(selected, paths):
+        req(path.is_file() and MODEL.resolve() in path.parents, 'DOMAIN_PHYSICAL_MODULE_MISSING', name)
+    return paths
+
+def physical_contract_files() -> tuple[pathlib.Path, ...]:
+    return BASE_PHYSICAL_FILES + active_domain_physical_files()
+
 def physical_contract_hash() -> str:
     digest = hashlib.sha256()
-    for path in PHYSICAL_FILES:
+    for path in physical_contract_files():
         digest.update(path.relative_to(ROOT).as_posix().encode('utf-8'))
         digest.update(b'\x00')
         digest.update(path.read_bytes())
@@ -87,13 +105,20 @@ def validate_policy() -> None:
     ingest = vc.load(INGEST_MANIFEST)
     req({'kernel/physical_continuity.yaml', 'runtime/physical_answer_contract.yaml'} <= set(runtime.get('source_files', [])), 'PHYSICAL_RUNTIME_MODULE_NOT_LOADED', runtime.get('name', '?'))
     req({'kernel/physical_continuity.yaml', 'ingest/physical_extraction_contract.yaml'} <= set(ingest.get('source_files', [])), 'PHYSICAL_INGEST_MODULE_NOT_LOADED', ingest.get('name', '?'))
-    for manifest in (runtime, ingest):
-        req('cartridges/neuroscience_physical_continuity.yaml' in manifest.get('domain_modules', []), 'NEURO_PHYSICAL_MODULE_NOT_LOADED', manifest.get('name', '?'))
-    fragments = {PHYSICAL_FILES[0]: ['Every admitted cause, operation, state, constraint, and transition is physical.', 'Metabolics drives biology', 'causal_admission_distinct_from_mechanistic_closure: true', 'no_action_at_a_distance_between_components'], PHYSICAL_FILES[1]: ['exact_intervention_effect_with_partial_route: allowed', 'mechanism_claim_with_partial_route: forbidden', 'metabolism_caused_it'], PHYSICAL_FILES[2]: ['Metabolism or metabolic activity by itself does not close a chain segment.', 'unresolved_physical_chain_slots'], PHYSICAL_FILES[3]: ['Neural tissue has no separate causal currency.', 'metabolically maintained tissue', 'region_X_activated_then_behavior_changed']}
+    runtime_domain = {name for name in runtime.get('domain_modules', []) if vc.string(name) and name.endswith('_physical_continuity.yaml')}
+    ingest_domain = {name for name in ingest.get('domain_modules', []) if vc.string(name) and name.endswith('_physical_continuity.yaml')}
+    req(runtime_domain == ingest_domain, 'DOMAIN_PHYSICAL_LOAD_GRAPH_DRIFT', str(sorted(runtime_domain ^ ingest_domain)))
+    req({path.relative_to(MODEL).as_posix() for path in active_domain_physical_files()} == runtime_domain, 'DOMAIN_PHYSICAL_DISCOVERY_DRIFT', str(sorted(runtime_domain)))
+    fragments = {
+        BASE_PHYSICAL_FILES[0]: ['Every admitted cause, operation, state, constraint, and transition is physical.', 'Metabolics drives biology', 'causal_admission_distinct_from_mechanistic_closure: true', 'no_action_at_a_distance_between_components'],
+        BASE_PHYSICAL_FILES[1]: ['exact_intervention_effect_with_partial_route: allowed', 'mechanism_claim_with_partial_route: forbidden', 'metabolism_caused_it'],
+        BASE_PHYSICAL_FILES[2]: ['Metabolism or metabolic activity by itself does not close a chain segment.', 'unresolved_physical_chain_slots'],
+    }
     for path, required in fragments.items():
         text = path.read_text(encoding='utf-8')
         for fragment in required:
             req(fragment in text, 'PHYSICAL_POLICY_FRAGMENT_MISSING', f'{path.relative_to(ROOT)}: {fragment}')
+    req(re.fullmatch('[0-9a-f]{64}', physical_contract_hash()) is not None, 'PHYSICAL_CONTRACT_HASH_INVALID', 'active physical contract')
 
 def validate_physical_chain(relation: dict[str, Any]) -> None:
     relation_id = relation['id']

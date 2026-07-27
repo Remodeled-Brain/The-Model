@@ -80,6 +80,12 @@ python scripts/validate_conformance.py
 python scripts/validate_physical_continuity.py
 ```
 
+Fixture sets are discovered from JSON files under `conformance/fixtures/`. The
+adoption policy must enumerate exactly the discovered fixture-set names. Active
+domain modules and physical-continuity refinements are discovered from the
+authoritative runtime manifest and hashed as ordered bundles, so adding a
+cartridge requires data registration rather than domain-specific runner logic.
+
 ## Mutation fixtures
 
 Narrative invariance holds the data constant and changes only the source interpretation. The relation disposition, closure state, explanatory scope, physical-chain status, and metabolic-binding status must remain unchanged.
@@ -94,7 +100,7 @@ Physical-chain fixtures hold a component-to-outcome narrative against missing ca
 
 Structural CI proves that the schemas, fixtures, validators, renderer, target-identity modules, physical-continuity modules, and self-tests remain consistent. It does not prove a provider follows them. Candidate adoption requires fresh provider result bundles satisfying `required_runs.json`. Runtime, kernel, cartridge, fixture, physical-contract, or provider-version changes invalidate earlier results.
 
-The strict adoption check verifies current hashes and requires the configured number of complete independent runs for every critical generic and neuroscience variant:
+The strict adoption check verifies current hashes and requires the configured number of complete independent runs for every critical variant in every discovered and configured fixture set:
 
 ```bash
 python scripts/validate_adoption.py

@@ -7,11 +7,11 @@ import target_identity_contract as ti
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 CONF=ROOT/"conformance"
-FIXTURE_FILES=(CONF/"fixtures/generic.json",CONF/"fixtures/neuroscience.json")
+FIXTURE_FILES=tuple(sorted((CONF/"fixtures").glob("*.json")))
 RESULTS=CONF/"results"
 PASS=CONF/"selftests/pass"; FAIL=CONF/"selftests/fail"
 POLICY=CONF/"required_runs.json"; SCHEMA=CONF/"decision_record.schema.json"
-MODEL=ROOT/"model"; BUILDER=ROOT/"scripts/build_master_prompt.py"; RUNTIME=MODEL/"dist/the_model_runtime.txt"; KERNEL=MODEL/"kernel/chain_contract.yaml"; CARTRIDGE=MODEL/"cartridges/neuroscience.yaml"
+MODEL=ROOT/"model"; BUILDER=ROOT/"scripts/build_master_prompt.py"; RUNTIME=MODEL/"dist/the_model_runtime.txt"; KERNEL=MODEL/"kernel/chain_contract.yaml"; RUNTIME_MANIFEST=MODEL/"manifests/runtime.json"
 
 CAUSAL={"causal_admitted","causal_rejected","causal_unresolved","not_a_causal_question"}
 CLOSURE={"closed","partial","descriptive_only","source_scale_only","proxy_limited","label_dependent","contested","unresolved","contradicted"}
@@ -46,6 +46,18 @@ def string(v:Any)->bool: return isinstance(v,str) and bool(v.strip())
 def strings(v:Any)->bool: return isinstance(v,list) and all(string(x) for x in v)
 def sha(path:pathlib.Path)->str: return hashlib.sha256(path.read_bytes()).hexdigest()
 
+def cartridge_bundle_hash()->str:
+    manifest=load(RUNTIME_MANIFEST)
+    modules=manifest.get("domain_modules")
+    req(isinstance(modules,list) and modules,"CARTRIDGE_MODULES_REQUIRED",str(RUNTIME_MANIFEST))
+    digest=hashlib.sha256()
+    for name in modules:
+        req(string(name),"CARTRIDGE_MODULE_INVALID",repr(name))
+        path=(MODEL/name).resolve()
+        req(path.is_file() and MODEL.resolve() in path.parents,"CARTRIDGE_MODULE_MISSING",name)
+        digest.update(name.encode("utf-8")); digest.update(b"\x00"); digest.update(path.read_bytes()); digest.update(b"\x00")
+    return digest.hexdigest()
+
 def validate_policy():
     schema=load(SCHEMA); req(schema.get("type")=="object","DECISION_SCHEMA_INVALID","schema type")
     required={"schema_version","speaker_intent","target_identities","relations","claims","answer_claim_order"}
@@ -54,15 +66,19 @@ def validate_policy():
     req("target_identity_id" in relation_required,"DECISION_SCHEMA_INVALID","relation target_identity_id")
     policy=load(POLICY).get("policy"); req(isinstance(policy,dict),"ADOPTION_POLICY_REQUIRED","policy")
     req(policy.get("semantic_results_required_for_adoption") is True,"ADOPTION_POLICY_INVALID","semantic results")
-    req(set(policy.get("required_fixture_sets",[]))=={"generic","neuroscience"},"ADOPTION_POLICY_INVALID","fixture sets")
+    configured=set(policy.get("required_fixture_sets",[]))
+    discovered={load(path).get("fixture_set") for path in FIXTURE_FILES}
+    req(all(string(value) for value in discovered),"ADOPTION_POLICY_INVALID","discovered fixture sets")
+    req(configured==discovered,"ADOPTION_POLICY_INVALID",f"configured {sorted(configured)} != discovered {sorted(discovered)}")
     req(policy.get("critical_fixture_failure_tolerance")==0,"ADOPTION_POLICY_INVALID","failure tolerance")
     req(isinstance(policy.get("minimum_independent_runs_per_critical_variant"),int) and policy["minimum_independent_runs_per_critical_variant"]>=1,"ADOPTION_POLICY_INVALID","run count")
     req(policy.get("positive_causal_control_required") is True,"ADOPTION_POLICY_INVALID","positive control")
+    req(re.fullmatch(r"[0-9a-f]{64}",cartridge_bundle_hash()) is not None,"CARTRIDGE_HASH_INVALID","active cartridge bundle")
     return policy
 
 def current_hashes():
     subprocess.run([sys.executable,str(BUILDER)],cwd=ROOT,check=True)
-    try: return {"runtime_hash":sha(RUNTIME),"kernel_hash":sha(KERNEL),"cartridge_hash":sha(CARTRIDGE),"target_identity_contract_hash":ti.target_identity_contract_hash()}
+    try: return {"runtime_hash":sha(RUNTIME),"kernel_hash":sha(KERNEL),"cartridge_hash":cartridge_bundle_hash(),"target_identity_contract_hash":ti.target_identity_contract_hash()}
     finally:
         RUNTIME.unlink(missing_ok=True)
         if RUNTIME.parent.exists() and not any(RUNTIME.parent.iterdir()): RUNTIME.parent.rmdir()
@@ -204,6 +220,13 @@ def catalog():
     return variants,fixtures
 
 def validate_expected(record:dict[str,Any],expected:dict[str,Any]):
+    identities=target_identities(record)
+    expected_identities=expected.get("target_identities",{})
+    req(isinstance(expected_identities,dict),"EXPECTED_TARGET_IDENTITIES_INVALID","expected.target_identities")
+    for iid,constraints in expected_identities.items():
+        req(iid in identities,"EXPECTED_TARGET_IDENTITY_MISSING",iid)
+        req(isinstance(constraints,dict),"EXPECTED_TARGET_IDENTITY_CONSTRAINTS",iid)
+        for field,value in constraints.items(): req(identities[iid].get(field)==value,"TARGET_IDENTITY_FIXTURE_EXPECTATION_FAILED",f"{iid}.{field}")
     rels=relations(record); er=expected.get("relations"); req(isinstance(er,dict) and er,"EXPECTED_RELATIONS_REQUIRED","expected.relations")
     for rid,constraints in er.items():
         req(rid in rels,"EXPECTED_RELATION_MISSING",rid)
