@@ -36,7 +36,7 @@ The proposal matches the general-system architecture when it refines shared iden
 - Gave the two terminology guards explicit, non-overlapping scopes: conceptual or causal completion in the main cartridge and physical-segment completion in the physical cartridge.
 - Added evolution vocabulary to the generic-fixture domain-leak guard.
 - Replaced the near-global positive/negative fixture check with named causal-control assertions.
-- Added `conformance/fixtures/evolution.json`, made it adoption-required, enabled `--fixture-set evolution`, and included every active cartridge and evolution physical-continuity contract in freshness hashing.
+- Added `conformance/fixtures/evolution.json`, made it adoption-required, enabled `--fixture-set evolution`, and registered the evolution physical-continuity contract explicitly for freshness hashing in both manifests.
 
 ## Adoption-gate assessment
 
@@ -55,7 +55,7 @@ The main cartridge owns relation reconstruction and domain burdens. The physical
 
 ## Minimal safe form
 
-Three cartridge files, one evolution semantic fixture set, conformance-runner and freshness integration, one dedicated structural validator, manifest entries under `domain_modules` only, and a candidate changelog fragment.
+Three cartridge files, one evolution semantic fixture set, shared conformance and freshness integration, one dedicated structural validator, manifest entries under `domain_modules` plus explicit physical-subset registration, and a candidate changelog fragment.
 
 ## Adoption status
 

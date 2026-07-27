@@ -9,6 +9,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 MODEL = ROOT / "model"
 EVOLUTION = MODEL / "cartridges" / "evolution.yaml"
 PHYSICAL = MODEL / "cartridges" / "evolution_physical_continuity.yaml"
+PHYSICAL_MODULE = "cartridges/evolution_physical_continuity.yaml"
 FIXTURES = MODEL / "cartridges" / "evolution_fixtures.json"
 SEMANTIC_FIXTURES = ROOT / "conformance" / "fixtures" / "evolution.json"
 RUNTIME = MODEL / "manifests" / "runtime.json"
@@ -95,7 +96,9 @@ def validate_manifests() -> None:
         manifest = vr.load_json(path)
         source = manifest.get("source_files", [])
         domain = manifest.get("domain_modules", [])
+        physical = manifest.get("physical_continuity_modules", [])
         vr.require(MODULES <= set(domain), f"{path.name}: evolution modules missing")
+        vr.require(PHYSICAL_MODULE in physical, f"{path.name}: evolution physical module not registered")
         vr.require(not MODULES & set(source), f"{path.name}: evolution modules belong only in domain_modules")
         vr.require(len(source + domain) == len(set(source + domain)), f"{path.name}: duplicate runtime input")
 
