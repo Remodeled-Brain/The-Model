@@ -11,7 +11,7 @@ FIXTURE_FILES=tuple(sorted((CONF/"fixtures").glob("*.json")))
 RESULTS=CONF/"results"
 PASS=CONF/"selftests/pass"; FAIL=CONF/"selftests/fail"
 POLICY=CONF/"required_runs.json"; SCHEMA=CONF/"decision_record.schema.json"
-MODEL=ROOT/"model"; BUILDER=ROOT/"scripts/build_master_prompt.py"; RUNTIME=MODEL/"dist/the_model_runtime.txt"; KERNEL=MODEL/"kernel/chain_contract.yaml"; RUNTIME_MANIFEST=MODEL/"manifests/runtime.json"
+MODEL=ROOT/"model"; BUILDER=ROOT/"scripts/build_master_prompt.py"; RUNTIME=MODEL/"dist/the_model_runtime.txt"; KERNEL=MODEL/"kernel/chain_contract.yaml"; RUNTIME_MANIFEST=MODEL/"manifests/runtime.json"; INGEST_MANIFEST=MODEL/"manifests/ingest.json"
 
 CAUSAL={"causal_admitted","causal_rejected","causal_unresolved","not_a_causal_question"}
 CLOSURE={"closed","partial","descriptive_only","source_scale_only","proxy_limited","label_dependent","contested","unresolved","contradicted"}
@@ -46,17 +46,34 @@ def string(v:Any)->bool: return isinstance(v,str) and bool(v.strip())
 def strings(v:Any)->bool: return isinstance(v,list) and all(string(x) for x in v)
 def sha(path:pathlib.Path)->str: return hashlib.sha256(path.read_bytes()).hexdigest()
 
-def cartridge_bundle_hash()->str:
-    manifest=load(RUNTIME_MANIFEST)
+def declared_domain_modules(manifest_path:pathlib.Path)->tuple[str,...]:
+    manifest=load(manifest_path)
     modules=manifest.get("domain_modules")
-    req(isinstance(modules,list) and modules,"CARTRIDGE_MODULES_REQUIRED",str(RUNTIME_MANIFEST))
+    req(isinstance(modules,list) and modules,"CARTRIDGE_MODULES_REQUIRED",str(manifest_path))
+    req(all(string(name) for name in modules),"CARTRIDGE_MODULE_INVALID",str(manifest_path))
+    req(len(modules)==len(set(modules)),"DUPLICATE_CARTRIDGE_MODULE",str(manifest_path))
+    return tuple(modules)
+
+def cartridge_bundle_hash()->str:
+    modules=declared_domain_modules(RUNTIME_MANIFEST)
+    ingest_modules=declared_domain_modules(INGEST_MANIFEST)
+    req(modules==ingest_modules,"CARTRIDGE_LOAD_GRAPH_DRIFT",f"runtime {list(modules)} != ingest {list(ingest_modules)}")
     digest=hashlib.sha256()
     for name in modules:
-        req(string(name),"CARTRIDGE_MODULE_INVALID",repr(name))
         path=(MODEL/name).resolve()
         req(path.is_file() and MODEL.resolve() in path.parents,"CARTRIDGE_MODULE_MISSING",name)
         digest.update(name.encode("utf-8")); digest.update(b"\x00"); digest.update(path.read_bytes()); digest.update(b"\x00")
     return digest.hexdigest()
+
+def fixture_set_name(path:pathlib.Path)->str:
+    value=load(path).get("fixture_set")
+    req(string(value),"FIXTURE_SET_REQUIRED",str(path))
+    return value
+
+def fixture_set_names()->tuple[str,...]:
+    names=tuple(fixture_set_name(path) for path in FIXTURE_FILES)
+    req(len(names)==len(set(names)),"DUPLICATE_FIXTURE_SET",str(names))
+    return tuple(sorted(names))
 
 def validate_policy():
     schema=load(SCHEMA); req(schema.get("type")=="object","DECISION_SCHEMA_INVALID","schema type")
@@ -67,8 +84,7 @@ def validate_policy():
     policy=load(POLICY).get("policy"); req(isinstance(policy,dict),"ADOPTION_POLICY_REQUIRED","policy")
     req(policy.get("semantic_results_required_for_adoption") is True,"ADOPTION_POLICY_INVALID","semantic results")
     configured=set(policy.get("required_fixture_sets",[]))
-    discovered={load(path).get("fixture_set") for path in FIXTURE_FILES}
-    req(all(string(value) for value in discovered),"ADOPTION_POLICY_INVALID","discovered fixture sets")
+    discovered=set(fixture_set_names())
     req(configured==discovered,"ADOPTION_POLICY_INVALID",f"configured {sorted(configured)} != discovered {sorted(discovered)}")
     req(policy.get("critical_fixture_failure_tolerance")==0,"ADOPTION_POLICY_INVALID","failure tolerance")
     req(isinstance(policy.get("minimum_independent_runs_per_critical_variant"),int) and policy["minimum_independent_runs_per_critical_variant"]>=1,"ADOPTION_POLICY_INVALID","run count")
@@ -204,7 +220,7 @@ def validate_decision_record(record:dict[str,Any]):
 def catalog():
     variants={}; fixtures={}
     for path in FIXTURE_FILES:
-        data=load(path); fs=data.get("fixture_set"); req(string(fs),"FIXTURE_SET_REQUIRED",str(path))
+        data=load(path); fs=fixture_set_name(path)
         rows=data.get("fixtures"); req(isinstance(rows,list) and rows,"FIXTURES_REQUIRED",str(path))
         for fixture in rows:
             fid=fixture.get("id"); req(string(fid),"FIXTURE_ID_REQUIRED",str(path))
@@ -265,7 +281,7 @@ def validate_mutation_groups(rows,fixtures):
 
 def validate_adoption(rows,fixtures,policy):
     req(bool(rows),"ADOPTION_RESULTS_REQUIRED","no provider results")
-    current=current_hashes(); fixture_hashes={path.stem:sha(path) for path in FIXTURE_FILES}
+    current=current_hashes(); fixture_hashes={fixture_set_name(path):sha(path) for path in FIXTURE_FILES}
     for row in rows:
         p=row["provider"]
         for field,value in current.items(): req(p.get(field)==value,"STALE_PROVIDER_RESULT",f"{row['fixture_id']}: {field}")
@@ -292,8 +308,16 @@ def set_path(root,path,value):
     elif isinstance(target,list): target[int(last)]=value
     else: target[last]=value
 
-def selftests():
+def selftests(variants):
     for path in sorted(PASS.glob("*.json")): validate_result(load(path))
+    positive=load(PASS/"decisive_intervention.json")
+    expected=variants[("generic","intervention-data-sensitivity","decisive_intervention")]["expected"]
+    validate_expected(positive["decision_record"],expected)
+    wrong_identity=copy.deepcopy(expected)
+    wrong_identity["target_identities"]["outcome_y"]["identity_disposition"]="grouping_handle_only"
+    try: validate_expected(positive["decision_record"],wrong_identity)
+    except ConformanceError as e: req(e.code=="TARGET_IDENTITY_FIXTURE_EXPECTATION_FAILED","SELFTEST_WRONG_FAILURE",e.code)
+    else: raise ConformanceError("SELFTEST_FALSE_NEGATIVE","target-identity fixture expectation")
     for path in sorted(FAIL.glob("*.json")):
         wrapper=load(path); expected=wrapper.get("expected_error_code"); result=wrapper.get("result")
         if result is None and string(wrapper.get("base")):
@@ -308,7 +332,7 @@ def main()->int:
     parser=argparse.ArgumentParser(); parser.add_argument("results",nargs="*",type=pathlib.Path); parser.add_argument("--fixtures-only",action="store_true"); parser.add_argument("--adoption",action="store_true"); args=parser.parse_args()
     try:
         req(not (args.fixtures_only and args.adoption),"ARGUMENT_CONFLICT","fixtures-only with adoption")
-        policy=validate_policy(); variants,fixtures=catalog(); selftests()
+        policy=validate_policy(); variants,fixtures=catalog(); selftests(variants)
         if not args.fixtures_only:
             paths=args.results or (sorted(RESULTS.rglob("*.json")) if RESULTS.exists() else []); rows=[]
             for path in paths:

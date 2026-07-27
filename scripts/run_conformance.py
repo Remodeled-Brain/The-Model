@@ -21,7 +21,10 @@ def catalogs():
     rows=[]
     for path in vc.FIXTURE_FILES:
         data=vc.load(path)
-        for fixture in data["fixtures"]: rows.append((data["fixture_set"],fixture,path))
+        fixture_set=vc.fixture_set_name(path)
+        fixtures=data.get("fixtures")
+        vc.req(isinstance(fixtures,list) and fixtures,"FIXTURES_REQUIRED",str(path))
+        for fixture in fixtures: rows.append((fixture_set,fixture,path))
     return rows
 def build_runtime()->str:
     subprocess.run([sys.executable,str(BUILDER)],cwd=ROOT,check=True)
@@ -37,10 +40,12 @@ def call_provider(command:list[str],payload:dict[str,Any])->dict[str,Any]:
     if not isinstance(value,dict): raise RuntimeError("provider must return a decision-record object")
     return value
 def main()->int:
+    try: fixture_sets=vc.fixture_set_names()
+    except vc.ConformanceError as e:
+        print(f"CONFORMANCE RUN FAILED [{e.code}]: {e.message}",file=sys.stderr); return 1
     p=argparse.ArgumentParser()
     p.add_argument("--provider-command",required=True,help="command reading fixture payload JSON on stdin")
     p.add_argument("--provider-name",required=True); p.add_argument("--model-id",required=True)
-    fixture_sets=tuple(sorted({vc.load(path)["fixture_set"] for path in vc.FIXTURE_FILES}))
     p.add_argument("--fixture-set",choices=(*fixture_sets,"all"),default="all")
     p.add_argument("--fixture-id",action="append",default=[])
     p.add_argument("--output-dir",type=pathlib.Path,default=ROOT/"conformance/results")

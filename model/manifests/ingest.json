@@ -35,6 +35,9 @@
     "cartridges/evolution_physical_continuity.yaml",
     "cartridges/evolution_fixtures.json"
   ],
+  "physical_continuity_modules": [
+    "cartridges/neuroscience_physical_continuity.yaml"
+  ],
   "reachable_modules": [
     {
       "name": "distributed-ingest",

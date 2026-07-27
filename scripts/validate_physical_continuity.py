@@ -72,12 +72,20 @@ def set_path(root: Any, path: str, value: Any) -> None:
     else:
         target[last] = value
 
+def declared_domain_physical_modules(manifest: dict[str, Any], manifest_path: pathlib.Path) -> tuple[str, ...]:
+    names = manifest.get('physical_continuity_modules')
+    req(isinstance(names, list) and names, 'DOMAIN_PHYSICAL_MODULES_REQUIRED', str(manifest_path))
+    req(all(vc.string(name) for name in names), 'DOMAIN_PHYSICAL_MODULE_INVALID', str(manifest_path))
+    req(len(names) == len(set(names)), 'DUPLICATE_DOMAIN_PHYSICAL_MODULE', str(manifest_path))
+    domain_modules = manifest.get('domain_modules')
+    req(isinstance(domain_modules, list), 'DOMAIN_MODULES_REQUIRED', str(manifest_path))
+    undeclared = set(names) - set(domain_modules)
+    req(not undeclared, 'DOMAIN_PHYSICAL_MODULE_NOT_LOADED', f'{manifest_path}: {sorted(undeclared)}')
+    return tuple(names)
+
 def active_domain_physical_files() -> tuple[pathlib.Path, ...]:
     manifest = vc.load(RUNTIME_MANIFEST)
-    names = manifest.get('domain_modules')
-    req(isinstance(names, list), 'DOMAIN_MODULES_REQUIRED', str(RUNTIME_MANIFEST))
-    selected = [name for name in names if vc.string(name) and name.endswith('_physical_continuity.yaml')]
-    req(bool(selected), 'DOMAIN_PHYSICAL_MODULE_REQUIRED', str(RUNTIME_MANIFEST))
+    selected = declared_domain_physical_modules(manifest, RUNTIME_MANIFEST)
     paths = tuple((MODEL / name).resolve() for name in selected)
     for name, path in zip(selected, paths):
         req(path.is_file() and MODEL.resolve() in path.parents, 'DOMAIN_PHYSICAL_MODULE_MISSING', name)
@@ -105,10 +113,10 @@ def validate_policy() -> None:
     ingest = vc.load(INGEST_MANIFEST)
     req({'kernel/physical_continuity.yaml', 'runtime/physical_answer_contract.yaml'} <= set(runtime.get('source_files', [])), 'PHYSICAL_RUNTIME_MODULE_NOT_LOADED', runtime.get('name', '?'))
     req({'kernel/physical_continuity.yaml', 'ingest/physical_extraction_contract.yaml'} <= set(ingest.get('source_files', [])), 'PHYSICAL_INGEST_MODULE_NOT_LOADED', ingest.get('name', '?'))
-    runtime_domain = {name for name in runtime.get('domain_modules', []) if vc.string(name) and name.endswith('_physical_continuity.yaml')}
-    ingest_domain = {name for name in ingest.get('domain_modules', []) if vc.string(name) and name.endswith('_physical_continuity.yaml')}
-    req(runtime_domain == ingest_domain, 'DOMAIN_PHYSICAL_LOAD_GRAPH_DRIFT', str(sorted(runtime_domain ^ ingest_domain)))
-    req({path.relative_to(MODEL).as_posix() for path in active_domain_physical_files()} == runtime_domain, 'DOMAIN_PHYSICAL_DISCOVERY_DRIFT', str(sorted(runtime_domain)))
+    runtime_domain = declared_domain_physical_modules(runtime, RUNTIME_MANIFEST)
+    ingest_domain = declared_domain_physical_modules(ingest, INGEST_MANIFEST)
+    req(runtime_domain == ingest_domain, 'DOMAIN_PHYSICAL_LOAD_GRAPH_DRIFT', f'runtime {list(runtime_domain)} != ingest {list(ingest_domain)}')
+    req(tuple(path.relative_to(MODEL).as_posix() for path in active_domain_physical_files()) == runtime_domain, 'DOMAIN_PHYSICAL_DISCOVERY_DRIFT', str(list(runtime_domain)))
     fragments = {
         BASE_PHYSICAL_FILES[0]: ['Every admitted cause, operation, state, constraint, and transition is physical.', 'Metabolics drives biology', 'causal_admission_distinct_from_mechanistic_closure: true', 'no_action_at_a_distance_between_components'],
         BASE_PHYSICAL_FILES[1]: ['exact_intervention_effect_with_partial_route: allowed', 'mechanism_claim_with_partial_route: forbidden', 'metabolism_caused_it'],
