@@ -5,7 +5,8 @@
     "semantic_results_required_for_adoption": true,
     "required_fixture_sets": [
       "generic",
-      "neuroscience"
+      "neuroscience",
+      "evolution"
     ],
     "critical_fixture_failure_tolerance": 0,
     "minimum_independent_runs_per_critical_variant": 3,

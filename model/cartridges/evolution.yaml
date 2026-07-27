@@ -51,43 +51,7 @@ evolution_cartridge:
       bounded shorthand when its generator, conditions, model or measurement procedure,
       uncertainty, and transport scope are recoverable. Vocabulary alone cannot assign
       identity, construct, evidence, or causal status.
-    cue_families:
-      selection:
-        - natural selection
-        - sexual selection
-        - purifying selection
-        - selection pressure
-        - selected for
-      fitness:
-        - fitness
-        - fitness benefit
-        - fitness cost
-        - survival of the fittest
-      adaptation_and_function:
-        - adaptation
-        - adaptive
-        - exaptation
-        - evolved for
-        - function is to
-        - designed for
-      agency:
-        - evolution invented
-        - species wanted
-        - organism tried to
-      historical_relation:
-        - homologous
-        - conserved
-        - ancient
-        - fundamental
-      optimality:
-        - optimal
-        - best possible
-        - perfectly adapted
-      genotype_purpose:
-        - gene for
-        - allele for
-        - genetic program
-        - blueprint
+    examples_ref: model/cartridges/evolution_fixtures.json#evo-surface-vocabulary-inspection-only
 
   evolutionary_change:
     definition: >
@@ -130,10 +94,6 @@ evolution_cartridge:
       A measured composition change does not identify which route generated it.
       Bottlenecks, linkage, clonal interference, and background selection often name
       coupled conditions or products rather than independent causal currencies.
-    defaults:
-      selection: unassigned
-      adaptation: unassigned
-      progress_or_optimization: unassigned
 
   relation_separation:
     required:
@@ -157,6 +117,12 @@ evolution_cartridge:
       and transport record. Closure on one relation cannot transfer to another.
 
   target_generators:
+    identity_scope_rule: >
+      This cartridge creates no domain-wide ceiling on identity closure. Use
+      generated_identity_closed only when the generator has no unresolved boundary,
+      regime, construction, uncertainty, or transport slots; otherwise retain the
+      applicable conditional, constructed, grouping, unresolved, or rejected status.
+
     population_composition_change:
       generator: >
         Population or lineage boundary, material or reproduced unit, composition metric,
@@ -560,6 +526,7 @@ evolution_cartridge:
       constructed quantity, intervention relation, or source-scope result that survives.
 
   terminology_guard:
+    scope: target_identity_causal_and_explanatory_completion
     reject_as_complete_explanation:
       - selection
       - selection_pressure

@@ -1,0 +1,338 @@
+{
+  "schema_version": "v1",
+  "status": "candidate",
+  "fixture_set": "evolution",
+  "purpose": "Critical semantic conformance fixtures for evolutionary target identity, causal route discrimination, historical inference, dependence, and preservation of exact bounded relations.",
+  "fixtures": [
+    {
+      "id": "evolution-selection-data-sensitivity",
+      "critical": true,
+      "mutation_type": "data_sensitivity",
+      "variants": [
+        {
+          "id": "frequency_change_with_open_routes",
+          "input": {
+            "question": "Did environmental regime R select allele A in population P?",
+            "narrative": "Allele A rose from 0.20 to 0.45, demonstrating selection by regime R.",
+            "data": {
+              "design": "observational population time series",
+              "population_boundary": "population P",
+              "measured_change": "allele A rose from 0.20 to 0.45 over ten generations",
+              "regime_measurement": "coarse historical annotation",
+              "drift": "unbounded",
+              "migration": "unbounded",
+              "transmission_distortion": "untested",
+              "linkage_and_demography": "untested"
+            }
+          },
+          "expected": {
+            "relations": {
+              "regime_to_descendant_output": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "descriptive_only",
+                "target_relation": "endogenous_dependency"
+              }
+            },
+            "required_stripped_assertions": ["Allele A rose from 0.20 to 0.45, demonstrating selection by regime R."],
+            "physical_relations": {
+              "regime_to_descendant_output": {
+                "explanatory_scope": "biological",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        },
+        {
+          "id": "controlled_regime_reversal",
+          "input": {
+            "question": "Did environmental regime R change descendant output for allele A in population P?",
+            "narrative": "Regime R selected allele A.",
+            "data": {
+              "design": "controlled experimental evolution",
+              "starting_population": "characterized and shared across conditions",
+              "manipulation": "regime R versus matched control with preregistered reversal",
+              "independent_units": "independent replicate lineages",
+              "outcome": "descendant contribution changes reproducibly and reverses with the regime",
+              "drift_contamination_and_migration": "separately bounded",
+              "internal_molecular_route": "partial"
+            }
+          },
+          "expected": {
+            "relations": {
+              "regime_to_descendant_output": {
+                "causal_disposition": "causal_admitted",
+                "closure_state": "partial",
+                "target_relation": "intervention_to_outcome"
+              }
+            },
+            "required_stripped_assertions": [],
+            "physical_relations": {
+              "regime_to_descendant_output": {
+                "explanatory_scope": "biological",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "evolution-historical-adaptation-data-sensitivity",
+      "critical": true,
+      "mutation_type": "data_sensitivity",
+      "variants": [
+        {
+          "id": "current_utility_story",
+          "input": {
+            "question": "Did trait T historically arise or persist because it produced effect Y under regime R?",
+            "narrative": "Trait T is useful today, conserved, and therefore evolved for Y.",
+            "data": {
+              "current_effect": "controlled present-day perturbation changes Y",
+              "historical_regime": "not independently established",
+              "historical_order": "unresolved",
+              "differential_persistence": "unmeasured",
+              "comparative_support": "conservation only",
+              "alternative_histories": "untested"
+            }
+          },
+          "expected": {
+            "relations": {
+              "trait_history_under_regime": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "descriptive_only",
+                "target_relation": "etiology_or_origin"
+              }
+            },
+            "required_stripped_assertions": ["Trait T is useful today, conserved, and therefore evolved for Y."],
+            "physical_relations": {
+              "trait_history_under_regime": {
+                "explanatory_scope": "cross_scale",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        },
+        {
+          "id": "discriminating_historical_record",
+          "input": {
+            "question": "Did trait T historically persist because it produced effect Y under regime R?",
+            "narrative": "Trait T was an adaptation to regime R.",
+            "data": {
+              "heritable_variation": "reproduced at the claimed phenotype resolution",
+              "historical_regime": "independently established before the lineage change",
+              "differential_persistence": "replicated predictions match descendant contribution",
+              "comparative_support": "phylogenetically controlled and transport-compatible",
+              "alternatives": "drift, correlated selection, constraint, and exaptation discriminated",
+              "subsequent_record": "later methods and disconfirmation searches do not break the route"
+            }
+          },
+          "expected": {
+            "relations": {
+              "trait_history_under_regime": {
+                "causal_disposition": "causal_admitted",
+                "closure_state": "partial",
+                "target_relation": "etiology_or_origin"
+              }
+            },
+            "required_stripped_assertions": [],
+            "physical_relations": {
+              "trait_history_under_regime": {
+                "explanatory_scope": "cross_scale",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "evolution-drift-neutrality-scope-separation",
+      "critical": true,
+      "mutation_type": "scope_separation",
+      "variants": [
+        {
+          "id": "finite_sampling_positive_and_nonsignificance_negative",
+          "input": {
+            "question": "Do these data establish drift or neutrality?",
+            "narrative": "The markers are neutral because selection was not significant.",
+            "data": {
+              "finite_sampling_route": "controlled bottlenecks across independent lineages",
+              "model": "preregistered finite-sampling variance model",
+              "fit": "temporal and distributional predictions match",
+              "measured_fitness_difference": "none detected with limited power",
+              "migration": "bounded",
+              "selection_equivalence_test": "not performed"
+            }
+          },
+          "expected": {
+            "relations": {
+              "finite_sampling_to_composition_change": {
+                "causal_disposition": "causal_admitted",
+                "closure_state": "closed",
+                "target_relation": "endogenous_dependency"
+              },
+              "neutrality_from_nonsignificance": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "descriptive_only",
+                "target_relation": "etiology_or_origin"
+              }
+            },
+            "required_stripped_assertions": ["The markers are neutral because selection was not significant."],
+            "physical_relations": {
+              "finite_sampling_to_composition_change": {
+                "explanatory_scope": "biological",
+                "physical_chain.status": "closed",
+                "physical_chain.metabolic_binding.status": "closed"
+              },
+              "neutrality_from_nonsignificance": {
+                "explanatory_scope": "biological",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "evolution-fitness-identity-separation",
+      "critical": true,
+      "mutation_type": "scope_separation",
+      "variants": [
+        {
+          "id": "formal_composite_and_grouped_quantities",
+          "input": {
+            "question": "What does fitness mean in these sources?",
+            "narrative": "All three studies measure the same underlying fitness.",
+            "data": {
+              "source_one": "invasion fitness from an explicit dynamical model and resident state",
+              "source_two": "a reproducible algorithmic composite index",
+              "source_three": "lifetime reproductive success under a measured population and environment",
+              "translation": "no operational equivalence relation joins the three quantities"
+            }
+          },
+          "expected": {
+            "target_identities": {
+              "invasion_fitness_quantity": {
+                "identity_disposition": "generated_identity_conditional",
+                "generator_type": "equation_or_model_defined_state",
+                "mapped_construct_disposition": "admitted"
+              },
+              "composite_fitness_index": {
+                "identity_disposition": "constructed_measurement_identity",
+                "generator_type": "algorithmic_reconstruction",
+                "mapped_construct_disposition": "admitted"
+              },
+              "broad_fitness_label": {
+                "identity_disposition": "grouping_handle_only",
+                "generator_type": "none_or_unresolved",
+                "mapped_construct_disposition": "grouping_handle_only"
+              }
+            },
+            "relations": {
+              "invasion_fitness_relation": {
+                "causal_disposition": "not_a_causal_question",
+                "closure_state": "descriptive_only",
+                "target_relation": "descriptive_distribution",
+                "construct_relation": "construct_internal"
+              },
+              "composite_fitness_relation": {
+                "causal_disposition": "not_a_causal_question",
+                "closure_state": "descriptive_only",
+                "target_relation": "descriptive_distribution",
+                "construct_relation": "construct_indexed"
+              },
+              "broad_fitness_relation": {
+                "causal_disposition": "not_a_causal_question",
+                "closure_state": "label_dependent",
+                "target_relation": "descriptive_distribution",
+                "construct_relation": "construct_indexed"
+              }
+            },
+            "required_stripped_assertions": ["All three studies measure the same underlying fitness."],
+            "physical_relations": {
+              "invasion_fitness_relation": {
+                "explanatory_scope": "descriptive_noncausal",
+                "physical_chain.status": "not_required",
+                "physical_chain.metabolic_binding.status": "not_required"
+              },
+              "composite_fitness_relation": {
+                "explanatory_scope": "descriptive_noncausal",
+                "physical_chain.status": "not_required",
+                "physical_chain.metabolic_binding.status": "not_required"
+              },
+              "broad_fitness_relation": {
+                "explanatory_scope": "descriptive_noncausal",
+                "physical_chain.status": "not_required",
+                "physical_chain.metabolic_binding.status": "not_required"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "evolution-dependence-scope-separation",
+      "critical": true,
+      "mutation_type": "scope_separation",
+      "variants": [
+        {
+          "id": "phylogeny_and_single_lineage_are_not_independent_counts",
+          "input": {
+            "question": "How much independent evidence supports the evolutionary claims?",
+            "narrative": "Two hundred species and thousands of generations provide overwhelming independent replication.",
+            "data": {
+              "comparative_relation": "measured trait-environment association across species sharing one phylogeny",
+              "phylogenetic_model": "absent",
+              "experimental_relation": "time series from one lineage",
+              "independent_replicate_lineages": "one",
+              "nominal_rows": "large",
+              "causal_alternatives": "open"
+            }
+          },
+          "expected": {
+            "relations": {
+              "cross_species_trait_environment_relation": {
+                "causal_disposition": "causal_unresolved",
+                "closure_state": "source_scale_only",
+                "target_relation": "endogenous_dependency"
+              },
+              "within_lineage_time_series_relation": {
+                "causal_disposition": "not_a_causal_question",
+                "closure_state": "descriptive_only",
+                "target_relation": "descriptive_distribution"
+              },
+              "replicated_regime_effect": {
+                "causal_disposition": "causal_rejected",
+                "closure_state": "descriptive_only",
+                "target_relation": "endogenous_dependency"
+              }
+            },
+            "required_stripped_assertions": ["Two hundred species and thousands of generations provide overwhelming independent replication."],
+            "physical_relations": {
+              "cross_species_trait_environment_relation": {
+                "explanatory_scope": "biological",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              },
+              "within_lineage_time_series_relation": {
+                "explanatory_scope": "descriptive_noncausal",
+                "physical_chain.status": "not_required",
+                "physical_chain.metabolic_binding.status": "not_required"
+              },
+              "replicated_regime_effect": {
+                "explanatory_scope": "biological",
+                "physical_chain.status": "partial",
+                "physical_chain.metabolic_binding.status": "partial"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

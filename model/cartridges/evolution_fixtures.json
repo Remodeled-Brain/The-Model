@@ -97,7 +97,7 @@
       ]
     },
     {
-      "id": "evo-fitness-formal-shortcut-positive-control",
+      "id": "evo-fitness-formal-shortcut-identity-control",
       "mode": "condition",
       "condition": "A paper reports invasion fitness defined by an explicit dynamical model, resident state, mutant type, environment, timescale, and uncertainty.",
       "expected_targets": [
@@ -130,6 +130,44 @@
         "accept fitness as an intrinsic cause",
         "replace it with survival of the fittest",
         "invent a selective regime"
+      ]
+    },
+    {
+      "id": "evo-constructed-and-grouped-quantity-identities",
+      "mode": "condition",
+      "condition": "One source reports a reproducible composite fitness index, several non-equivalent formal and measured fitness quantities under one broad label, and an algorithmically reconstructed optimality index.",
+      "expected_targets": [
+        {"target": "composite_fitness_index", "identity_disposition": "constructed_measurement_identity", "construct_disposition": "admitted", "construct_relation": "construct_indexed", "causal_disposition": "not_a_causal_question", "evidence_role": "descriptive_only"},
+        {"target": "broad_fitness_label", "identity_disposition": "grouping_handle_only", "construct_disposition": "grouping_handle_only", "construct_relation": "construct_indexed", "causal_disposition": "not_a_causal_question", "evidence_role": "non_probative"},
+        {"target": "algorithmic_optimality_index", "identity_disposition": "constructed_measurement_identity", "construct_disposition": "admitted", "construct_relation": "construct_internal", "causal_disposition": "not_a_causal_question", "evidence_role": "descriptive_only"}
+      ],
+      "required": [
+        "preserve each reproducible index at its construction scope",
+        "keep non-equivalent fitness generators separate under the grouping handle",
+        "keep identity disposition separate from relation-level construct dependence"
+      ],
+      "forbidden": [
+        "merge the quantities because they share the word fitness",
+        "treat a constructed index as an intrinsic biological essence",
+        "use identity resolution to erase construct dependence"
+      ]
+    },
+    {
+      "id": "evo-surface-vocabulary-inspection-only",
+      "mode": "condition",
+      "condition": "A source uses selection, fitness, adaptation, homology, conservation, optimality, and gene-for language without supplying operations, measurements, generators, or historical bridges.",
+      "expected_targets": [
+        {"target": "surface_terms_without_recoverable_relations", "identity_disposition": "identity_unresolved", "construct_disposition": "underspecified", "causal_disposition": "causal_unresolved", "evidence_role": "non_probative"}
+      ],
+      "required": [
+        "use the terms only to locate the relations that require reconstruction",
+        "inspect whether any bounded generator or exact observation survives label removal",
+        "leave identity and causality unresolved when no operation is recoverable"
+      ],
+      "forbidden": [
+        "assign a verdict from a keyword",
+        "treat the vocabulary as a target-identity trigger list",
+        "reject a separately generated exact relation because it uses conventional shorthand"
       ]
     },
     {
@@ -330,7 +368,7 @@
       "required": [
         "model shared ancestry or justify independence",
         "qualify information precision and transport by phylogenetic dependence",
-        "preserve measured species data while limiting causal claims"
+        "preserve the measured cross-species relation as segment support while independence and causal attribution remain open"
       ],
       "forbidden": [
         "use nominal species count as independent sample size",
@@ -348,8 +386,8 @@
       ],
       "required": [
         "treat replicate lineage or population as the relevant independent unit",
-        "preserve the within-lineage trajectory",
-        "reject precision and replication claims based on repeated measurements alone"
+        "preserve the within-lineage trajectory as descriptive evidence",
+        "reject the separate replicated-regime claim because repeated measurements do not create independent lineages"
       ],
       "forbidden": [
         "count generations or assays as independent populations",

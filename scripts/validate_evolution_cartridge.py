@@ -10,8 +10,14 @@ MODEL = ROOT / "model"
 EVOLUTION = MODEL / "cartridges" / "evolution.yaml"
 PHYSICAL = MODEL / "cartridges" / "evolution_physical_continuity.yaml"
 FIXTURES = MODEL / "cartridges" / "evolution_fixtures.json"
+SEMANTIC_FIXTURES = ROOT / "conformance" / "fixtures" / "evolution.json"
 RUNTIME = MODEL / "manifests" / "runtime.json"
 INGEST = MODEL / "manifests" / "ingest.json"
+GENERIC_FIXTURES = (
+    MODEL / "runtime" / "fixtures.json",
+    MODEL / "ingest" / "fixtures.json",
+    MODEL / "kernel" / "evidence_admission_fixtures.json",
+)
 
 MODULES = {
     "cartridges/evolution.yaml",
@@ -29,13 +35,16 @@ IDENTITY = {
 CONSTRUCT = {"admitted", "grouping_handle_only", "premise_rejected", "underspecified"}
 CAUSAL = {"causal_admitted", "causal_rejected", "causal_unresolved", "not_a_causal_question"}
 ROLES = {"premise_breaking", "route_closing", "route_discriminating", "segment_supporting", "descriptive_only", "non_probative"}
+CONSTRUCT_RELATIONS = {"construct_independent", "construct_indexed", "construct_internal"}
 CRITICAL_FIXTURES = {
     "evo-descriptive-frequency-change",
     "evo-selection-attribution-with-open-alternatives",
     "evo-manipulated-regime-selection-positive-control",
     "evo-drift-positive-control",
     "evo-neutrality-from-nonsignificance",
-    "evo-fitness-formal-shortcut-positive-control",
+    "evo-fitness-formal-shortcut-identity-control",
+    "evo-constructed-and-grouped-quantity-identities",
+    "evo-surface-vocabulary-inspection-only",
     "evo-current-role-origin-separation",
     "evo-historical-adaptation-positive-control",
     "evo-conservation-descriptive-only",
@@ -48,6 +57,30 @@ CRITICAL_FIXTURES = {
     "evo-optimum-model-positive-control",
     "evo-phylogenetic-pseudoreplication",
     "evo-lineage-pseudoreplication",
+}
+EXPECTED_CAUSAL_CONTROLS = {
+    "evo-manipulated-regime-selection-positive-control": "causal_admitted",
+    "evo-drift-positive-control": "causal_admitted",
+    "evo-historical-adaptation-positive-control": "causal_admitted",
+    "evo-selection-attribution-with-open-alternatives": "causal_rejected",
+    "evo-neutrality-from-nonsignificance": "causal_rejected",
+}
+SEMANTIC_CRITICAL_FIXTURES = {
+    "evolution-selection-data-sensitivity",
+    "evolution-historical-adaptation-data-sensitivity",
+    "evolution-drift-neutrality-scope-separation",
+    "evolution-fitness-identity-separation",
+    "evolution-dependence-scope-separation",
+}
+DOMAIN_LEAK_TERMS = {
+    "natural selection",
+    "fitness",
+    "allele",
+    "homology",
+    "phylogeny",
+    "genotype",
+    "gene flow",
+    "adaptation",
 }
 
 
@@ -109,8 +142,8 @@ def validate_fixtures() -> None:
     vr.require(data.get("schema_version") == "v1", "evolution fixtures must use schema v1")
     vr.require(isinstance(fixtures, list) and fixtures, "evolution fixtures missing")
     seen: set[str] = set()
-    found_positive = False
-    found_negative = False
+    identities_seen: set[str] = set()
+    causal_by_fixture: dict[str, set[str]] = {}
     for fixture in fixtures:
         vr.require(isinstance(fixture, dict), "evolution fixture must be an object")
         fixture_id = fixture.get("id")
@@ -140,6 +173,12 @@ def validate_fixtures() -> None:
             vr.require(construct in CONSTRUCT, f"{fixture_id}.{name}: invalid construct disposition {construct}")
             vr.require(causal in CAUSAL, f"{fixture_id}.{name}: invalid causal disposition {causal}")
             vr.require(role in ROLES, f"{fixture_id}.{name}: invalid evidence role {role}")
+            construct_relation = target.get("construct_relation")
+            if construct_relation is not None:
+                vr.require(
+                    construct_relation in CONSTRUCT_RELATIONS,
+                    f"{fixture_id}.{name}: invalid construct relation {construct_relation}",
+                )
             expected_construct = {
                 "generated_identity_closed": "admitted",
                 "generated_identity_conditional": "admitted",
@@ -149,12 +188,48 @@ def validate_fixtures() -> None:
                 "premise_rejected": "premise_rejected",
             }[identity]
             vr.require(construct == expected_construct, f"{fixture_id}.{name}: identity/construct mapping mismatch")
-            found_positive |= causal == "causal_admitted"
-            found_negative |= causal == "causal_rejected"
+            identities_seen.add(identity)
+            causal_by_fixture.setdefault(fixture_id, set()).add(causal)
     missing = CRITICAL_FIXTURES - seen
     vr.require(not missing, f"evolution fixtures missing critical cases: {sorted(missing)}")
-    vr.require(found_positive, "evolution fixtures need a positive causal control")
-    vr.require(found_negative, "evolution fixtures need a causal failure control")
+    required_identities = {
+        "generated_identity_conditional",
+        "constructed_measurement_identity",
+        "grouping_handle_only",
+        "identity_unresolved",
+        "premise_rejected",
+    }
+    vr.require(
+        required_identities <= identities_seen,
+        f"evolution fixture identity branches missing: {sorted(required_identities - identities_seen)}",
+    )
+    for fixture_id, disposition in EXPECTED_CAUSAL_CONTROLS.items():
+        vr.require(
+            disposition in causal_by_fixture.get(fixture_id, set()),
+            f"{fixture_id}: expected causal control {disposition} missing",
+        )
+
+
+def validate_semantic_fixtures() -> None:
+    data = vr.load_json(SEMANTIC_FIXTURES)
+    vr.require(data.get("fixture_set") == "evolution", "evolution semantic fixture set missing")
+    fixtures = data.get("fixtures")
+    vr.require(isinstance(fixtures, list) and fixtures, "evolution semantic fixtures missing")
+    ids = {item.get("id") for item in fixtures if isinstance(item, dict)}
+    missing = SEMANTIC_CRITICAL_FIXTURES - ids
+    vr.require(not missing, f"evolution semantic fixtures missing critical cases: {sorted(missing)}")
+    for fixture in fixtures:
+        vr.require(fixture.get("critical") is True, f"{fixture.get('id')}: evolution semantic fixture must be critical")
+
+
+def validate_generic_domain_separation() -> None:
+    for path in GENERIC_FIXTURES:
+        text = path.read_text(encoding="utf-8").casefold()
+        leaked = sorted(term for term in DOMAIN_LEAK_TERMS if term in text)
+        vr.require(
+            not leaked,
+            f"evolution terms leaked into generic fixtures {path.relative_to(ROOT)}: {leaked}",
+        )
 
 
 if __name__ == "__main__":
@@ -162,6 +237,8 @@ if __name__ == "__main__":
         validate_manifests()
         validate_cartridge_text()
         validate_fixtures()
+        validate_semantic_fixtures()
+        validate_generic_domain_separation()
     except (vr.ValidationError, OSError, json.JSONDecodeError) as exc:
         raise SystemExit(f"EVOLUTION CARTRIDGE VALIDATION FAILED: {exc}") from exc
     print("evolution cartridge validation passed")
