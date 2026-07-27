@@ -1,0 +1,1 @@
+- **[candidate]** Discover conformance fixture sets and active cartridge and physical-contract bundles generically so domain cartridges register data without adding domain-name branches to shared runners or validators (OpenAI, 2026-07-26)
